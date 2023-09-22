@@ -233,7 +233,6 @@
 				9749D1AAFAA3EF9512348370 /* Pods-RunnerTests.profile-prod.xcconfig */,
 				79A037C1E9E83E5C28F53E9A /* Pods-RunnerTests.release-prod.xcconfig */,
 			);
-			name = Pods;
 			path = Pods;
 			sourceTree = "<group>";
 		};
@@ -881,6 +880,7 @@
 			baseConfigurationReference = 03FB70871548C8050751F8F9 /* Pods-Runner.debug-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -894,6 +894,7 @@
 			baseConfigurationReference = 7773CC1196AD40ECF5F4AF1E /* Pods-Runner.profile-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -907,6 +908,7 @@
 			baseConfigurationReference = 3B061145B30603D53FC4E6F3 /* Pods-Runner.release-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;

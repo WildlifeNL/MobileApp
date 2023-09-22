@@ -12,9 +12,9 @@ flavors:
       name: "WildlifeNL Beta"
       icon: "assets/icon/staging.png"
     android:
-      applicationId: "nl.wildlifeNL.staging"
+      applicationId: "nl.wildlifeNL"
     ios:
-      bundleId: "nl.wildlifeNL.staging"
+      bundleId: "nl.wildlifeNL"
   prod:
     app:
       name: "WildlifeNL"
