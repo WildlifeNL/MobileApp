@@ -1,4 +1,4 @@
-package com.example.wildlife_nl_app
+package nl.wildlifeNL
 
 import io.flutter.embedding.android.FlutterActivity
 
