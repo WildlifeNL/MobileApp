@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
+import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 
 class BottomNavigation extends StatefulWidget {
@@ -24,7 +25,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           icon: Icon(
             AppIcons.home_outlined,
             color: selectedIndex == 0
-                ? Colors.green
+                ? AppColors.primary
                 : Colors.black.withOpacity(0.6),
           ),
           label: "Home",
@@ -36,7 +37,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           icon: Icon(
             AppIcons.deer,
             color: selectedIndex == 1
-                ? Colors.green
+                ? AppColors.primary
                 : Colors.black.withOpacity(0.6),
           ),
           label: "Activity",
@@ -50,14 +51,15 @@ class _BottomNavigationState extends State<BottomNavigation> {
             child: Container(
               width: 52,
               height: 52,
-              decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.green,
-                  border: Border.fromBorderSide(BorderSide(
-                    color: Colors.white,
-                    width: 8,
-                    strokeAlign: BorderSide.strokeAlignOutside,
-                  ))),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: AppColors.primary,
+                border: Border.all(
+                  color: Colors.white,
+                  width: 8,
+                  strokeAlign: BorderSide.strokeAlignOutside,
+                ),
+              ),
               child: const Icon(
                 AppIcons.map,
                 size: 30,
@@ -74,7 +76,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           icon: Icon(
             AppIcons.project_outlined,
             color: selectedIndex == 3
-                ? Colors.green
+                ? AppColors.primary
                 : Colors.black.withOpacity(0.6),
           ),
           label: "Project",
@@ -86,7 +88,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           icon: Icon(
             AppIcons.profile_outlined,
             color: selectedIndex == 4
-                ? Colors.green
+                ? AppColors.primary
                 : Colors.black.withOpacity(0.6),
           ),
           label: "Profile",
@@ -97,6 +99,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
     return Scaffold(
       body: items[selectedIndex].$2,
+      backgroundColor: AppColors.neutral_50,
       bottomNavigationBar: Transform.translate(
         offset: Offset(0, Platform.isAndroid ? 0 : 34),
         child: Stack(
