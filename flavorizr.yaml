@@ -2,7 +2,7 @@ flavors:
   dev:
     app:
       name: "WildlifeNL Dev"
-      icon: "assets/icon/dev.png"
+      icon: "assets/app-icon/dev.png"
     android:
       applicationId: "nl.wildlifeNL.dev"
     ios:
@@ -10,7 +10,7 @@ flavors:
   staging:
     app:
       name: "WildlifeNL Beta"
-      icon: "assets/icon/staging.png"
+      icon: "assets/app-icon/staging.png"
     android:
       applicationId: "nl.wildlifeNL"
     ios:
@@ -18,7 +18,7 @@ flavors:
   prod:
     app:
       name: "WildlifeNL"
-      icon: "assets/icon/prod.png"
+      icon: "assets/app-icon/prod.png"
     android:
       applicationId: "nl.wildlifeNL"
     ios:

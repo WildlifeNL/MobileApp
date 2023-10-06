@@ -18,7 +18,7 @@ class GetExampleById extends _$GetExampleById {
 
     switch (response) {
       case Ok():
-        ref.cache(const Duration(minutes: 1));
+        ref.cache(const Duration(seconds: 5));
       case Err():
         developer.log(response.unwrapErr());
     }

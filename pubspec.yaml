@@ -42,6 +42,8 @@ dependencies:
   http: ^1.1.0
   option_result: ^3.1.3
   json_annotation: ^4.8.1
+  material_symbols_icons: ^4.2668.0
+  flutter_svg: ^2.0.7
 
 dev_dependencies:
   flutter_test:
@@ -49,7 +51,7 @@ dev_dependencies:
 
   flutter_lints: ^2.0.0
   build_runner: ^2.4.6
-  riverpod_generator: ^2.3.2
+  riverpod_generator: ^3.0.0-dev.3
   custom_lint: ^0.5.3
   riverpod_lint: ^2.1.0
   json_serializable: ^6.7.1
@@ -58,3 +60,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  assets:
+    - assets/
+
+  fonts:
+    - family: AppIcons
+      fonts:
+        - asset: assets/fonts/AppIcons.ttf
