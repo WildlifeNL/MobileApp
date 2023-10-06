@@ -18,33 +18,8 @@ class App extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           useMaterial3: true,
         ),
-        home: _flavorBanner(
-          child: const BottomNavigation(),
-          show: kDebugMode,
-        ),
+        home: const BottomNavigation(),
       ),
     );
   }
-
-  Widget _flavorBanner({
-    required Widget child,
-    bool show = true,
-  }) =>
-      show
-          ? Banner(
-              location: BannerLocation.topStart,
-              message: F.nameHumanized,
-              color: F.color,
-              textStyle: const TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.w700,
-                fontSize: 12.0,
-                letterSpacing: 1.0,
-              ),
-              textDirection: TextDirection.ltr,
-              child: child,
-            )
-          : Container(
-              child: child,
-            );
 }
