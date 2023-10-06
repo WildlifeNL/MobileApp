@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -14,19 +16,10 @@ class BottomNavigation extends StatefulWidget {
 class _BottomNavigationState extends State<BottomNavigation> {
   int selectedIndex = 0;
 
-  final List<Widget> children = [];
-  final List<NavigationDestination> items = [];
-
-  _addItem(NavigationDestination item, Widget child) {
-    items.add(item);
-    children.add(child);
-  }
-
   @override
   Widget build(BuildContext context) {
-    children.clear();
-    items.clear();
-    _addItem(
+    var items = [
+      (
         NavigationDestination(
           icon: Icon(
             AppIcons.home_outlined,
@@ -36,8 +29,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           label: "Home",
         ),
-        const ExamplePage());
-    _addItem(
+        const ExamplePage(),
+      ),
+      (
         NavigationDestination(
           icon: Icon(
             AppIcons.deer,
@@ -47,8 +41,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           label: "Activity",
         ),
-        const ExamplePage());
-    _addItem(
+        const ExamplePage(),
+      ),
+      (
         NavigationDestination(
           icon: Padding(
             padding: const EdgeInsets.only(bottom: 10),
@@ -72,8 +67,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           label: "",
         ),
-        const ExamplePage());
-    _addItem(
+        const ExamplePage(),
+      ),
+      (
         NavigationDestination(
           icon: Icon(
             AppIcons.project_outlined,
@@ -83,8 +79,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           label: "Project",
         ),
-        const ExamplePage());
-    _addItem(
+        const ExamplePage(),
+      ),
+      (
         NavigationDestination(
           icon: Icon(
             AppIcons.profile_outlined,
@@ -94,58 +91,100 @@ class _BottomNavigationState extends State<BottomNavigation> {
           ),
           label: "Profile",
         ),
-        const ExamplePage());
+        const ExamplePage(),
+      ),
+    ];
 
     return Scaffold(
-      body: children[selectedIndex],
-      bottomNavigationBar: Stack(
-        children: [
-          Container(
-            height: 100,
-            width: double.maxFinite,
-            decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: const BorderRadiusDirectional.vertical(
-                  top: Radius.circular(32),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    offset: const Offset(0, -5),
-                    blurRadius: 35,
-                    spreadRadius: 0,
-                  ),
-                ]),
-            foregroundDecoration: const BoxDecoration(
-              borderRadius: BorderRadiusDirectional.vertical(
-                top: Radius.circular(32),
-              ),
+      body: items[selectedIndex].$2,
+      bottomNavigationBar: Transform.translate(
+        offset: Offset(0, Platform.isAndroid ? 0 : 34),
+        child: Stack(
+          children: [
+            const CustomNavBarBackground(),
+            CustomNavBarForeground(
+              onDestinationSelected: (index) {
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
+              items: items.map((x) => x.$1).toList(),
             ),
-            clipBehavior: Clip.antiAlias,
-            child: null,
-          ),
-          Theme(
-            data: Theme.of(context).copyWith(splashColor: Colors.transparent),
-            child: Padding(
-              padding: const EdgeInsets.only(bottom: 20.0),
-              child: NavigationBar(
-                animationDuration: Duration.zero,
-                height: 80,
-                indicatorColor: Colors.transparent,
-                backgroundColor: Colors.transparent,
-                surfaceTintColor: Colors.transparent,
-                destinations: items,
-                selectedIndex: selectedIndex,
-                onDestinationSelected: (index) {
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                },
-              ),
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
+    );
+  }
+}
+
+class CustomNavBarForeground extends StatefulWidget {
+  const CustomNavBarForeground({
+    super.key,
+    required this.items,
+    required this.onDestinationSelected,
+  });
+
+  final List<NavigationDestination> items;
+
+  final Function(int)? onDestinationSelected;
+
+  @override
+  State<CustomNavBarForeground> createState() => _CustomNavBarForegroundState();
+}
+
+class _CustomNavBarForegroundState extends State<CustomNavBarForeground> {
+  int selectedIndex = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Theme(
+      data: Theme.of(context).copyWith(splashColor: Colors.transparent),
+      child: Transform(
+        transform: Transform.translate(offset: const Offset(0, -10)).transform,
+        child: NavigationBar(
+          animationDuration: Duration.zero,
+          height: 100,
+          indicatorColor: Colors.transparent,
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          destinations: widget.items,
+          selectedIndex: selectedIndex,
+          onDestinationSelected: widget.onDestinationSelected,
+        ),
+      ),
+    );
+  }
+}
+
+class CustomNavBarBackground extends StatelessWidget {
+  const CustomNavBarBackground({
+    super.key,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 100,
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadiusDirectional.vertical(
+            top: Radius.circular(32),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.2),
+              offset: const Offset(0, -5),
+              blurRadius: 35,
+              spreadRadius: 0,
+            ),
+          ]),
+      foregroundDecoration: const BoxDecoration(
+        borderRadius: BorderRadiusDirectional.vertical(
+          top: Radius.circular(32),
+        ),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: null,
     );
   }
 }
