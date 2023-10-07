@@ -14,31 +14,37 @@ class BottomNavigation extends StatefulWidget {
   State<BottomNavigation> createState() => _BottomNavigationState();
 }
 
-class _BottomNavigationState extends State<BottomNavigation> {
+class _BottomNavigationState extends State<BottomNavigation>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    value: 1,
+    lowerBound: 0,
+    upperBound: 1,
+    duration: const Duration(milliseconds: 175),
+    vsync: this,
+  );
+
+  final double shadow = 1;
+  final double animationIntensity = 0.7;
+
   int selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     var items = [
       (
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(
             AppIcons.home_outlined,
-            color: selectedIndex == 0
-                ? AppColors.primary
-                : Colors.black.withOpacity(0.6),
           ),
           label: "Home",
         ),
         const ExamplePage(),
       ),
       (
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(
             AppIcons.deer,
-            color: selectedIndex == 1
-                ? AppColors.primary
-                : Colors.black.withOpacity(0.6),
           ),
           label: "Activity",
         ),
@@ -46,50 +52,72 @@ class _BottomNavigationState extends State<BottomNavigation> {
       ),
       (
         NavigationDestination(
-          icon: Padding(
-            padding: const EdgeInsets.only(bottom: 10),
-            child: Container(
-              width: 52,
-              height: 52,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: AppColors.primary,
-                border: Border.all(
-                  color: Colors.white,
-                  width: 8,
-                  strokeAlign: BorderSide.strokeAlignOutside,
-                ),
-              ),
-              child: const Icon(
-                AppIcons.map,
-                size: 30,
-                color: Colors.white,
-              ),
-            ),
-          ),
+          icon: AnimatedBuilder(
+              animation: _controller,
+              builder: (context, snapshot) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: Colors.white,
+                        width: 8 +
+                            2 * animationIntensity -
+                            2 * _controller.value * animationIntensity,
+                        strokeAlign: BorderSide.strokeAlignOutside,
+                      ),
+                    ),
+                    child: Container(
+                      width: 52 -
+                          4 * animationIntensity +
+                          4 * _controller.value * animationIntensity,
+                      height: 52 -
+                          4 * animationIntensity +
+                          4 * _controller.value * animationIntensity,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary,
+                        boxShadow: [
+                          BoxShadow(
+                              //color: Colors.black.withOpacity(0.1 + _controller.value * 0.1),
+                              color: Color.fromRGBO(
+                                  190,
+                                  213,
+                                  88,
+                                  0.25 * shadow +
+                                      _controller.value * 0.25 * shadow),
+                              offset: const Offset(0, 4),
+                              blurRadius: 20,
+                              spreadRadius: 0)
+                        ],
+                      ),
+                      child: const Icon(
+                        AppIcons.map,
+                        size: 30,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                );
+              }),
           label: "",
         ),
         const ExamplePage(),
       ),
       (
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(
             AppIcons.project_outlined,
-            color: selectedIndex == 3
-                ? AppColors.primary
-                : Colors.black.withOpacity(0.6),
           ),
           label: "Project",
         ),
         const ExamplePage(),
       ),
       (
-        NavigationDestination(
+        const NavigationDestination(
           icon: Icon(
             AppIcons.profile_outlined,
-            color: selectedIndex == 4
-                ? AppColors.primary
-                : Colors.black.withOpacity(0.6),
           ),
           label: "Profile",
         ),
@@ -106,7 +134,14 @@ class _BottomNavigationState extends State<BottomNavigation> {
           children: [
             const CustomNavBarBackground(),
             CustomNavBarForeground(
+              selectedIndex: selectedIndex,
               onDestinationSelected: (index) {
+                Future.delayed(Duration.zero, () async {
+                  if (index == 2) {
+                    await _controller.animateTo(0, curve: Curves.easeInCubic);
+                    await _controller.animateBack(1, curve: Curves.easeInCubic);
+                  }
+                });
                 setState(() {
                   selectedIndex = index;
                 });
@@ -125,19 +160,20 @@ class CustomNavBarForeground extends StatefulWidget {
     super.key,
     required this.items,
     required this.onDestinationSelected,
+    required this.selectedIndex,
   });
 
   final List<NavigationDestination> items;
 
   final Function(int)? onDestinationSelected;
 
+  final int selectedIndex;
+
   @override
   State<CustomNavBarForeground> createState() => _CustomNavBarForegroundState();
 }
 
 class _CustomNavBarForegroundState extends State<CustomNavBarForeground> {
-  int selectedIndex = 0;
-
   @override
   Widget build(BuildContext context) {
     return Theme(
@@ -146,13 +182,14 @@ class _CustomNavBarForegroundState extends State<CustomNavBarForeground> {
         transform: Transform.translate(offset: const Offset(0, -10)).transform,
         child: NavigationBar(
           animationDuration: Duration.zero,
-          height: 100,
+          height: 92,
           indicatorColor: Colors.transparent,
           backgroundColor: Colors.transparent,
           surfaceTintColor: Colors.transparent,
           destinations: widget.items,
-          selectedIndex: selectedIndex,
+          selectedIndex: widget.selectedIndex,
           onDestinationSelected: widget.onDestinationSelected,
+          labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         ),
       ),
     );
