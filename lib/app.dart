@@ -19,16 +19,20 @@ class App extends StatelessWidget {
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
           navigationBarTheme: NavigationBarThemeData(
             iconTheme: MaterialStateProperty.resolveWith((state) {
-              if(state.contains(MaterialState.selected)){
+              if (state.contains(MaterialState.selected)) {
                 return const IconThemeData(color: AppColors.primary);
               }
-                return IconThemeData(color: Colors.black.withOpacity(0.7));
+              return IconThemeData(color: Colors.black.withOpacity(0.7));
             }),
             labelTextStyle: MaterialStateProperty.resolveWith((state) {
               if (state.contains(MaterialState.selected)) {
-                return const TextStyle(color: AppColors.primary, fontSize: 12, height: 0.7);
+                return const TextStyle(
+                    color: AppColors.primary, fontSize: 12, height: 0.7);
               }
-              return TextStyle(color: Colors.black.withOpacity(0.7), fontSize: 12, height: 0.7);
+              return TextStyle(
+                  color: Colors.black.withOpacity(0.7),
+                  fontSize: 12,
+                  height: 0.7);
             }),
           ),
           useMaterial3: true,
