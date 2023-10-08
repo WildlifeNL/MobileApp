@@ -25,7 +25,7 @@ class ActivityItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final curvedAnimation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+    final curvedAnimation = CurvedAnimation(parent: animation, curve: Easing.standard, reverseCurve: Easing.standardAccelerate);
 
     return FadeTransition(
       opacity: Tween<double>(
@@ -145,8 +145,7 @@ class ActivityItemDescription extends StatefulWidget {
       _ActivityItemDescriptionState();
 }
 
-class _ActivityItemDescriptionState extends State<ActivityItemDescription>
-    with TickerProviderStateMixin {
+class _ActivityItemDescriptionState extends State<ActivityItemDescription> {
   var expanded = false;
 
   @override
@@ -174,6 +173,9 @@ class _ActivityItemDescriptionState extends State<ActivityItemDescription>
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 AnimatedCrossFade(
+                  firstCurve: Easing.standard,
+                  secondCurve: Easing.standard,
+                  sizeCurve: Easing.standard,
                   secondChild: GestureDetector(
                     onTap: () {
                       setState(() {

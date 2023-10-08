@@ -278,7 +278,6 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
 
   void handleChanges(List oldList, List newList, List activitiesList) {
     final state = animatedListKey.currentState!;
-
     for (var value in activitiesList.reversed) {
       var isInOld = oldList.contains(value);
       var isInNew = newList.contains(value);
@@ -288,10 +287,11 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         state.removeItem(
           index,
           (context, animation) => renderItem(oldList, index, animation),
-          duration: Duration(milliseconds: 450),
+          duration: const Duration(milliseconds: 300),
         );
       }
     }
+
     for (var value in activitiesList) {
       var isInOld = oldList.contains(value);
       var isInNew = newList.contains(value);
