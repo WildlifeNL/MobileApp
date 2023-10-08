@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 
@@ -26,7 +27,8 @@ class ActivityItemCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final curvedAnimation = CurvedAnimation(parent: animation, curve: Easing.standard, reverseCurve: Easing.standardAccelerate);
-
+    final formatter = intl.DateFormat.yMd().add_jm();
+    
     return FadeTransition(
       opacity: Tween<double>(
         begin: 0,
@@ -105,7 +107,7 @@ class ActivityItemCard extends ConsumerWidget {
                       Flexible(
                         fit: FlexFit.tight,
                         child: Text(
-                          date.toString().substring(0, 16),
+                          formatter.format(date),
                           textAlign: TextAlign.end,
                           style: const TextStyle(
                             color: AppColors.neutral_400,

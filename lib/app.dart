@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/nav.dart';
 
-import 'flavors.dart';
 import 'utilities/app_colors.dart';
 
 class App extends StatelessWidget {
@@ -13,6 +14,16 @@ class App extends StatelessWidget {
   Widget build(BuildContext context) {
     return ProviderScope(
       child: MaterialApp(
+        localizationsDelegates: const [
+          S.delegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: const [
+          Locale('en'), // English
+          Locale('nl'), // Dutch
+        ],
         debugShowCheckedModeBanner: false,
         title: "WildlifeNL",
         theme: ThemeData(

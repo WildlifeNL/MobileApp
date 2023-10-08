@@ -30,6 +30,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.6
   permission_handler: ^11.0.1
@@ -47,6 +49,7 @@ dependencies:
   expandable_text: ^2.3.0
   auto_animated: ^3.2.0
   uuid: ^3.0.7
+  intl: any
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +66,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  generate: true
 
   assets:
     - assets/
@@ -71,3 +75,5 @@ flutter:
     - family: AppIcons
       fonts:
         - asset: assets/fonts/AppIcons.ttf
+flutter_intl:
+  enabled: true

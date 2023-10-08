@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/pages/activity.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -33,20 +34,20 @@ class _BottomNavigationState extends State<BottomNavigation>
   Widget build(BuildContext context) {
     var items = [
       (
-        const NavigationDestination(
-          icon: Icon(
+        NavigationDestination(
+          icon: const Icon(
             AppIcons.home_outlined,
           ),
-          label: "Home",
+          label: S.of(context).tabHome,
         ),
         const ExamplePage(),
       ),
       (
-        const NavigationDestination(
-          icon: Icon(
+        NavigationDestination(
+          icon: const Icon(
             AppIcons.deer,
           ),
-          label: "Activity",
+          label: S.of(context).tabActivity,
         ),
         const ActivityPage(),
       ),
@@ -59,20 +60,20 @@ class _BottomNavigationState extends State<BottomNavigation>
         const ExamplePage(),
       ),
       (
-        const NavigationDestination(
-          icon: Icon(
+        NavigationDestination(
+          icon: const Icon(
             AppIcons.project_outlined,
           ),
-          label: "Project",
+          label: S.of(context).tabProject,
         ),
         const ExamplePage(),
       ),
       (
-        const NavigationDestination(
-          icon: Icon(
+        NavigationDestination(
+          icon: const Icon(
             AppIcons.profile_outlined,
           ),
-          label: "Profile",
+          label: S.of(context).tabProfile,
         ),
         const ExamplePage(),
       ),

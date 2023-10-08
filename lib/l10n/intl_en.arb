@@ -1,0 +1,9 @@
+{
+  "filterActivitiesAll": "All",
+  "filterActivitiesSightings": "Sightings",
+  "filterActivitiesIncidents": "Incidents",
+  "tabHome": "Home",
+  "tabActivity": "Activity",
+  "tabProject": "Project",
+  "tabProfile": "Profile"
+}

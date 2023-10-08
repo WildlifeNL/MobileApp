@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 
 enum ActivityFilter {
@@ -31,7 +32,7 @@ class _ActivityFilterChipsState extends State<ActivityFilterChips> {
           children: [
             ActivityFilterChip(
                 selected: filter == ActivityFilter.all,
-                title: "All",
+                title: S.of(context).filterActivitiesAll,
                 onSelected: (_) {
                   if (filter == ActivityFilter.all) return;
 
@@ -45,7 +46,7 @@ class _ActivityFilterChipsState extends State<ActivityFilterChips> {
             ),
             ActivityFilterChip(
                 selected: filter == ActivityFilter.sightings,
-                title: "Sightings",
+                title: S.of(context).filterActivitiesSightings,
                 onSelected: (_) {
                   if (filter == ActivityFilter.sightings) return;
 
@@ -59,7 +60,7 @@ class _ActivityFilterChipsState extends State<ActivityFilterChips> {
             ),
             ActivityFilterChip(
                 selected: filter == ActivityFilter.incidents,
-                title: "Incident",
+                title: S.of(context).filterActivitiesIncidents,
                 onSelected: (_) {
                   if (filter == ActivityFilter.incidents) return;
 
