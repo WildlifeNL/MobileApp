@@ -180,14 +180,6 @@ class ActivityPage extends ConsumerStatefulWidget {
 class _ActivityPageState extends ConsumerState<ActivityPage> {
   var currentFilter = ActivityFilter.all;
 
-  late ScrollController _controller;
-
-  @override
-  void initState() {
-    _controller = ScrollController();
-    super.initState();
-  }
-
   List<dynamic> filterList(List<dynamic> activities, ActivityFilter filter) {
     return activities
         .where((element) => filter == ActivityFilter.all
@@ -237,20 +229,17 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
           ref.invalidate(activitiesProvider);
           var value = await ref.read(activitiesProvider.future);
 
-          var allActivities = value.followedBy(activitiesList).toList();
           var allUniqueActivities = [];
-
-          for (var activity in allActivities) {
+          for (var activity in value.followedBy(activitiesList).toList()) {
             if(!allUniqueActivities.contains(activity)){
               allUniqueActivities.add(activity);
             }
           }
 
-          handleChanges(filteredList, value, allUniqueActivities);
+          handleChanges(filteredList, filterList(value, currentFilter), allUniqueActivities);
           setState(() {});
         },
         child: CustomScrollView(
-          controller: _controller,
           slivers: [
             SliverPadding(
               padding: const EdgeInsets.only(top: 25),
