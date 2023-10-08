@@ -11,154 +11,153 @@ import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/widgets/activity_item_card.dart';
 
+import 'dart:developer' as developer;
+
 import '../widgets/activity_filter_chips.dart';
 
 part "activity.g.dart";
+
+var allItems = [
+  SightingActivityItem(
+    animal: "Deer",
+    animalCount: 1,
+    location: "Eindhoven",
+    date: DateTime.now()
+        .subtract(Duration(days: 1, hours: 3, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+    animal: "Wolf",
+    title: "Property damage",
+    date: DateTime.now()
+        .subtract(Duration(days: 1, hours: 5, minutes: random.nextInt(60))),
+    description: "The animal destroyed several fences",
+  ),
+  IncidentActivityItem(
+    animal: "Fox",
+    title: "Aggressive behaviour",
+    date: DateTime.now()
+        .subtract(Duration(days: 1, hours: 8, minutes: random.nextInt(60))),
+    description:
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+  ),
+  SightingActivityItem(
+    animal: "Deer",
+    animalCount: 3,
+    location: "Amsterdam",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+    animal: "Stoat",
+    title: "Property damage",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 4, minutes: random.nextInt(60))),
+    description: "The animal destroyed the cables inside my car",
+  ),
+  SightingActivityItem(
+    animal: "Fox",
+    animalCount: 1,
+    location: "Heerlen",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Hare",
+    animalCount: 9,
+    location: "Valkenswaard",
+    date: DateTime.now()
+        .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+      animal: "Otter",
+      title: "Aggressive behaviour",
+      date: DateTime.now()
+          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+      description: "Dit is een uitleg over dit incident"),
+  SightingActivityItem(
+    animal: "Wild horse",
+    animalCount: 5,
+    location: "Veluwe",
+    date: DateTime.now()
+        .subtract(Duration(days: 11, hours: 3, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Deer",
+    animalCount: 3,
+    location: "Amsterdam",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Fox",
+    animalCount: 1,
+    location: "Heerlen",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Hare",
+    animalCount: 9,
+    location: "Valkenswaard",
+    date: DateTime.now()
+        .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+      animal: "Otter",
+      title: "Aggressive behaviour",
+      date: DateTime.now()
+          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+      description: "Dit is een uitleg over dit incident"),
+  SightingActivityItem(
+    animal: "Fox",
+    animalCount: 1,
+    location: "Heerlen",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Hare",
+    animalCount: 9,
+    location: "Valkenswaard",
+    date: DateTime.now()
+        .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+      animal: "Otter",
+      title: "Aggressive behaviour",
+      date: DateTime.now()
+          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+      description: "Dit is een uitleg over dit incident"),
+  SightingActivityItem(
+    animal: "Fox",
+    animalCount: 1,
+    location: "Heerlen",
+    date: DateTime.now()
+        .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+  ),
+  SightingActivityItem(
+    animal: "Hare",
+    animalCount: 9,
+    location: "Valkenswaard",
+    date: DateTime.now()
+        .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+  ),
+  IncidentActivityItem(
+      animal: "Otter",
+      title: "Aggressive behaviour",
+      date: DateTime.now()
+          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+      description: "Dit is een uitleg over dit incident"),
+];
 
 @riverpod
 class Activities extends _$Activities {
   @override
   Future<List<dynamic>> build() async {
-    var items = [];
+    var items = allItems.getRange(random.nextInt(8), allItems.length).toList();
 
-    items.add(SightingActivityItem(
-      animal: "Deer",
-      animalCount: 1,
-      location: "Eindhoven",
-      date: DateTime.now()
-          .subtract(Duration(days: 1, hours: 3, minutes: random.nextInt(60))),
-    ));
-    items.add(IncidentActivityItem(
-      animal: "Wolf",
-      title: "Property damage",
-      date: DateTime.now()
-          .subtract(Duration(days: 1, hours: 5, minutes: random.nextInt(60))),
-      description: "The animal destroyed several fences",
-    ));
-    items.add(IncidentActivityItem(
-      animal: "Fox",
-      title: "Aggressive behaviour",
-      date: DateTime.now()
-          .subtract(Duration(days: 1, hours: 8, minutes: random.nextInt(60))),
-      description:
-          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    ));
-    items.add(SightingActivityItem(
-      animal: "Deer",
-      animalCount: 3,
-      location: "Amsterdam",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
-    ));
-    items.add(IncidentActivityItem(
-      animal: "Stoat",
-      title: "Property damage",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 4, minutes: random.nextInt(60))),
-      description: "The animal destroyed the cables inside my car",
-    ));
-    items.add(SightingActivityItem(
-      animal: "Fox",
-      animalCount: 1,
-      location: "Heerlen",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Hare",
-      animalCount: 9,
-      location: "Valkenswaard",
-      date: DateTime.now()
-          .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
-    ));
-    items.add(
-      IncidentActivityItem(
-          animal: "Otter",
-          title: "Aggressive behaviour",
-          date: DateTime.now().subtract(
-              Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-          description: "Dit is een uitleg over dit incident"),
-    );
-    items.add(SightingActivityItem(
-      animal: "Wild horse",
-      animalCount: 5,
-      location: "Veluwe",
-      date: DateTime.now()
-          .subtract(Duration(days: 11, hours: 3, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Deer",
-      animalCount: 3,
-      location: "Amsterdam",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Fox",
-      animalCount: 1,
-      location: "Heerlen",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Hare",
-      animalCount: 9,
-      location: "Valkenswaard",
-      date: DateTime.now()
-          .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
-    ));
-    items.add(
-      IncidentActivityItem(
-          animal: "Otter",
-          title: "Aggressive behaviour",
-          date: DateTime.now().subtract(
-              Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-          description: "Dit is een uitleg over dit incident"),
-    );
-    items.add(SightingActivityItem(
-      animal: "Fox",
-      animalCount: 1,
-      location: "Heerlen",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Hare",
-      animalCount: 9,
-      location: "Valkenswaard",
-      date: DateTime.now()
-          .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
-    ));
-    items.add(
-      IncidentActivityItem(
-          animal: "Otter",
-          title: "Aggressive behaviour",
-          date: DateTime.now().subtract(
-              Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-          description: "Dit is een uitleg over dit incident"),
-    );
-    items.add(SightingActivityItem(
-      animal: "Fox",
-      animalCount: 1,
-      location: "Heerlen",
-      date: DateTime.now()
-          .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
-    ));
-    items.add(SightingActivityItem(
-      animal: "Hare",
-      animalCount: 9,
-      location: "Valkenswaard",
-      date: DateTime.now()
-          .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
-    ));
-    items.add(
-      IncidentActivityItem(
-          animal: "Otter",
-          title: "Aggressive behaviour",
-          date: DateTime.now().subtract(
-              Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-          description: "Dit is een uitleg over dit incident"),
-    );
+    await Future.delayed(const Duration(seconds: 3));
+
     return await Future.value(items);
   }
 
@@ -169,6 +168,7 @@ class Activities extends _$Activities {
 
 final random = Random();
 final animatedListKey = GlobalKey<SliverAnimatedListState>();
+final refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
 class ActivityPage extends ConsumerStatefulWidget {
   const ActivityPage({super.key});
@@ -211,8 +211,18 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
       return const Text("Error occurred.");
     }
 
-    if (activities.isLoading) {
-      return const Text("Still loading.");
+    if (activities.isLoading && !activities.hasValue) {
+      return const Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: CircularProgressIndicator(
+              color: AppColors.primary,
+              strokeWidth: 3,
+            ),
+          ),
+        ],
+      );
     }
 
     var activitiesList = activities.value!;
@@ -221,31 +231,50 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: CustomScrollView(
-        controller: _controller,
-        slivers: [
-          SliverPadding(
-            padding: const EdgeInsets.only(top: 25),
-            sliver: ActivityFilterChips(
-              onFilter: (filter) {
-                handleChanges(filteredList, filterList(activitiesList, filter),
-                    activitiesList);
-                setState(() {
-                  currentFilter = filter;
-                });
-              },
+      child: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () async {
+          ref.invalidate(activitiesProvider);
+          var value = await ref.read(activitiesProvider.future);
+
+          var allActivities = value.followedBy(activitiesList).toList();
+          var allUniqueActivities = [];
+
+          for (var activity in allActivities) {
+            if(!allUniqueActivities.contains(activity)){
+              allUniqueActivities.add(activity);
+            }
+          }
+
+          handleChanges(filteredList, value, allUniqueActivities);
+          setState(() {});
+        },
+        child: CustomScrollView(
+          controller: _controller,
+          slivers: [
+            SliverPadding(
+              padding: const EdgeInsets.only(top: 25),
+              sliver: ActivityFilterChips(
+                onFilter: (filter) {
+                  handleChanges(filteredList,
+                      filterList(activitiesList, filter), activitiesList);
+                  setState(() {
+                    currentFilter = filter;
+                  });
+                },
+              ),
             ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.only(bottom: 25),
-            sliver: SliverAnimatedList(
-              key: animatedListKey,
-              initialItemCount: filteredList.length,
-              itemBuilder: (context, index, animation) =>
-                  renderItem(filteredList, index, animation),
+            SliverPadding(
+              padding: const EdgeInsets.only(bottom: 25),
+              sliver: SliverAnimatedList(
+                key: animatedListKey,
+                initialItemCount: filteredList.length,
+                itemBuilder: (context, index, animation) =>
+                    renderItem(filteredList, index, animation),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
