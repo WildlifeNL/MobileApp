@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 
-class ActivityItemCard extends StatelessWidget {
+class ActivityItemCard extends ConsumerWidget {
   const ActivityItemCard({
     super.key,
     required this.icon,
@@ -11,6 +12,7 @@ class ActivityItemCard extends StatelessWidget {
     required this.date,
     required this.color,
     this.description,
+    required this.animation,
   }) : assert(title.length <= 21);
 
   final IconData icon;
@@ -19,90 +21,111 @@ class ActivityItemCard extends StatelessWidget {
   final DateTime date;
   final Color color;
   final String? description;
+  final Animation<double> animation;
 
   @override
-  Widget build(BuildContext context) {
-    return Card(
-      color: Colors.white,
-      surfaceTintColor: Colors.white,
-      child: Padding(
-        padding: EdgeInsets.only(
-            top: 8.0,
-            left: 8.0,
-            right: 8.0,
-            bottom: description == null ? 8 : 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration:
-                          BoxDecoration(shape: BoxShape.circle, color: color),
-                      child: Icon(
-                        icon,
-                        color: Colors.white,
-                        size: 24,
-                      ),
-                    ),
-                    const Padding(padding: EdgeInsets.only(left: 8)),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          title,
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.w500,
-                            height: 1.3,
-                            fontSize: 13,
+  Widget build(BuildContext context, WidgetRef ref) {
+    final curvedAnimation = CurvedAnimation(parent: animation, curve: Curves.easeInOut);
+
+    return FadeTransition(
+      opacity: Tween<double>(
+        begin: 0,
+        end: 1,
+      ).animate(curvedAnimation),
+      child: SizeTransition(
+        sizeFactor: Tween<double>(
+          begin: 0,
+          end: 1,
+        ).animate(curvedAnimation),
+        child: ScaleTransition(
+          scale: Tween<double>(
+            begin: 0.4,
+            end: 1,
+          ).animate(curvedAnimation),
+          child: Card(
+            color: Colors.white,
+            surfaceTintColor: Colors.white,
+            child: Padding(
+              padding: EdgeInsets.only(
+                  top: 8.0,
+                  left: 8.0,
+                  right: 8.0,
+                  bottom: description == null ? 8 : 0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle, color: color),
+                            child: Icon(
+                              icon,
+                              color: Colors.white,
+                              size: 24,
+                            ),
                           ),
-                        ),
-                        Text(
-                          subtitle,
-                          softWrap: true,
+                          const Padding(padding: EdgeInsets.only(left: 8)),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                title,
+                                style: TextStyle(
+                                  color: color,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.3,
+                                  fontSize: 13,
+                                ),
+                              ),
+                              Text(
+                                subtitle,
+                                softWrap: true,
+                                style: const TextStyle(
+                                  color: AppColors.neutral_400,
+                                  fontWeight: FontWeight.w300,
+                                  height: 1.3,
+                                  fontSize: 12,
+                                  letterSpacing: 0.1,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                      ),
+                      Flexible(
+                        fit: FlexFit.tight,
+                        child: Text(
+                          date.toString().substring(0, 16),
+                          textAlign: TextAlign.end,
                           style: const TextStyle(
                             color: AppColors.neutral_400,
                             fontWeight: FontWeight.w300,
-                            height: 1.3,
+                            height: 1,
                             fontSize: 12,
-                            letterSpacing: 0.1,
+                            letterSpacing: 0,
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Padding(
-                  padding: EdgeInsets.only(left: 5),
-                ),
-                Flexible(
-                  fit: FlexFit.tight,
-                  child: Text(
-                    date.toString().substring(0, 16),
-                    textAlign: TextAlign.end,
-                    style: const TextStyle(
-                      color: AppColors.neutral_400,
-                      fontWeight: FontWeight.w300,
-                      height: 1,
-                      fontSize: 12,
-                      letterSpacing: 0,
-                    ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            if (description != null)
-              ActivityItemDescription(
-                description: description!,
+                  if (description != null)
+                    ActivityItemDescription(
+                      description: description!,
+                    ),
+                ],
               ),
-          ],
+            ),
+          ),
         ),
       ),
     );

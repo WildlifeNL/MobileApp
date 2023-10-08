@@ -22,7 +22,8 @@ class _BottomNavigationState extends State<BottomNavigation>
     value: 1,
     lowerBound: 0,
     upperBound: 1,
-    duration: Duration(milliseconds: MediaQuery.of(context).disableAnimations ? 0 : 175),
+    duration: Duration(
+        milliseconds: MediaQuery.of(context).disableAnimations ? 0 : 175),
     vsync: this,
   );
 
@@ -51,7 +52,8 @@ class _BottomNavigationState extends State<BottomNavigation>
       ),
       (
         NavigationDestination(
-          icon: AnimatedMapIcon(controller: _controller, animationIntensity: 0.7, shadow: 1),
+          icon: AnimatedMapIcon(
+              controller: _controller, animationIntensity: 0.7, shadow: 1),
           label: "",
         ),
         const ExamplePage(),
@@ -77,7 +79,12 @@ class _BottomNavigationState extends State<BottomNavigation>
     ];
 
     return Scaffold(
-      body: items[selectedIndex].$2,
+      body: SafeArea(
+        top: true,
+        bottom: false,
+        minimum: const EdgeInsets.only(bottom: 90),
+        child: items[selectedIndex].$2,
+      ),
       backgroundColor: AppColors.neutral_50,
       extendBody: true,
       bottomNavigationBar: Transform.translate(
@@ -150,12 +157,8 @@ class AnimatedMapIcon extends StatelessWidget {
                   boxShadow: [
                     BoxShadow(
                         //color: Colors.black.withOpacity(0.1 + _controller.value * 0.1),
-                        color: Color.fromRGBO(
-                            190,
-                            213,
-                            88,
-                            0.25 * shadow +
-                                _controller.value * 0.25 * shadow),
+                        color: Color.fromRGBO(190, 213, 88,
+                            0.25 * shadow + _controller.value * 0.25 * shadow),
                         offset: const Offset(0, 4),
                         blurRadius: 20,
                         spreadRadius: 0)
