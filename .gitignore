@@ -1,5 +1,4 @@
 *.g.dart
-**/lib/generated/**/*.dart
 
 # Miscellaneous
 *.class
