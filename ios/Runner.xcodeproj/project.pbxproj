@@ -629,6 +629,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -841,6 +842,7 @@
 			baseConfigurationReference = 8432E6DB3BE26883E73845D4 /* Pods-Runner.debug-dev.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -854,6 +856,7 @@
 			baseConfigurationReference = 2836BA0009FC90CEF9832B18 /* Pods-Runner.profile-dev.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -867,6 +870,7 @@
 			baseConfigurationReference = D593DA6DC017819B42F00F28 /* Pods-Runner.release-dev.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -880,6 +884,7 @@
 			baseConfigurationReference = 03FB70871548C8050751F8F9 /* Pods-Runner.debug-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -894,6 +899,7 @@
 			baseConfigurationReference = 7773CC1196AD40ECF5F4AF1E /* Pods-Runner.profile-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -908,6 +914,7 @@
 			baseConfigurationReference = 3B061145B30603D53FC4E6F3 /* Pods-Runner.release-staging.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_BUNDLE_IDENTIFIER = nl.wildlifeNL;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
@@ -922,6 +929,7 @@
 			baseConfigurationReference = 64A7C61313E04D41896FA1E0 /* Pods-Runner.debug-prod.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -935,6 +943,7 @@
 			baseConfigurationReference = C24FC5E61E0D3DD3355C4D25 /* Pods-Runner.profile-prod.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -948,6 +957,7 @@
 			baseConfigurationReference = 854DF05F22B80F804E29CDD6 /* Pods-Runner.release-prod.xcconfig */;
 			buildSettings = {
 				DEVELOPMENT_TEAM = R9XJ622U85;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				PRODUCT_NAME = Runner;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
@@ -1354,6 +1364,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1382,6 +1393,7 @@
 				DEVELOPMENT_TEAM = "";
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Runner/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
