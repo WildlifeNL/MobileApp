@@ -221,48 +221,54 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
 
     var filteredList = filterList(activitiesList, currentFilter);
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15),
-      child: RefreshIndicator(
-        color: AppColors.primary,
-        onRefresh: () async {
-          ref.invalidate(activitiesProvider);
-          var value = await ref.read(activitiesProvider.future);
+    return SafeArea(
+      top: true,
+      bottom: false,
+      minimum: const EdgeInsets.only(bottom: 90),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15),
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            ref.invalidate(activitiesProvider);
+            var value = await ref.read(activitiesProvider.future);
 
-          var allUniqueActivities = [];
-          for (var activity in value.followedBy(activitiesList).toList()) {
-            if(!allUniqueActivities.contains(activity)){
-              allUniqueActivities.add(activity);
+            var allUniqueActivities = [];
+            for (var activity in value.followedBy(activitiesList).toList()) {
+              if (!allUniqueActivities.contains(activity)) {
+                allUniqueActivities.add(activity);
+              }
             }
-          }
 
-          handleChanges(filteredList, filterList(value, currentFilter), allUniqueActivities);
-          setState(() {});
-        },
-        child: CustomScrollView(
-          slivers: [
-            SliverPadding(
-              padding: const EdgeInsets.only(top: 25),
-              sliver: ActivityFilterChips(
-                onFilter: (filter) {
-                  handleChanges(filteredList,
-                      filterList(activitiesList, filter), activitiesList);
-                  setState(() {
-                    currentFilter = filter;
-                  });
-                },
+            handleChanges(filteredList, filterList(value, currentFilter),
+                allUniqueActivities);
+            setState(() {});
+          },
+          child: CustomScrollView(
+            slivers: [
+              SliverPadding(
+                padding: const EdgeInsets.only(top: 25),
+                sliver: ActivityFilterChips(
+                  onFilter: (filter) {
+                    handleChanges(filteredList,
+                        filterList(activitiesList, filter), activitiesList);
+                    setState(() {
+                      currentFilter = filter;
+                    });
+                  },
+                ),
               ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.only(bottom: 25),
-              sliver: SliverAnimatedList(
-                key: animatedListKey,
-                initialItemCount: filteredList.length,
-                itemBuilder: (context, index, animation) =>
-                    renderItem(filteredList, index, animation),
+              SliverPadding(
+                padding: const EdgeInsets.only(bottom: 25),
+                sliver: SliverAnimatedList(
+                  key: animatedListKey,
+                  initialItemCount: filteredList.length,
+                  itemBuilder: (context, index, animation) =>
+                      renderItem(filteredList, index, animation),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
