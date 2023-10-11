@@ -26,9 +26,12 @@ class ActivityItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final curvedAnimation = CurvedAnimation(parent: animation, curve: Easing.standard, reverseCurve: Easing.standardAccelerate);
+    final curvedAnimation = CurvedAnimation(
+        parent: animation,
+        curve: Easing.standard,
+        reverseCurve: Easing.standardAccelerate);
     final formatter = intl.DateFormat.yMd().add_jm();
-    
+
     return FadeTransition(
       opacity: Tween<double>(
         begin: 0,

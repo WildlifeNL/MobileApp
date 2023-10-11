@@ -14,7 +14,7 @@ class ActivityFilterChips extends StatefulWidget {
     required this.onFilter,
   });
 
-  final Null Function(ActivityFilter) onFilter;
+  final Function(ActivityFilter) onFilter;
 
   @override
   State<ActivityFilterChips> createState() => _ActivityFilterChipsState();
@@ -22,6 +22,15 @@ class ActivityFilterChips extends StatefulWidget {
 
 class _ActivityFilterChipsState extends State<ActivityFilterChips> {
   ActivityFilter filter = ActivityFilter.all;
+
+  onSelected(ActivityFilter filterChip) {
+    if (filter == filterChip) return;
+
+    setState(() {
+      filter = filterChip;
+      widget.onFilter(filter);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,44 +40,26 @@ class _ActivityFilterChipsState extends State<ActivityFilterChips> {
         child: Row(
           children: [
             ActivityFilterChip(
-                selected: filter == ActivityFilter.all,
-                title: S.of(context).filterActivitiesAll,
-                onSelected: (_) {
-                  if (filter == ActivityFilter.all) return;
-
-                  setState(() {
-                    filter = ActivityFilter.all;
-                    widget.onFilter(filter);
-                  });
-                }),
+              selected: filter == ActivityFilter.all,
+              title: S.of(context).filterActivitiesAll,
+              onSelected: (_) => onSelected(ActivityFilter.all),
+            ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
-                selected: filter == ActivityFilter.sightings,
-                title: S.of(context).filterActivitiesSightings,
-                onSelected: (_) {
-                  if (filter == ActivityFilter.sightings) return;
-
-                  setState(() {
-                    filter = ActivityFilter.sightings;
-                    widget.onFilter(filter);
-                  });
-                }),
+              selected: filter == ActivityFilter.sightings,
+              title: S.of(context).filterActivitiesSightings,
+              onSelected: (_) => onSelected(ActivityFilter.sightings),
+            ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
-                selected: filter == ActivityFilter.incidents,
-                title: S.of(context).filterActivitiesIncidents,
-                onSelected: (_) {
-                  if (filter == ActivityFilter.incidents) return;
-
-                  setState(() {
-                    filter = ActivityFilter.incidents;
-                    widget.onFilter(filter);
-                  });
-                }),
+              selected: filter == ActivityFilter.incidents,
+              title: S.of(context).filterActivitiesIncidents,
+              onSelected: (_) => onSelected(ActivityFilter.incidents),
+            ),
           ],
         ),
       ),
@@ -86,7 +77,7 @@ class ActivityFilterChip extends StatelessWidget {
 
   final bool selected;
   final String title;
-  final Null Function(bool _) onSelected;
+  final Function(bool _) onSelected;
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +87,7 @@ class ActivityFilterChip extends StatelessWidget {
       selected: selected,
       labelStyle: TextStyle(
           color: selected ? Colors.white : AppColors.neutral_500, fontSize: 12),
-      labelPadding: EdgeInsets.symmetric(horizontal: 1),
+      labelPadding: const EdgeInsets.symmetric(horizontal: 1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       label: Text(title),
       showCheckmark: false,
