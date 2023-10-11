@@ -2,11 +2,13 @@ import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/pages/activity.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
+import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 
@@ -57,7 +59,7 @@ class _BottomNavigationState extends State<BottomNavigation>
               controller: _controller, animationIntensity: 0.7, shadow: 1),
           label: "",
         ),
-        const ExamplePage(),
+        MapPage(),
       ),
       (
         NavigationDestination(
@@ -80,12 +82,17 @@ class _BottomNavigationState extends State<BottomNavigation>
     ];
 
     return Scaffold(
-      body: SafeArea(
-        top: true,
-        bottom: false,
-        minimum: const EdgeInsets.only(bottom: 90),
-        child: items[selectedIndex].$2,
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize: const Size(0.0, 0.0),
+        child: AppBar(
+            systemOverlayStyle: const SystemUiOverlayStyle(
+                statusBarIconBrightness: Brightness.dark
+            ),
+            backgroundColor: AppColors.neutral_50.withOpacity(0.7)
+        ),
       ),
+      body: items[selectedIndex].$2,
       backgroundColor: AppColors.neutral_50,
       extendBody: true,
       bottomNavigationBar: Transform.translate(
