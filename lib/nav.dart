@@ -3,8 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/pages/activity.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
@@ -38,7 +36,7 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
         NavigationDestination(
           icon: const Icon(
-            AppIcons.home_outlined,
+            AppIcons.home,
           ),
           label: S.of(context).tabHome,
         ),
@@ -47,7 +45,7 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
         NavigationDestination(
           icon: const Icon(
-            AppIcons.deer,
+            AppIcons.paw,
           ),
           label: S.of(context).tabActivity,
         ),
@@ -59,12 +57,12 @@ class _BottomNavigationState extends State<BottomNavigation>
               controller: _controller, animationIntensity: 0.7, shadow: 1),
           label: "",
         ),
-        MapPage(),
+        const MapPage(),
       ),
       (
         NavigationDestination(
           icon: const Icon(
-            AppIcons.project_outlined,
+            AppIcons.project,
           ),
           label: S.of(context).tabProject,
         ),
@@ -73,7 +71,7 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
         NavigationDestination(
           icon: const Icon(
-            AppIcons.profile_outlined,
+            AppIcons.account,
           ),
           label: S.of(context).tabProfile,
         ),
@@ -84,21 +82,24 @@ class _BottomNavigationState extends State<BottomNavigation>
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: PreferredSize(
-        preferredSize: const Size(0.0, 0.0),
-        child: AppBar(
-            systemOverlayStyle: const SystemUiOverlayStyle(
-                statusBarIconBrightness: Brightness.dark
-            ),
-            backgroundColor: AppColors.neutral_50.withOpacity(0.7)
-        ),
+        preferredSize: const Size(0, 0),
+        child: ClipRRect(
+            child: BackdropFilter(
+                // For some reason iOS blur is different from Android blur
+                filter: Platform.isAndroid
+                    ? ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5)
+                    : ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                blendMode: BlendMode.srcIn,
+                child: Container(
+                  color: AppColors.neutral_50.withOpacity(0.7),
+                ))),
       ),
       body: items[selectedIndex].$2,
       backgroundColor: AppColors.neutral_50,
       extendBody: true,
       bottomNavigationBar: Transform.translate(
-        offset: Offset(0, Platform.isAndroid ? 0 : 34),
-        child: Stack(
-          children: [
+          offset: Offset(0, Platform.isAndroid ? 12 : 34),
+          child: Stack(children: [
             const CustomNavBarBackground(),
             CustomNavBarForeground(
               selectedIndex: selectedIndex,
@@ -114,10 +115,8 @@ class _BottomNavigationState extends State<BottomNavigation>
                 });
               },
               items: items.map((x) => x.$1).toList(),
-            ),
-          ],
-        ),
-      ),
+            )
+          ])),
     );
   }
 }

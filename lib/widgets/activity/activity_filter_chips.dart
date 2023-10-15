@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 
@@ -85,8 +86,8 @@ class ActivityFilterChip extends StatelessWidget {
       side: BorderSide.none,
       visualDensity: VisualDensity.compact,
       selected: selected,
-      labelStyle: TextStyle(
-          color: selected ? Colors.white : AppColors.neutral_500, fontSize: 12),
+      labelStyle: GoogleFonts.inter(
+          color: selected ? Colors.white : AppColors.neutral_500, fontSize: 12, fontWeight: FontWeight.w500),
       labelPadding: const EdgeInsets.symmetric(horizontal: 1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       label: Text(title),

@@ -9,11 +9,11 @@ import 'package:wildlife_nl_app/models/activity/incident_activity_item.dart';
 import 'package:wildlife_nl_app/models/activity/sighting_activity_item.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
-import 'package:wildlife_nl_app/widgets/activity_item_card.dart';
+import 'package:wildlife_nl_app/widgets/activity/activity_item_card.dart';
 
 import 'dart:developer' as developer;
 
-import '../widgets/activity_filter_chips.dart';
+import '../widgets/activity/activity_filter_chips.dart';
 
 part "activity.g.dart";
 
