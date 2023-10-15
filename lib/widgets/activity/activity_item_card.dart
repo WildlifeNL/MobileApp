@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -82,7 +83,7 @@ class ActivityItemCard extends ConsumerWidget {
                             children: [
                               Text(
                                 title,
-                                style: TextStyle(
+                                style: GoogleFonts.inter(
                                   color: color,
                                   fontWeight: FontWeight.w500,
                                   height: 1.3,
@@ -92,12 +93,11 @@ class ActivityItemCard extends ConsumerWidget {
                               Text(
                                 subtitle,
                                 softWrap: true,
-                                style: const TextStyle(
+                                style: GoogleFonts.interTight(
                                   color: AppColors.neutral_400,
                                   fontWeight: FontWeight.w300,
                                   height: 1.3,
                                   fontSize: 12,
-                                  letterSpacing: 0.1,
                                 ),
                               ),
                             ],
@@ -112,12 +112,11 @@ class ActivityItemCard extends ConsumerWidget {
                         child: Text(
                           formatter.format(date),
                           textAlign: TextAlign.end,
-                          style: const TextStyle(
+                          style: GoogleFonts.interTight(
                             color: AppColors.neutral_400,
                             fontWeight: FontWeight.w300,
                             height: 1,
                             fontSize: 12,
-                            letterSpacing: 0,
                           ),
                         ),
                       ),
@@ -159,7 +158,7 @@ class _ActivityItemDescriptionState extends State<ActivityItemDescription> {
       padding: const EdgeInsets.only(top: 8.0),
       child: LayoutBuilder(
         builder: (context, constraints) {
-          const style = TextStyle(
+          final style = GoogleFonts.inter(
             color: AppColors.neutral_500,
             fontWeight: FontWeight.w300,
             height: 1,
