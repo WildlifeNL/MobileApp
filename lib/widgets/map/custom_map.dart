@@ -108,6 +108,7 @@ class _CustomMapState extends ConsumerState<CustomMap> {
                   onPressed: () {
                     showModalBottomSheet(
                       context: context,
+                      isScrollControlled: true,
                       builder: (context) => const AddRegistrationModal(),
                     );
                   },

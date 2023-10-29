@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:developer' as dev;
+import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,6 +15,8 @@ import 'package:wildlife_nl_app/widgets/base_modal.dart';
 import 'package:wildlife_nl_app/widgets/form_field_with_label.dart';
 
 var uuid = Uuid();
+
+var random = Random();
 
 class AddRegistrationModal extends ConsumerStatefulWidget {
   const AddRegistrationModal({super.key});
@@ -33,10 +37,12 @@ class _AddRegistrationModalState extends ConsumerState<AddRegistrationModal> {
   Widget build(BuildContext context) {
     return BaseModal(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 27, horizontal: 20),
+        padding:
+            const EdgeInsets.only(bottom: 40, top: 30, left: 20, right: 20),
         child: Form(
           key: _formKey,
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               Padding(
                 padding: const EdgeInsets.only(bottom: 20.0),
@@ -92,8 +98,9 @@ class _AddRegistrationModalState extends ConsumerState<AddRegistrationModal> {
               FormFieldWithLabel(
                 labelText: "Amount of adult animals",
                 child: TextFormField(
-                  textInputAction: TextInputAction.none,
-                  keyboardType: TextInputType.number,
+                  keyboardType: Platform.isIOS
+                      ? const TextInputType.numberWithOptions(signed: true)
+                      : TextInputType.number,
                   validator: (value) {
                     if (value == null || (int.tryParse(value) ?? 0) <= 0) {
                       return 'Please enter an amount above 0';
@@ -110,8 +117,9 @@ class _AddRegistrationModalState extends ConsumerState<AddRegistrationModal> {
               FormFieldWithLabel(
                 labelText: "Amount of juvenile animals",
                 child: TextFormField(
-                  textInputAction: TextInputAction.none,
-                  keyboardType: TextInputType.number,
+                  keyboardType: Platform.isIOS
+                      ? const TextInputType.numberWithOptions(signed: true)
+                      : TextInputType.number,
                   validator: (value) {
                     if (value == null || (int.tryParse(value) ?? -1) <= -1) {
                       return 'Please enter an amount';
@@ -137,12 +145,23 @@ class _AddRegistrationModalState extends ConsumerState<AddRegistrationModal> {
                 onPressed: () async {
                   // Validate returns true if the form is valid, or false otherwise.
                   if (_formKey.currentState!.validate()) {
+                    var u = random.nextDouble();
+                    var v = random.nextDouble();
+
+                    var lowerLat = 51.246694388292696;
+                    var higherLat = 52.167926821188;
+                    var differenceLat = higherLat - lowerLat;
+
+                    var lowerLon = 4.959291472267324;
+                    var higherLon = 6.294014195306687;
+                    var differenceLon = higherLon - lowerLon;
+
                     // Call API
                     var request = Interaction(
                       id: uuid.v4(),
                       interactionTime: DateTime.now(),
-                      interactionLat: 52.083333,
-                      interactionLon: 5.7999968,
+                      interactionLat: lowerLat + differenceLat * u,
+                      interactionLon: lowerLon + differenceLon * u,
                       animalId: "a2f08215-7bb4-4ebb-9c6e-7c937cdfb906",
                       interactionDescription: "Description of the interaction",
                       interactionEncounter: "Encounter",
