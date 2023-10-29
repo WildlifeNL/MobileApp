@@ -87,7 +87,9 @@ class ActivityFilterChip extends StatelessWidget {
       visualDensity: VisualDensity.compact,
       selected: selected,
       labelStyle: GoogleFonts.inter(
-          color: selected ? Colors.white : AppColors.neutral_500, fontSize: 12, fontWeight: FontWeight.w500),
+          color: selected ? Colors.white : AppColors.neutral_500,
+          fontSize: 12,
+          fontWeight: FontWeight.w500),
       labelPadding: const EdgeInsets.symmetric(horizontal: 1),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
       label: Text(title),

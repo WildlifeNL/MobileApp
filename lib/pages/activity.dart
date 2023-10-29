@@ -1,164 +1,204 @@
-import 'dart:math';
+import 'dart:convert';
+import 'dart:math' as math;
 
-import 'package:auto_animated/auto_animated.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:wildlife_nl_app/models/activity/incident_activity_item.dart';
-import 'package:wildlife_nl_app/models/activity/sighting_activity_item.dart';
+import 'package:wildlife_nl_app/models/data/geojson/point.dart';
+import 'package:wildlife_nl_app/models/data/incident.dart';
+import 'package:wildlife_nl_app/models/data/interaction.dart';
+import 'package:wildlife_nl_app/models/data/sighting.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/widgets/activity/activity_item_card.dart';
 
-import 'dart:developer' as developer;
+import 'package:http/http.dart' as http;
 
 import '../widgets/activity/activity_filter_chips.dart';
 
 part "activity.g.dart";
 
+final random = math.Random();
+
 var allItems = [
-  SightingActivityItem(
+  Sighting(
     animal: "Deer",
     animalCount: 1,
-    location: "Eindhoven",
-    date: DateTime.now()
+    locationName: "Eindhoven",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 1, hours: 3, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
+  Incident(
     animal: "Wolf",
     title: "Property damage",
-    date: DateTime.now()
+    dateTime: DateTime.now()
         .subtract(Duration(days: 1, hours: 5, minutes: random.nextInt(60))),
     description: "The animal destroyed several fences",
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
+  Incident(
     animal: "Fox",
     title: "Aggressive behaviour",
-    date: DateTime.now()
+    dateTime: DateTime.now()
         .subtract(Duration(days: 1, hours: 8, minutes: random.nextInt(60))),
     description:
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Deer",
     animalCount: 3,
-    location: "Amsterdam",
-    date: DateTime.now()
+    locationName: "Amsterdam",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
+  Incident(
     animal: "Stoat",
     title: "Property damage",
-    date: DateTime.now()
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 4, minutes: random.nextInt(60))),
     description: "The animal destroyed the cables inside my car",
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Fox",
     animalCount: 1,
-    location: "Heerlen",
-    date: DateTime.now()
-        .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+    locationName: "Heerlen",
+    dateTime: DateTime.now(),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Hare",
     animalCount: 9,
-    location: "Valkenswaard",
-    date: DateTime.now()
+    locationName: "Valkenswaard",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
-      animal: "Otter",
-      title: "Aggressive behaviour",
-      date: DateTime.now()
-          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-      description: "Dit is een uitleg over dit incident"),
-  SightingActivityItem(
+  Incident(
+    animal: "Otter",
+    title: "Aggressive behaviour",
+    dateTime: DateTime.now()
+        .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+    description: "Dit is een uitleg over dit incident",
+    location: Point(coordinates: [51.44083, 5.47778]),
+  ),
+  Sighting(
     animal: "Wild horse",
     animalCount: 5,
-    location: "Veluwe",
-    date: DateTime.now()
+    locationName: "Veluwe",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 11, hours: 3, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Deer",
     animalCount: 3,
-    location: "Amsterdam",
-    date: DateTime.now()
+    locationName: "Amsterdam",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 1, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Fox",
     animalCount: 1,
-    location: "Heerlen",
-    date: DateTime.now()
+    locationName: "Heerlen",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Hare",
     animalCount: 9,
-    location: "Valkenswaard",
-    date: DateTime.now()
+    locationName: "Valkenswaard",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
-      animal: "Otter",
-      title: "Aggressive behaviour",
-      date: DateTime.now()
-          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-      description: "Dit is een uitleg over dit incident"),
-  SightingActivityItem(
+  Incident(
+    animal: "Otter",
+    title: "Aggressive behaviour",
+    dateTime: DateTime.now()
+        .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+    description: "Dit is een uitleg over dit incident",
+    location: Point(coordinates: [51.44083, 5.47778]),
+  ),
+  Sighting(
     animal: "Fox",
     animalCount: 1,
-    location: "Heerlen",
-    date: DateTime.now()
+    locationName: "Heerlen",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Hare",
     animalCount: 9,
-    location: "Valkenswaard",
-    date: DateTime.now()
+    locationName: "Valkenswaard",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
-      animal: "Otter",
-      title: "Aggressive behaviour",
-      date: DateTime.now()
-          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-      description: "Dit is een uitleg over dit incident"),
-  SightingActivityItem(
+  Incident(
+    animal: "Otter",
+    title: "Aggressive behaviour",
+    dateTime: DateTime.now()
+        .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+    description: "Dit is een uitleg over dit incident",
+    location: Point(coordinates: [51.44083, 5.47778]),
+  ),
+  Sighting(
     animal: "Fox",
     animalCount: 1,
-    location: "Heerlen",
-    date: DateTime.now()
+    locationName: "Heerlen",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 2, hours: 7, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  SightingActivityItem(
+  Sighting(
     animal: "Hare",
     animalCount: 9,
-    location: "Valkenswaard",
-    date: DateTime.now()
+    locationName: "Valkenswaard",
+    dateTime: DateTime.now()
         .subtract(Duration(days: 3, hours: 9, minutes: random.nextInt(60))),
+    location: Point(coordinates: [51.44083, 5.47778]),
   ),
-  IncidentActivityItem(
-      animal: "Otter",
-      title: "Aggressive behaviour",
-      date: DateTime.now()
-          .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
-      description: "Dit is een uitleg over dit incident"),
+  Incident(
+    animal: "Otter",
+    title: "Aggressive behaviour",
+    dateTime: DateTime.now()
+        .subtract(Duration(days: 10, hours: 4, minutes: random.nextInt(60))),
+    description: "Dit is een uitleg over dit incident",
+    location: Point(coordinates: [51.44083, 5.47778]),
+  ),
 ];
 
 @riverpod
 class Activities extends _$Activities {
   @override
   Future<List<dynamic>> build() async {
-    var items = allItems.getRange(random.nextInt(8), allItems.length).toList();
+    var response = await http.get(Uri.parse("http://35.178.117.91:81/interactions/list?offset=0&count=100"));
 
-    await Future.delayed(const Duration(seconds: 3));
+    var decodedJson = jsonDecode(response.body);
+    
+    List<dynamic> jsonList = decodedJson["results"];
+    
+    List<dynamic> objList = [];
+    
+    for (var value in jsonList) {
+      final interaction = Interaction.fromJson(value);
+      if(interaction.interactionType == "sighting"){
+        objList.add(Sighting.fromInteraction(interaction));
+      }
+      if(interaction.interactionType == "incident"){
+        objList.add(Incident.fromInteraction(interaction));
+      }
+    }
 
-    return await Future.value(items);
+    return objList;
   }
 
   void reset() {
@@ -166,7 +206,6 @@ class Activities extends _$Activities {
   }
 }
 
-final random = Random();
 final animatedListKey = GlobalKey<SliverAnimatedListState>();
 final refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
@@ -185,8 +224,8 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
         .where((element) => filter == ActivityFilter.all
             ? true
             : switch (element) {
-                IncidentActivityItem() => filter == ActivityFilter.incidents,
-                SightingActivityItem() => filter == ActivityFilter.sightings,
+                Incident() => filter == ActivityFilter.incidents,
+                Sighting() => filter == ActivityFilter.sightings,
                 Object() => false,
                 null => false,
               })
@@ -276,23 +315,23 @@ class _ActivityPageState extends ConsumerState<ActivityPage> {
 
   Widget renderItem(activitiesList, int index, Animation<double> animation) {
     switch (activitiesList[index]) {
-      case IncidentActivityItem item:
+      case Incident item:
         return ActivityItemCard(
           icon: Symbols.warning_rounded,
           title: item.title,
           subtitle: item.animal,
-          date: item.date,
+          date: item.dateTime,
           color: AppColors.incident,
           animation: animation,
           description: item.description,
         );
-      case SightingActivityItem item:
+      case Sighting item:
         return ActivityItemCard(
           icon: AppIcons.deer,
           title: item.animal,
           subtitle:
-              "${item.animalCount} animal${item.animalCount > 1 ? "s" : ""} • ${item.location}",
-          date: item.date,
+              "${item.animalCount} animal${item.animalCount > 1 ? "s" : ""} • ${item.locationName}",
+          date: item.dateTime,
           color: AppColors.primary,
           animation: animation,
         );
