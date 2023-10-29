@@ -10,9 +10,9 @@ extension CacheRef<T> on AutoDisposeRef<T> {
     onDispose(() => timer?.cancel());
 
     onCancel(() {
-        timer = Timer(duration, () {
-          keepAliveLink.close();
-        });
+      timer = Timer(duration, () {
+        keepAliveLink.close();
+      });
     });
 
     onResume(() => timer?.cancel());

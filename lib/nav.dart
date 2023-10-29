@@ -80,21 +80,11 @@ class _BottomNavigationState extends State<BottomNavigation>
     ];
 
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: PreferredSize(
-        preferredSize: const Size(0, 0),
-        child: ClipRRect(
-            child: BackdropFilter(
-                // For some reason iOS blur is different from Android blur
-                filter: Platform.isAndroid
-                    ? ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5)
-                    : ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                blendMode: BlendMode.srcIn,
-                child: Container(
-                  color: AppColors.neutral_50.withOpacity(0.7),
-                ))),
+      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColors.neutral_50,),
+      body: AnnotatedRegion<SystemUiOverlayStyle>(
+        value: SystemUiOverlayStyle.dark,
+        child: items[selectedIndex].$2,
       ),
-      body: items[selectedIndex].$2,
       backgroundColor: AppColors.neutral_50,
       extendBody: true,
       bottomNavigationBar: Transform.translate(

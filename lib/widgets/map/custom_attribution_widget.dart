@@ -20,7 +20,10 @@ class CustomAttributionWidget extends StatelessWidget {
           Matrix4.translationValues(0, Platform.isAndroid ? -100 : -104, 0),
       child: RichAttributionWidget(
         popupInitialDisplayDuration: const Duration(seconds: 3),
-        animationConfig: const FadeRAWA(popupDuration: Duration(milliseconds: 200), popupCurveIn: Easing.standardDecelerate ,popupCurveOut: Easing.standardAccelerate),
+        animationConfig: const FadeRAWA(
+            popupDuration: Duration(milliseconds: 200),
+            popupCurveIn: Easing.standardDecelerate,
+            popupCurveOut: Easing.standardAccelerate),
         popupBackgroundColor: AppColors.neutral_50,
         attributions: [
           TextSourceAttribution(
