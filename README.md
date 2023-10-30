@@ -1,16 +1,36 @@
 # wildlife_nl_app
 
-A new Flutter project.
+The project for the first version of the WildlifeNL app
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+This project has the following folder structure
 
-A few resources to get you started if this is your first Flutter project:
+```
+android/       # Android-specific
+└── app/       # Android-specific assets
+assets/        # Assets used across both platforms
+├── app-icon/  # App Icon source
+├── fonts/     # Fonts (including icons)
+└── symbols/   # Icon sources
+ios/           # iOS-specific files
+lib/           # Source code
+├── generated/ # All generated files that have to be checked into git (for now only localization)
+├── l10n/      # Localization
+├── models/    # Data models used inside the app
+├── pages/     # Widgets that fill up an entire screen and are part of the main layout
+├── screens/   # Widgets that fill up an entire screen
+├── services/  # Access to things outside of the app (API)
+├── state/     # Riverpod/State management
+├── utilities/ # Re-usable pieces of logic
+└── widgets/   # Re-usable widgets
+test/          # Tests
+```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+If anything is found that doesn't fit in these bounds, just create the code and it it processed during Review.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+For State management Riverpod is used, we use the Riverpod annotations to automatically generate our Riverpod providers for us.
+
+For localization we use l10n, for this you need an Android Studio (possibly also available for VSCode) plugin called Flutter Intl.
+
+Also recommended are the following plugins for Android Studio: Flutter snippets and Flutter Riverpod snippets, for these plugins there probably exist an equivalent VSCode version.

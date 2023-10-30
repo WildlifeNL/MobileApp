@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
-import 'package:wildlife_nl_app/models/data/geojson/point.dart';
-import 'package:wildlife_nl_app/models/data/interaction.dart';
+import 'package:wildlife_nl_app/models/before_merge/data/geojson/point.dart';
+import 'package:wildlife_nl_app/models/before_merge/data/interaction.dart';
 
 var uuid = const Uuid();
 

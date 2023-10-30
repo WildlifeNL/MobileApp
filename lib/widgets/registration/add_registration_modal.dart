@@ -8,7 +8,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:uuid/uuid.dart';
-import 'package:wildlife_nl_app/models/data/interaction.dart';
+import 'package:wildlife_nl_app/models/before_merge/data/interaction.dart';
 import 'package:wildlife_nl_app/pages/activity.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/widgets/base_modal.dart';
