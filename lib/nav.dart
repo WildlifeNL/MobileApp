@@ -4,9 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wildlife_nl_app/generated/l10n.dart';
-import 'package:wildlife_nl_app/pages/activity.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
-import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 
@@ -43,39 +41,40 @@ class _BottomNavigationState extends State<BottomNavigation>
         const ExamplePage(),
       ),
       (
-        NavigationDestination(
-          icon: const Icon(
-            AppIcons.paw,
-          ),
-          label: S.of(context).tabActivity,
+      NavigationDestination(
+        icon: const Icon(
+          AppIcons.home,
         ),
-        const ActivityPage(),
+        label: S.of(context).tabHome,
+      ),
+      const ExamplePage(),
       ),
       (
-        NavigationDestination(
-          icon: AnimatedMapIcon(
-              controller: _controller, animationIntensity: 0.7, shadow: 1),
-          label: "",
+      NavigationDestination(
+        icon: const Icon(
+          AppIcons.home,
         ),
-        const MapPage(),
+        label: S.of(context).tabHome,
+      ),
+      const ExamplePage(),
       ),
       (
-        NavigationDestination(
-          icon: const Icon(
-            AppIcons.project,
-          ),
-          label: S.of(context).tabProject,
+      NavigationDestination(
+        icon: const Icon(
+          AppIcons.home,
         ),
-        const ExamplePage(),
+        label: S.of(context).tabHome,
+      ),
+      const ExamplePage(),
       ),
       (
-        NavigationDestination(
-          icon: const Icon(
-            AppIcons.account,
-          ),
-          label: S.of(context).tabProfile,
+      NavigationDestination(
+        icon: const Icon(
+          AppIcons.home,
         ),
-        const ExamplePage(),
+        label: S.of(context).tabHome,
+      ),
+      const ExamplePage(),
       ),
     ];
 
