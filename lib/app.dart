@@ -21,8 +21,9 @@ class App extends StatelessWidget {
           GlobalCupertinoLocalizations.delegate,
         ],
         supportedLocales: const [
-          Locale('en'), // English
-          Locale('nl'), // Dutch
+          Locale('en'),
+          Locale('nl'),
+          Locale('de'),
         ],
         debugShowCheckedModeBanner: false,
         title: "WildlifeNL",
