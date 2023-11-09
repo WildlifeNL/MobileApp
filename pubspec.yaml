@@ -81,10 +81,10 @@ flutter:
         - asset: assets/fonts/AppIcons.ttf
     - family: Verdana
       fonts:
-          - asset: fonts/verdana.ttf
-          - asset: fonts/verdana-bold.ttf
+          - asset: assets/fonts/verdana.ttf
+          - asset: assets/fonts/verdana-bold.ttf
             weight: 700
-          - asset: fonts/verdana-bold-italic.ttf
+          - asset: assets/fonts/verdana-bold-italic.ttf
             weight: 700
             style: italic
 flutter_intl:
