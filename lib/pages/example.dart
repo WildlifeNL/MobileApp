@@ -4,6 +4,7 @@ import 'package:option_result/result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wildlife_nl_app/models/example_by_id.dart';
 import 'package:wildlife_nl_app/state/example_by_id.dart';
+import 'package:wildlife_nl_app/utilities/app_styles.dart';
 
 part "example.g.dart";
 
@@ -54,7 +55,7 @@ class ExamplePage extends ConsumerWidget {
         children: <Widget>[
           Text(
             'You have pushed the button this many times:',
-            style: Theme.of(context).textTheme.bodyMedium,
+            style: AppStyles.of(context).data.textStyle.headerLarge,
           ),
           Text(
             '$counter',
