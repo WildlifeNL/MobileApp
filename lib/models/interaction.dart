@@ -12,10 +12,10 @@ class Interaction {
   final String animalId;
   final InteractionType type;
   final DateTime time;
-  final String image;
+  final String? image;
   final String description;
-  final int distance;
-  final int duration;
+  final int? distance;
+  final int? duration;
   final DateTime creationDate;
   final DateTime lastModified;
   final double lat;

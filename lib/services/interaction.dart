@@ -45,29 +45,4 @@ class InteractionService {
 
     return Ok(PaginatedInteractions.fromJson(response.body));
   }
-
-  //Doesn't work until interactions allow both userId + interaction type filtering
-  static Future<Result<PaginatedInteractions, String>>
-      getInteractionsByTypeAndUserId(
-          String userId, InteractionType? type, int page, int pageCount,
-          {required String accessToken}) async {
-    Uri uri;
-    if (type == null) {
-      uri = Uri.parse(
-          "${F.apiUrl}api/controllers/interactions.php?userId=$userId&page=$page&count=$pageCount");
-    } else {
-      //this doesn't work yet
-      uri = Uri.parse(
-          "${F.apiUrl}api/controllers/interactions.php?userId=$userId&type=${type.toSnakeCaseString()}&page=$page&count=$pageCount");
-    }
-
-    var response = await http.get(uri);
-
-    //Example validation
-    if (response.statusCode != 200) {
-      return Err("HTTP status code was not 200: ${response.body}");
-    }
-
-    return Ok(PaginatedInteractions.fromJson(response.body));
-  }
 }

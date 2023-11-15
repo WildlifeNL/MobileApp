@@ -4,48 +4,80 @@ import 'package:wildlife_nl_app/services/interaction.dart';
 
 part 'interactions.g.dart';
 
+class InteractionState {
+  final int currentPage;
+  final bool hasNextPage;
+  final bool isLoadingNewPage;
+
+  final List<Interaction> items;
+
+  InteractionState(
+      {required this.items,
+      required this.currentPage,
+      required this.hasNextPage,
+      required this.isLoadingNewPage});
+
+  InteractionState copyWith({
+    List<Interaction>? items,
+    int? currentPage,
+    bool? hasNextPage,
+    bool? isLoadingNewPage,
+  }) =>
+      InteractionState(
+        items: items ?? this.items,
+        currentPage: currentPage ?? this.currentPage,
+        hasNextPage: hasNextPage ?? this.hasNextPage,
+        isLoadingNewPage: isLoadingNewPage ?? this.isLoadingNewPage,
+      );
+}
+
 @riverpod
 class Interactions extends _$Interactions {
-  int currentPage = 0;
-  bool hasNextPage = true;
-  bool isLoadingNewPage = true;
-
   @override
-  Future<List<Interaction>> build(InteractionType? activityType) async {
-    List<Interaction> interactions = [];
-    var response = await InteractionService.getInteractions(currentPage, 10,
-        accessToken: "");
+  Future<InteractionState> build(InteractionType? activityType) async {
+    var response =
+        await InteractionService.getInteractions(1, 10, accessToken: "");
 
     if (response.isOk()) {
       var paginatedInteractions = response.unwrap();
-      interactions.addAll(paginatedInteractions.results);
-      hasNextPage = paginatedInteractions.meta.nextPageUrl != null;
+      return InteractionState(
+        items: paginatedInteractions.results,
+        hasNextPage: paginatedInteractions.meta.nextPageUrl != null,
+        currentPage: 1,
+        isLoadingNewPage: false,
+      );
+    } else {
+      throw Exception(response.unwrapErr());
     }
-
-    currentPage++;
-    isLoadingNewPage = false;
-
-    return interactions;
   }
 
   Future<void> getNextPage() async {
-    if (isLoadingNewPage && hasNextPage) return;
-    isLoadingNewPage = true;
-    List<Interaction> interactions = state.value!.toList();
-    var response = await InteractionService.getInteractions(currentPage, 10,
-        accessToken: "");
+    if (state.value == null ||
+        state.requireValue.isLoadingNewPage ||
+        !state.requireValue.hasNextPage) return;
+    state = AsyncData(state.value!.copyWith(isLoadingNewPage: true));
+    var response = await InteractionService.getInteractions(
+      state.requireValue.currentPage + 1,
+      10,
+      accessToken: "",
+    );
 
     if (response.isOk()) {
       var paginatedInteractions = response.unwrap();
-      interactions.addAll(paginatedInteractions.results);
-      hasNextPage = paginatedInteractions.meta.nextPageUrl != null;
+
+      state = AsyncData(
+        InteractionState(
+          items: [
+            ...state.requireValue.items,
+            ...paginatedInteractions.results
+          ],
+          hasNextPage: paginatedInteractions.meta.nextPageUrl != null,
+          currentPage: state.requireValue.currentPage + 1,
+          isLoadingNewPage: false
+        ),
+      );
+    } else {
+      state = AsyncData(state.value!.copyWith(isLoadingNewPage: false));
     }
-
-    state = AsyncData(interactions);
-
-    currentPage++;
-    isLoadingNewPage = false;
   }
 }
-
-
