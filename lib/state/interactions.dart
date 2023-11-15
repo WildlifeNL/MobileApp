@@ -5,7 +5,7 @@ import 'package:wildlife_nl_app/services/interaction.dart';
 part 'interactions.g.dart';
 
 @riverpod
-class Sightings extends _$Sightings {
+class Interactions extends _$Interactions {
   int currentPage = 0;
   bool hasNextPage = true;
   bool isLoadingNewPage = true;

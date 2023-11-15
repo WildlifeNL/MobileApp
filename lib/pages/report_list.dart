@@ -7,8 +7,8 @@ class ActivitiesPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, ref) {
-    var interactions = ref.watch(interactionsProvider);
-    var provider = ref.read(interactionsProvider.notifier);
+    var interactions = ref.watch(interactionsProvider(null));
+    var provider = ref.read(interactionsProvider(null));
 
     return const Placeholder();
   }
