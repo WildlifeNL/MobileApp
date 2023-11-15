@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
+import 'package:wildlife_nl_app/pages/report_list.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 
@@ -45,7 +46,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Activiteit",
         ),
-        const ExamplePage(),
+        const ReportListPage(),
       ),
       (
         InkWell(
