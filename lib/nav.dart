@@ -1,9 +1,7 @@
 import 'dart:io';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
@@ -32,54 +30,73 @@ class _BottomNavigationState extends State<BottomNavigation>
   Widget build(BuildContext context) {
     var items = [
       (
-        NavigationDestination(
-          icon: const Icon(
+        const NavigationDestination(
+          icon: Icon(
             AppIcons.home,
           ),
-          label: S.of(context).tabHome,
+          label: "Home",
         ),
         const ExamplePage(),
       ),
       (
-      NavigationDestination(
-        icon: const Icon(
-          AppIcons.home,
+        const NavigationDestination(
+          icon: Icon(
+            AppIcons.report_list,
+          ),
+          label: "Activiteit",
         ),
-        label: S.of(context).tabHome,
-      ),
-      const ExamplePage(),
+        const ExamplePage(),
       ),
       (
-      NavigationDestination(
-        icon: const Icon(
-          AppIcons.home,
+        InkWell(
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                //TODO: Scaffold should be replaced with the create a report page.
+                builder: (context) => Scaffold(
+                  body: Center(child: const Text("Hi"),),
+                  appBar: AppBar(),
+                ),
+              ),
+            );
+          },
+          child: NavigationDestination(
+            icon: AnimatedReportIcon(
+              controller: _controller,
+              animationIntensity: 0.7,
+              shadow: 1,
+            ),
+            label: "",
+            enabled: false,
+          ),
         ),
-        label: S.of(context).tabHome,
-      ),
-      const ExamplePage(),
+        const ExamplePage(),
       ),
       (
-      NavigationDestination(
-        icon: const Icon(
-          AppIcons.home,
+        const NavigationDestination(
+          icon: Icon(
+            AppIcons.map,
+          ),
+          label: "Kaart",
         ),
-        label: S.of(context).tabHome,
-      ),
-      const ExamplePage(),
+        const ExamplePage(),
       ),
       (
-      NavigationDestination(
-        icon: const Icon(
-          AppIcons.home,
+        const NavigationDestination(
+          icon: Icon(
+            AppIcons.person_outlined,
+          ),
+          label: "Profiel",
         ),
-        label: S.of(context).tabHome,
-      ),
-      const ExamplePage(),
-      ),
+        const ExamplePage(),
+      )
     ];
 
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 0, backgroundColor: AppColors.neutral_50,),
+      appBar: AppBar(
+        toolbarHeight: 0,
+        backgroundColor: AppColors.neutral_50,
+      ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
         child: items[selectedIndex].$2,
@@ -110,8 +127,8 @@ class _BottomNavigationState extends State<BottomNavigation>
   }
 }
 
-class AnimatedMapIcon extends StatelessWidget {
-  const AnimatedMapIcon({
+class AnimatedReportIcon extends StatelessWidget {
+  const AnimatedReportIcon({
     super.key,
     required AnimationController controller,
     required this.animationIntensity,
@@ -161,7 +178,7 @@ class AnimatedMapIcon extends StatelessWidget {
                   ],
                 ),
                 child: const Icon(
-                  AppIcons.map,
+                  AppIcons.report,
                   size: 30,
                   color: Colors.white,
                 ),
@@ -180,7 +197,7 @@ class CustomNavBarForeground extends StatefulWidget {
     required this.selectedIndex,
   });
 
-  final List<NavigationDestination> items;
+  final List<Widget> items;
 
   final Function(int)? onDestinationSelected;
 
