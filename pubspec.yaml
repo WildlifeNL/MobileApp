@@ -30,8 +30,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_localizations:
-    sdk: flutter
 
   cupertino_icons: ^1.0.6
   permission_handler: ^11.0.1
@@ -54,6 +52,7 @@ dependencies:
   google_fonts: ^6.1.0
   kiwi: ^4.1.0
   easy_localization: ^3.0.3
+  easy_localization_loader: ^2.0.0
 
 dev_dependencies:
   flutter_test:
@@ -87,5 +86,3 @@ flutter:
           - asset: assets/fonts/verdana-bold-italic.ttf
             weight: 700
             style: italic
-flutter_intl:
-  enabled: true
