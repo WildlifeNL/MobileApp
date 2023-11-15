@@ -5,15 +5,15 @@ import 'package:wildlife_nl_app/services/interaction.dart';
 part 'interactions.g.dart';
 
 @riverpod
-class Interactions extends _$Interactions {
+class Sightings extends _$Sightings {
   int currentPage = 0;
   bool hasNextPage = true;
   bool isLoadingNewPage = true;
 
   @override
-  Future<List<Interaction>> build() async {
+  Future<List<Interaction>> build(InteractionType? activityType) async {
     List<Interaction> interactions = [];
-    var response = await InteractionService.getInteractions(currentPage, 20,
+    var response = await InteractionService.getInteractions(currentPage, 10,
         accessToken: "");
 
     if (response.isOk()) {
@@ -24,6 +24,7 @@ class Interactions extends _$Interactions {
 
     currentPage++;
     isLoadingNewPage = false;
+
     return interactions;
   }
 
@@ -31,7 +32,7 @@ class Interactions extends _$Interactions {
     if (isLoadingNewPage && hasNextPage) return;
     isLoadingNewPage = true;
     List<Interaction> interactions = state.value!.toList();
-    var response = await InteractionService.getInteractions(currentPage, 20,
+    var response = await InteractionService.getInteractions(currentPage, 10,
         accessToken: "");
 
     if (response.isOk()) {
@@ -41,7 +42,10 @@ class Interactions extends _$Interactions {
     }
 
     state = AsyncData(interactions);
+
     currentPage++;
     isLoadingNewPage = false;
   }
 }
+
+
