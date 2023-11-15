@@ -46,7 +46,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Activiteit",
         ),
-        const ReportListPage(),
+        const ActivitiesPage(),
       ),
       (
         InkWell(
