@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
+import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 
@@ -61,11 +62,11 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
       NavigationDestination(
         icon: const Icon(
-          AppIcons.home,
+          AppIcons.map,
         ),
         label: S.of(context).tabHome,
       ),
-      const ExamplePage(),
+      const Map(),
       ),
       (
       NavigationDestination(
