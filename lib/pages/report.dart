@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -20,6 +21,16 @@ class AnimalType {
   final List<Animals> animals;
 
   AnimalType({required this.name, required this.img, required this.animals});
+}
+
+class AnimalQuestion {
+  final String question;
+  final bool fullWidth;
+  final String hint;
+  final List<String> options;
+  final String answer;
+
+  AnimalQuestion({required this.question, required this.fullWidth, required this.hint, required this.options, required this.answer});
 }
 
 class ReportPage extends StatefulWidget {
@@ -69,6 +80,41 @@ class _ReportPageState extends State<ReportPage> {
       animals: [
         Animals(name: "Wisent", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
       ],
+    ),
+  ];
+
+  final List<AnimalQuestion> animalQuestions = [
+    AnimalQuestion(
+      question: "Aantal dieren:",
+      fullWidth: false,
+      hint: "Selecteer aantal",
+      options: ['0','1','2','3','4','5+'],
+      answer: "",
+    ),
+    AnimalQuestion(
+      question: "Aantal jonge:",
+      fullWidth: false,
+      hint: "Selecteer aantal",
+      options: ['0','1','2','3','4','5+'],
+      answer: "",
+    ),
+    AnimalQuestion(
+      question: "Wat was je aan het doen toen je het dier zag?",
+      fullWidth: true,
+      hint: "Selecteer handeling",
+      options: [
+        'Er op af rennen',
+        'Luide geluiden maken',
+        'Langzaam er naar toe lopen',
+        'Een selfie maken',
+        'Wegrennen',
+       'Een foto maken',
+        'Langs het dier lopen',
+        'Stil blijven staan',
+        'Naar het dier kijken',
+        'Langzaam weglopen',
+      ],
+      answer: "",
     ),
   ];
 
@@ -142,6 +188,7 @@ class _ReportPageState extends State<ReportPage> {
 
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: AppBar(toolbarHeight: 0, excludeHeaderSemantics: true,),
       body: Column(
@@ -299,20 +346,18 @@ class _ReportPageState extends State<ReportPage> {
                   CustomStep(
                       state: _currentStep >= 2 ? CustomStepState.editing : CustomStepState.indexed,
                       content: Container(
+                        padding: EdgeInsets.only(top: 4),
                         width: double.maxFinite,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hier komen evalutie vragen',
-                              style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                color: AppColors.primary,
-                              ),
-                            ),
-                          ],
-                        ),
+                        child: Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: animalQuestions.map((question) => MyDropdown(
+                              options: question.options,
+                              title: question.question,
+                              placeholder: question.hint,
+                              fullWidth: question.fullWidth
+                          )).toList(),
+                        )
                       )
                   ),
                 ]),
@@ -338,8 +383,7 @@ class _ReportPageState extends State<ReportPage> {
                               'Vorige',
                               style: AppStyles.of(context).data.textStyle.buttonText
                           ),
-                          style: ElevatedButton.styleFrom(
-                            primary: Colors.white, // Achtergrondkleur van de knop
+                          style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
                             onPrimary: AppColors.primary, // Tekstkleur van de knop
                             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
                             shape: RoundedRectangleBorder(
@@ -388,6 +432,73 @@ class _ReportPageState extends State<ReportPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MyDropdown extends StatefulWidget {
+  final List<String> options;
+  final String title;
+  final String placeholder;
+  final bool fullWidth;
+
+  MyDropdown({required this.options, required this.title, required this.placeholder, required this.fullWidth});
+
+  @override
+  _MyDropdownState createState() => _MyDropdownState();
+}
+
+class _MyDropdownState extends State<MyDropdown> {
+  String? selectedValue;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          widget.title,
+          style: AppStyles
+              .of(context)
+              .data
+              .textStyle
+              .cardTitle
+              .copyWith(
+            color: AppColors.primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownMenu<String>(
+              trailingIcon: Transform.translate(offset: Offset(10, 0),child: const Icon(AppIcons.arrow_down, size: 16)),
+              selectedTrailingIcon: Transform.translate(offset: Offset(10, 0),child: Transform.rotate(angle: 180 * pi / 180, child: const Icon(AppIcons.arrow_down, size: 16))),
+              width: widget.fullWidth ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
+              hintText: widget.placeholder,
+              textStyle: AppStyles
+                  .of(context)
+                  .data
+                  .textStyle
+                  .paragraph,
+              menuStyle: const MenuStyle(
+                backgroundColor: MaterialStatePropertyAll(Colors.white),
+                visualDensity: VisualDensity.compact,
+              ),
+              inputDecorationTheme: const InputDecorationTheme(
+                constraints: BoxConstraints(maxHeight: 40),
+                isDense: true,
+                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide.none),
+                fillColor: Colors.white,
+                filled: true,
+                contentPadding: EdgeInsets.symmetric(horizontal: 8)
+              ),
+
+              dropdownMenuEntries: widget.options.map<DropdownMenuEntry<String>>((String value) {
+                return DropdownMenuEntry<String>(
+                  value: value,
+                  label: value,
+                );
+              }).toList(),
+            ),
+      ],
     );
   }
 }
