@@ -79,7 +79,7 @@ final List<AnimalQuestion> animalQuestions = [
       required: false,
       fullWidth: true,
       hint: '',
-      options: ['angstig', 'neutral', 'enthousiast']
+      options: ['angstig', 'neutraal', 'enthousiast']
   ),
   AnimalQuestion(
     inputType: 'dropdown',
@@ -122,7 +122,7 @@ final List<AnimalQuestion> animalQuestions = [
 
 final animalQuestionsMap = animalQuestions.asMap();
 
-List<String> _evaluationAnswers = List.filled(animalQuestions.length, "");
+List<String> _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
 String _chosenType = '';
 String _chosenName = '';
 
@@ -262,383 +262,386 @@ class _ReportPageState extends State<ReportPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(toolbarHeight: 0, excludeHeaderSemantics: true,),
-      body: Column(
-        children: [
-          Container(
-            width: double.maxFinite,
-            padding: const EdgeInsets.only(
-              left: 8,
-              right: 8,
-              bottom: 4,
-            ),
-            child: Column(
-              children: [
-                Container(
-                  width: double.maxFinite,
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                      child: IconButton(
-                          onPressed: (){
-                            Navigator.of(context).pop();
-                          },
-                          icon: Icon(AppIcons.cross)),
-                  ),
-                ),
-                SizedBox(
-                  width: double.maxFinite,
-                  child: Text(
-                    'Nieuwe melding',
-                    textAlign: TextAlign.center,
-                    style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(
-                      color: AppColors.primary
+      body: Container(
+        color: AppColors.neutral_50,
+        child: Column(
+          children: [
+            Container(
+              width: double.maxFinite,
+              padding: const EdgeInsets.only(
+                left: 8,
+                right: 8,
+                bottom: 4,
+              ),
+              child: Column(
+                children: [
+                  Container(
+                    width: double.maxFinite,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                        child: IconButton(
+                            onPressed: (){
+                              Navigator.of(context).pop();
+                            },
+                            icon: Icon(AppIcons.cross)),
                     ),
                   ),
-                ),
-              ],
+                  SizedBox(
+                    width: double.maxFinite,
+                    child: Text(
+                      'Nieuwe melding',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(
+                        color: AppColors.primary
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Flexible(
-            child: CustomStepper(
-                elevation: 0,
-                currentStep: _currentStep,
-                controlsBuilder: (context, details) => Text(""),
-                steps: [
-                  CustomStep(
-                      state: _currentStep == 0 ? CustomStepState.editing : CustomStepState.complete,
-                      content: Container(
-                        width: double.maxFinite,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Wat is de diersoort?',
-                              style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            Container(
-                                padding: EdgeInsets.only(top: 4),
-                                width: double.maxFinite,
-                                child: Wrap(
-                                    spacing: 16,
-                                    runSpacing: 16,
-                                    children: diersoorten.map((diersoort) => GestureDetector(
-                                      onTap: (){
-                                        if(_chosenType != diersoort.name) {
-                                          setState(() {
-                                            _chosenType = diersoort.name;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            _chosenType = '';
-                                          });
-                                        }
-                                      },
-                                      child: FractionallySizedBox(
-                                        widthFactor: 1/3.3,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            AspectRatio(
-                                                  aspectRatio: 1.0,
-                                                  child: Container(
-                                                    padding: const EdgeInsets.all(8),
-                                                    decoration: ShapeDecoration(
-                                                      color: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                        side: BorderSide(
-                                                          color: _chosenType == diersoort.name ? AppColors.primary : Colors.white,
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    child: Row(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      mainAxisAlignment: MainAxisAlignment.center,
-                                                      crossAxisAlignment: CrossAxisAlignment.center,
-                                                      children: [
-                                                        Expanded(
-                                                          child: Image(
-                                                            image: NetworkImage(diersoort.img)
-                                                          ),
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                                diersoort.name,
-                                                textAlign: TextAlign.center,
-                                                style: AppStyles.of(context).data.textStyle.paragraph,
-                                              ),
-                                          ],
-                                        ),
-                                      ),
-                                    )).toList())
-                            ),
-                          ],
-                        ),
-                      )
-                  ),
-                  CustomStep(
-                    state: _currentStep < 1 ? CustomStepState.indexed : (_currentStep > 1 ? CustomStepState.complete : CustomStepState.editing),
-                      content: Container(
-                        width: double.maxFinite,
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Wat is het dier?',
-                              style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            Container(
-                                padding: EdgeInsets.only(top: 4),
-                                width: double.maxFinite,
-                                child: Wrap(
-                                    spacing: 16,
-                                    runSpacing: 16,
-                                    children:  getFilteredAnimals(),
+            Flexible(
+              child: CustomStepper(
+                  elevation: 0,
+                  currentStep: _currentStep,
+                  controlsBuilder: (context, details) => Text(""),
+                  steps: [
+                    CustomStep(
+                        state: _currentStep == 0 ? CustomStepState.editing : CustomStepState.complete,
+                        content: Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Wat is de diersoort?',
+                                style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                  color: AppColors.primary,
                                 ),
-                            ),
-                          ],
-                        ),
-                      )
-                  ),
-                  CustomStep(
-                      state: _currentStep >= 2 ? CustomStepState.editing : CustomStepState.indexed,
-                      content: Container(
-                        padding: EdgeInsets.only(top: 4),
-                        width: double.maxFinite,
-                        child: Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
-                          children: animalQuestionsMap.map((i, question) {
-                            if (question.inputType == "dropdown") {
-                              return MapEntry(i,
-                                  MyDropdown(
-                                    options: question.options,
-                                    title: question.question,
-                                    placeholder: question.hint,
-                                    fullWidth: question.fullWidth,
-                                    required: question.required,
-                                    index: i,
-                                  )
-                              );
-                            } else if (question.inputType == 'horizontalOptions') {
-                              return MapEntry(i, Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      question.question,
-                                      style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height:8),
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                      children: question.options.map((option) => GestureDetector(
+                              ),
+                              Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  width: double.maxFinite,
+                                  child: Wrap(
+                                      spacing: 16,
+                                      runSpacing: 16,
+                                      children: diersoorten.map((diersoort) => GestureDetector(
                                         onTap: (){
-                                          if(_evaluationAnswers[i] != option) {
+                                          if(_chosenType != diersoort.name) {
                                             setState(() {
-                                              _evaluationAnswers[i] = option;
+                                              _chosenType = diersoort.name;
                                             });
                                           } else {
-                                              setState(() {
-                                                _evaluationAnswers[i] = '';
-                                              });
+                                            setState(() {
+                                              _chosenType = '';
+                                            });
                                           }
                                         },
-                                        child: Container(
-                                            decoration: ShapeDecoration(
-                                              color: Colors.white,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8),
-                                                side: BorderSide(
-                                                  color: _evaluationAnswers[i] == option ? AppColors.primary : Colors.white,
-                                                  width: 2,
-                                                ),
-                                              ),
-                                            ),
-                                            padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                            child: Text(option)
-                                        ),
-                                      )).toList(),
-                                    )
-                                  ],
-                                ),
-                              ));
-                            }
-                            else if (question.inputType == 'stars'){
-                              return MapEntry(i, Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      question.question,
-                                      style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    RatingBar.builder(
-                                      minRating: 1,
-                                      direction: Axis.horizontal,
-                                      allowHalfRating: true,
-                                      itemCount: 5,
-                                      itemPadding: EdgeInsets.symmetric(horizontal: 0),
-                                      itemBuilder: (context, _) => Icon(
-                                        Icons.star,
-                                        color: AppColors.primary,
-                                      ),
-                                      onRatingUpdate: (rating) {
-                                        if(_evaluationAnswers[i] != rating) {
-                                            _evaluationAnswers[i] = rating.toString();
-                                        }
-                                      },
-                                    ),
-                                  ]
-                              )
-                              ));
-                            }
-                            else if (question.inputType == 'photo') {
-                              return MapEntry(i, Container(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      question.question,
-                                      style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                                    const SizedBox(height:8),
-                                    Row(
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () {
-                                            _pickImage(ImageSource.gallery, i); // Open gallery
-                                          },
-                                          child: Row(
+                                        child: FractionallySizedBox(
+                                          widthFactor: 1/3.3,
+                                          child: Column(
                                             mainAxisSize: MainAxisSize.min,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
                                             children: [
-                                              Icon(AppIcons.add, size: 20),
-                                              SizedBox(width: 4),
-                                              Text("Voeg foto toe"),
+                                              AspectRatio(
+                                                    aspectRatio: 1.0,
+                                                    child: Container(
+                                                      padding: const EdgeInsets.all(8),
+                                                      decoration: ShapeDecoration(
+                                                        color: Colors.white,
+                                                        shape: RoundedRectangleBorder(
+                                                            borderRadius: BorderRadius.circular(8),
+                                                          side: BorderSide(
+                                                            color: _chosenType == diersoort.name ? AppColors.primary : Colors.white,
+                                                            width: 2,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      child: Row(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                                        children: [
+                                                          Expanded(
+                                                            child: Image(
+                                                              image: NetworkImage(diersoort.img)
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                  diersoort.name,
+                                                  textAlign: TextAlign.center,
+                                                  style: AppStyles.of(context).data.textStyle.paragraph,
+                                                ),
                                             ],
                                           ),
-                                          style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
-                                            onPrimary: AppColors.primary, // Tekstkleur van de knop
-                                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
-                                                side: BorderSide(color: AppColors.primary, width: 2)
-                                            ),
-                                            elevation: 0,
-                                          ),
                                         ),
-                                      ],
-                                    )
-                                  ]
-                                )
-                              ));
-                            }
-                            else {
-                              return MapEntry(i, Container());
-                            }
-                          }).values.toList(),
-                        )
-                      )
-                  ),
-                ]),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Visibility(
-                      visible: _currentStep > 0,
-                      child: Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                              setState(() {
-                                _currentStep--; // Verhoog de huidige stap
-                              });
-                          },
-                          child: Text(
-                              'Vorige',
-                              style: AppStyles.of(context).data.textStyle.buttonText
+                                      )).toList())
+                              ),
+                            ],
                           ),
-                          style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
-                            onPrimary: AppColors.primary, // Tekstkleur van de knop
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
+                        )
+                    ),
+                    CustomStep(
+                      state: _currentStep < 1 ? CustomStepState.indexed : (_currentStep > 1 ? CustomStepState.complete : CustomStepState.editing),
+                        content: Container(
+                          width: double.maxFinite,
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Wat is het dier?',
+                                style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              Container(
+                                  padding: EdgeInsets.only(top: 4),
+                                  width: double.maxFinite,
+                                  child: Wrap(
+                                      spacing: 16,
+                                      runSpacing: 16,
+                                      children:  getFilteredAnimals(),
+                                  ),
+                              ),
+                            ],
+                          ),
+                        )
+                    ),
+                    CustomStep(
+                        state: _currentStep >= 2 ? CustomStepState.editing : CustomStepState.indexed,
+                        content: Container(
+                          padding: EdgeInsets.only(top: 4),
+                          width: double.maxFinite,
+                          child: Wrap(
+                            spacing: 16,
+                            runSpacing: 16,
+                            children: animalQuestionsMap.map((i, question) {
+                              if (question.inputType == "dropdown") {
+                                return MapEntry(i,
+                                    MyDropdown(
+                                      options: question.options,
+                                      title: question.question,
+                                      placeholder: question.hint,
+                                      fullWidth: question.fullWidth,
+                                      required: question.required,
+                                      index: i,
+                                    )
+                                );
+                              } else if (question.inputType == 'horizontalOptions') {
+                                return MapEntry(i, Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        question.question,
+                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(height:8),
+                                      Row(
+                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        children: question.options.map((option) => GestureDetector(
+                                          onTap: (){
+                                            if(_evaluationAnswers[i] != option) {
+                                              setState(() {
+                                                _evaluationAnswers[i] = option;
+                                              });
+                                            } else {
+                                                setState(() {
+                                                  _evaluationAnswers[i] = '';
+                                                });
+                                            }
+                                          },
+                                          child: Container(
+                                              decoration: ShapeDecoration(
+                                                color: Colors.white,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8),
+                                                  side: BorderSide(
+                                                    color: _evaluationAnswers[i] == option ? AppColors.primary : Colors.white,
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                              ),
+                                              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                                              child: Text(option)
+                                          ),
+                                        )).toList(),
+                                      )
+                                    ],
+                                  ),
+                                ));
+                              }
+                              else if (question.inputType == 'stars'){
+                                return MapEntry(i, Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        question.question,
+                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      RatingBar.builder(
+                                        minRating: 1,
+                                        direction: Axis.horizontal,
+                                        allowHalfRating: true,
+                                        itemCount: 5,
+                                        itemPadding: EdgeInsets.symmetric(horizontal: 0),
+                                        itemBuilder: (context, _) => Icon(
+                                          Icons.star,
+                                          color: AppColors.primary,
+                                        ),
+                                        onRatingUpdate: (rating) {
+                                          if(_evaluationAnswers[i] != rating) {
+                                              _evaluationAnswers[i] = rating.toString();
+                                          }
+                                        },
+                                      ),
+                                    ]
+                                )
+                                ));
+                              }
+                              else if (question.inputType == 'photo') {
+                                return MapEntry(i, Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        question.question,
+                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(height:8),
+                                      Row(
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () {
+                                              _pickImage(ImageSource.gallery, i); // Open gallery
+                                            },
+                                            child: Row(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Icon(AppIcons.add, size: 20),
+                                                SizedBox(width: 4),
+                                                Text("Voeg foto toe"),
+                                              ],
+                                            ),
+                                            style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
+                                              onPrimary: AppColors.primary, // Tekstkleur van de knop
+                                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
+                                                  side: BorderSide(color: AppColors.primary, width: 2)
+                                              ),
+                                              elevation: 0,
+                                            ),
+                                          ),
+                                        ],
+                                      )
+                                    ]
+                                  )
+                                ));
+                              }
+                              else {
+                                return MapEntry(i, Container());
+                              }
+                            }).values.toList(),
+                          )
+                        )
+                    ),
+                  ]),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Visibility(
+                        visible: _currentStep > 0,
+                        child: Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                                setState(() {
+                                  _currentStep--; // Verhoog de huidige stap
+                                });
+                            },
+                            child: Text(
+                                'Vorige',
+                                style: AppStyles.of(context).data.textStyle.buttonText
+                            ),
+                            style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
+                              onPrimary: AppColors.primary, // Tekstkleur van de knop
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
+                                side: BorderSide(color: AppColors.primary, width: 2)
+                              ),
+                              elevation: 0,
+                            ),
+                          ),
+                        ),
+                      ),
+                      Visibility(
+                        visible: _currentStep > 0,
+                        child: SizedBox(width: 16.0), // Space between buttons if 2nd button is visible
+                      ),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: (_chosenType.isNotEmpty && _currentStep == 0) ? () {
+                            setState(() {
+                              _currentStep++;
+                            });
+                          } : ((_chosenName.isNotEmpty && _currentStep == 1) ? () {
+                            setState(() {
+                              _currentStep++;
+                            });
+                            } : ((_currentStep == 2) ? () {
+                            print(_evaluationAnswers);
+                            Navigator.of(context).pop();
+                            _currentStep = 0;
+                            _chosenName = '';
+                            _chosenType= '';
+                            _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+                          }  : null)),
+                          // onPressed: null,
+                          child: Text(
+                            _currentStep < 2 ? 'Volgende' : 'Opslaan',
+                            style: AppStyles.of(context).data.textStyle.buttonText
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            primary:AppColors.primary,
+                            onPrimary: Colors.white,
+                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                             shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
-                              side: BorderSide(color: AppColors.primary, width: 2)
+                                borderRadius: BorderRadius.circular(8.0),
                             ),
                             elevation: 0,
                           ),
                         ),
                       ),
-                    ),
-                    Visibility(
-                      visible: _currentStep > 0,
-                      child: SizedBox(width: 16.0), // Space between buttons if 2nd button is visible
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: (_chosenType.isNotEmpty && _currentStep == 0) ? () {
-                          setState(() {
-                            _currentStep++;
-                          });
-                        } : ((_chosenName.isNotEmpty && _currentStep == 1) ? () {
-                          setState(() {
-                            _currentStep++;
-                          });
-                          } : ((_evaluationAnswers[0].isNotEmpty && _evaluationAnswers[1].isNotEmpty) ? () {
-                          print(_evaluationAnswers);
-                          Navigator.of(context).pop();
-                          _currentStep = 0;
-                          _chosenName = '';
-                          _chosenType= '';
-                          _evaluationAnswers = List.filled(animalQuestions.length, "");
-                        }  : null)),
-                        // onPressed: null,
-                        child: Text(
-                          _currentStep < 2 ? 'Volgende' : 'Opslaan',
-                          style: AppStyles.of(context).data.textStyle.buttonText
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          primary:AppColors.primary,
-                          onPrimary: Colors.white,
-                          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          elevation: 0,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -659,7 +662,6 @@ class MyDropdown extends StatefulWidget {
 }
 
 class _MyDropdownState extends State<MyDropdown> {
-  String? selectedValue;
 
   @override
   Widget build(BuildContext context) {
@@ -679,39 +681,40 @@ class _MyDropdownState extends State<MyDropdown> {
         ),
         const SizedBox(height: 8),
         DropdownMenu<String>(
-              trailingIcon: Transform.translate(offset: Offset(10, 0),child: const Icon(AppIcons.arrow_down, size: 16)),
-              selectedTrailingIcon: Transform.translate(offset: Offset(10, 0),child: Transform.rotate(angle: 180 * pi / 180, child: const Icon(AppIcons.arrow_down, size: 16))),
-              width: widget.fullWidth ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
-              hintText: widget.placeholder,
-              textStyle: AppStyles
-                  .of(context)
-                  .data
-                  .textStyle
-                  .paragraph,
-              menuStyle: const MenuStyle(
-                backgroundColor: MaterialStatePropertyAll(Colors.white),
-                visualDensity: VisualDensity.compact,
-              ),
-              inputDecorationTheme: const InputDecorationTheme(
-                constraints: BoxConstraints(maxHeight: 40),
-                isDense: true,
-                border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide.none),
-                fillColor: Colors.white,
-                filled: true,
-                contentPadding: EdgeInsets.symmetric(horizontal: 8)
-              ),
-              onSelected: (String? value) {
-                  setState(() {
-                    _evaluationAnswers[widget.index] = value!;
-                  });
-              },
-              dropdownMenuEntries: widget.options.map<DropdownMenuEntry<String>>((String value) {
-                return DropdownMenuEntry<String>(
-                  value: value,
-                  label: value,
-                );
-              }).toList(),
-            ),
+          initialSelection: widget.index == 0 ? '1' : (widget.index == 1 ? '0' : null),
+          trailingIcon: Transform.translate(offset: Offset(10, 0),child: const Icon(AppIcons.arrow_down, size: 16)),
+          selectedTrailingIcon: Transform.translate(offset: Offset(10, 0),child: Transform.rotate(angle: 180 * pi / 180, child: const Icon(AppIcons.arrow_down, size: 16))),
+          width: widget.fullWidth ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
+          hintText: widget.placeholder,
+          textStyle: AppStyles
+              .of(context)
+              .data
+              .textStyle
+              .paragraph,
+          menuStyle: const MenuStyle(
+            backgroundColor: MaterialStatePropertyAll(Colors.white),
+            visualDensity: VisualDensity.compact,
+          ),
+          inputDecorationTheme: const InputDecorationTheme(
+            constraints: BoxConstraints(maxHeight: 40),
+            isDense: true,
+            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide.none),
+            fillColor: Colors.white,
+            filled: true,
+            contentPadding: EdgeInsets.symmetric(horizontal: 8)
+          ),
+          onSelected: (String? value) {
+              setState(() {
+                _evaluationAnswers[widget.index] = value!;
+              });
+          },
+          dropdownMenuEntries: widget.options.map<DropdownMenuEntry<String>>((String value) {
+            return DropdownMenuEntry<String>(
+              value: value,
+              label: value,
+            );
+          }).toList(),
+        ),
       ],
     );
   }
