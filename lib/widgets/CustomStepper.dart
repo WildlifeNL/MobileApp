@@ -103,10 +103,6 @@ const TextStyle _kStepStyle = TextStyle(
 );
 const Color _kErrorLight = Colors.red;
 final Color _kErrorDark = Colors.red.shade400;
-const Color _kCircleActiveLight = Colors.white;
-const Color _kCircleActiveDark = Colors.black87;
-const Color _kDisabledLight = Colors.black38;
-const Color _kDisabledDark = Colors.white38;
 const double _kStepSize = 24.0;
 const double _kTriangleHeight = _kStepSize * 0.866025; // Triangle height. sqrt(3.0) / 2.0
 
@@ -243,58 +239,6 @@ class CustomStepper extends StatefulWidget {
   /// If null, the 'cancel' button will be disabled.
   final VoidCallback? onStepCancel;
 
-  /// The callback for creating custom controls.
-  ///
-  /// If null, the default controls from the current theme will be used.
-  ///
-  /// This callback which takes in a context and a [ControlsDetails] object, which
-  /// contains step information and two functions: [onStepContinue] and [onStepCancel].
-  /// These can be used to control the stepper. For example, reading the
-  /// [ControlsDetails.currentStep] value within the callback can change the text
-  /// of the continue or cancel button depending on which step users are at.
-  ///
-  /// {@tool dartpad}
-  /// Creates a stepper control with custom buttons.
-  ///
-  /// ```dart
-  /// Widget build(BuildContext context) {
-  ///   return Stepper(
-  ///     controlsBuilder:
-  ///       (BuildContext context, ControlsDetails details) {
-  ///          return Row(
-  ///            children: <Widget>[
-  ///              TextButton(
-  ///                onPressed: details.onStepContinue,
-  ///                child: Text('Continue to Step ${details.stepIndex + 1}'),
-  ///              ),
-  ///              TextButton(
-  ///                onPressed: details.onStepCancel,
-  ///                child: Text('Back to Step ${details.stepIndex - 1}'),
-  ///              ),
-  ///            ],
-  ///          );
-  ///       },
-  ///     steps: const <Step>[
-  ///       Step(
-  ///         title: Text('A'),
-  ///         content: SizedBox(
-  ///           width: 100.0,
-  ///           height: 100.0,
-  ///         ),
-  ///       ),
-  ///       Step(
-  ///         title: Text('B'),
-  ///         content: SizedBox(
-  ///           width: 100.0,
-  ///           height: 100.0,
-  ///         ),
-  ///       ),
-  ///     ],
-  ///   );
-  /// }
-  /// ```
-  /// ** See code in examples/api/lib/material/stepper/stepper.controls_builder.0.dart **
-  /// {@end-tool}
   final ControlsWidgetBuilder? controlsBuilder;
 
   /// The elevation of this stepper's [Material] when [type] is [CustomStepperType.horizontal].
@@ -352,16 +296,8 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     }
   }
 
-  bool _isFirst(int index) {
-    return index == 0;
-  }
-
   bool _isLast(int index) {
     return widget.steps.length - 1 == index;
-  }
-
-  bool _isCurrent(int index) {
-    return widget.currentStep == index;
   }
 
   bool _isDark() {
@@ -377,6 +313,7 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     return false;
   }
 
+  // Inside of the circle
   Widget _buildCircleChild(int index, bool oldState) {
     final CustomStepState state = oldState ? _oldStates[index]! : widget.steps[index].state;
     final Widget? icon = widget.stepIconBuilder?.call(index, state);
@@ -386,7 +323,6 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     switch (state) {
       case CustomStepState.indexed:
         return Container(
-          // margin: const EdgeInsets.symmetric(vertical: 8.0),
           width: 12,
           height: 12,
           child: AnimatedContainer(
@@ -415,6 +351,7 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     }
   }
 
+  // Backgroundcolor of the circles
   Color _circleColor(int index) {
     final CustomStepState state = widget.steps[index].state;
     switch (state) {
@@ -429,6 +366,7 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     }
   }
 
+  // build the circles of the steps
   Widget _buildCircle(int index, bool oldState) {
     return Container(
       // margin: const EdgeInsets.symmetric(vertical: 8.0),
@@ -491,101 +429,22 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     }
   }
 
-  Widget _buildVerticalControls(int stepIndex) {
-    if (widget.controlsBuilder != null) {
-      return widget.controlsBuilder!(
-        context,
-        ControlsDetails(
-          currentStep: widget.currentStep,
-          onStepContinue: widget.onStepContinue,
-          onStepCancel: widget.onStepCancel,
-          stepIndex: stepIndex,
-        ),
-      );
-    }
-
-    final Color cancelColor;
-    switch (Theme.of(context).brightness) {
-      case Brightness.light:
-        cancelColor = Colors.black54;
-      case Brightness.dark:
-        cancelColor = Colors.white70;
-    }
-
-    final ThemeData themeData = Theme.of(context);
-    final ColorScheme colorScheme = themeData.colorScheme;
-    final MaterialLocalizations localizations = MaterialLocalizations.of(context);
-
-    const OutlinedBorder buttonShape = RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(2)));
-    const EdgeInsets buttonPadding = EdgeInsets.symmetric(horizontal: 16.0);
-
-    return Container(
-      margin: const EdgeInsets.only(top: 16.0),
-      child: ConstrainedBox(
-        constraints: const BoxConstraints.tightFor(height: 48.0),
-        child: Row(
-          // The Material spec no longer includes a Stepper widget. The continue
-          // and cancel button styles have been configured to match the original
-          // version of this widget.
-          children: <Widget>[
-            TextButton(
-              onPressed: widget.onStepContinue,
-              style: ButtonStyle(
-                foregroundColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-                  return states.contains(MaterialState.disabled) ? null : (_isDark() ? colorScheme.onSurface : colorScheme.onPrimary);
-                }),
-                backgroundColor: MaterialStateProperty.resolveWith<Color?>((Set<MaterialState> states) {
-                  return _isDark() || states.contains(MaterialState.disabled) ? null : colorScheme.primary;
-                }),
-                padding: const MaterialStatePropertyAll<EdgeInsetsGeometry>(buttonPadding),
-                shape: const MaterialStatePropertyAll<OutlinedBorder>(buttonShape),
-              ),
-              child: Text(
-                  themeData.useMaterial3
-                      ? localizations.continueButtonLabel
-                      : localizations.continueButtonLabel.toUpperCase()
-              ),
-            ),
-            Container(
-              margin: const EdgeInsetsDirectional.only(start: 8.0),
-              child: TextButton(
-                onPressed: widget.onStepCancel,
-                style: TextButton.styleFrom(
-                  foregroundColor: cancelColor,
-                  padding: buttonPadding,
-                  shape: buttonShape,
-                ),
-                child: Text(
-                    themeData.useMaterial3
-                        ? localizations.cancelButtonLabel
-                        : localizations.cancelButtonLabel.toUpperCase()
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildHorizontal() {
     final List<Widget> children = <Widget>[
       for (int i = 0; i < widget.steps.length; i += 1) ...<Widget>[
-        InkResponse(
-          child: Row(
-            children: <Widget>[
-              SizedBox(
-                height: _isLabel() ? 104.0 : 40.0,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: <Widget>[
-                    if (widget.steps[i].label != null) const SizedBox(height: 24.0,),
-                    Center(child: _buildIcon(i)),
-                  ],
-                ),
+        Row(
+          children: <Widget>[
+            SizedBox(
+              height: _isLabel() ? 104.0 : 40.0,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  if (widget.steps[i].label != null) const SizedBox(height: 24.0,),
+                  Center(child: _buildIcon(i)),
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
         if (!_isLast(i))
           Expanded(
@@ -594,7 +453,7 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
               margin: const EdgeInsets.symmetric(horizontal: 8.0),
               height: 1.5,
               color: widget.currentStep >= i+1
-                  ? AppColors.primary // Kleur voor de actieve stap
+                  ? AppColors.primary // Color for line before active step
                   : Colors.grey.shade400,
             ),
           ),
@@ -613,33 +472,35 @@ class _CustomStepperState extends State<CustomStepper> with TickerProviderStateM
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        children: <Widget>[
-          Material(
-            elevation: widget.elevation ?? 2,
-              child: Row(
-                children: children,
-              ),
-          ),
-          Expanded(
-            child: ListView(
-              controller: widget.controller,
-              physics: widget.physics,
-              padding: const EdgeInsets.only(top: 4),
-              children: <Widget>[
-                AnimatedSize(
-                  curve: Curves.fastOutSlowIn,
-                  duration: kThemeAnimationDuration,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: stepPanels),
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          children: <Widget>[
+            Material(
+              elevation: widget.elevation ?? 2,
+                child: Container(
+                  color: AppColors.neutral_50, // background of steps overview
+                  child: Row(
+                    children: children,
+                  ),
                 ),
-                _buildVerticalControls(widget.currentStep),
-              ],
             ),
-          ),
-        ],
-      ),
-    );
+            Expanded(
+              child: ListView(
+                controller: widget.controller,
+                physics: widget.physics,
+                padding: const EdgeInsets.only(top: 4),
+                children: <Widget>[
+                  AnimatedSize(
+                    curve: Curves.fastOutSlowIn,
+                    duration: kThemeAnimationDuration,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: stepPanels),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      );
   }
 
   @override

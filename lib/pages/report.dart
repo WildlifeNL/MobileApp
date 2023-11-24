@@ -258,13 +258,19 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
+  Future _cancelReport() async {
+    print(_evaluationAnswers);
+    Navigator.of(context).pop();
+    _currentStep = 0;
+    _chosenName = '';
+    _chosenType= '';
+    _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(toolbarHeight: 0, excludeHeaderSemantics: true,),
-      body: Container(
-        color: AppColors.neutral_50,
-        child: Column(
+      body: Column(
           children: [
             Container(
               width: double.maxFinite,
@@ -272,6 +278,7 @@ class _ReportPageState extends State<ReportPage> {
                 left: 8,
                 right: 8,
                 bottom: 4,
+                top: 35,
               ),
               child: Column(
                 children: [
@@ -281,7 +288,7 @@ class _ReportPageState extends State<ReportPage> {
                       alignment: Alignment.centerRight,
                         child: IconButton(
                             onPressed: (){
-                              Navigator.of(context).pop();
+                              _cancelReport();
                             },
                             icon: Icon(AppIcons.cross)),
                     ),
@@ -474,7 +481,7 @@ class _ReportPageState extends State<ReportPage> {
                                                 ),
                                               ),
                                               padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                              child: Text(option)
+                                              child: Text(option, style: AppStyles.of(context).data.textStyle.paragraph,)
                                           ),
                                         )).toList(),
                                       )
@@ -539,11 +546,12 @@ class _ReportPageState extends State<ReportPage> {
                                                 Text("Voeg foto toe"),
                                               ],
                                             ),
-                                            style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
-                                              onPrimary: AppColors.primary, // Tekstkleur van de knop
-                                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
+                                            style: ElevatedButton.styleFrom(
+                                              primary: AppColors.neutral_50,
+                                              onPrimary: AppColors.primary,
+                                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                                               shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
+                                                  borderRadius: BorderRadius.circular(8),
                                                   side: BorderSide(color: AppColors.primary, width: 2)
                                               ),
                                               elevation: 0,
@@ -585,11 +593,12 @@ class _ReportPageState extends State<ReportPage> {
                                 'Vorige',
                                 style: AppStyles.of(context).data.textStyle.buttonText
                             ),
-                            style: ElevatedButton.styleFrom( // Achtergrondkleur van de knop
-                              onPrimary: AppColors.primary, // Tekstkleur van de knop
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8), // Padding van de knop
+                            style: ElevatedButton.styleFrom(
+                              primary: AppColors.neutral_50,
+                              onPrimary: AppColors.primary,
+                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                               shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8), // Afgeronde hoeken
+                                borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(color: AppColors.primary, width: 2)
                               ),
                               elevation: 0,
@@ -612,12 +621,7 @@ class _ReportPageState extends State<ReportPage> {
                               _currentStep++;
                             });
                             } : ((_currentStep == 2) ? () {
-                            print(_evaluationAnswers);
-                            Navigator.of(context).pop();
-                            _currentStep = 0;
-                            _chosenName = '';
-                            _chosenType= '';
-                            _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+                            _cancelReport();
                           }  : null)),
                           // onPressed: null,
                           child: Text(
@@ -642,7 +646,6 @@ class _ReportPageState extends State<ReportPage> {
             ),
           ],
         ),
-      ),
     );
   }
 }
