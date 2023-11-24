@@ -202,33 +202,46 @@ class _ReportPageState extends State<ReportPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            AspectRatio(
-              aspectRatio: 1.0,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(
-                      color: _chosenName == dier.name ? AppColors.primary : Colors.white,
-                      width: 2,
+            Stack(
+              children: [
+                AspectRatio(
+                  aspectRatio: 1.0,
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: ShapeDecoration(
+                      color: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                        side: BorderSide(
+                          color: _chosenName == dier.name ? AppColors.primary : Colors.white,
+                          width: 2,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Image(
+                              image: NetworkImage(dier.img)
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Image(
-                          image: NetworkImage(dier.img)
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                Positioned(
+                  right: -4,
+                  top: -4,
+                  child: IconButton(
+                      onPressed: (){
+                        print('pressed info button');
+                      },
+                      icon: const Icon(AppIcons.incident)),
+                )
+              ],
             ),
             const SizedBox(height: 4),
             Text(
