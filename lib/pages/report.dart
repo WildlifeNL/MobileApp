@@ -13,16 +13,6 @@ import 'package:wildlife_nl_app/utilities/app_text_styles.dart';
 import 'package:wildlife_nl_app/widgets/CustomStepper.dart';
 import 'package:http/http.dart' as http;
 
-class AnimalQuestion {
-  final String inputType;
-  final String question;
-  final bool required;
-  final bool fullWidth;
-  final String hint;
-  final List<String> options;
-
-  AnimalQuestion({required this.inputType, required this.question,required this.required, required this.fullWidth, required this.hint, required this.options});
-}
 
 class AnimalType {
   final String name;
@@ -49,17 +39,32 @@ class Animal {
   });
 }
 
+class AnimalQuestion {
+  final String inputType;
+  final String question;
+  final bool required;
+  final bool fullWidth;
+  final String hint;
+  final List<String> options;
+
+  AnimalQuestion({required this.inputType, required this.question,required this.required, required this.fullWidth, required this.hint, required this.options});
+}
+
 final String apiUrlAnimalTypes = "https://api.wildlifedatabase.nl/api/controllers/animals.php/family";
 final String apiUrlAnimals = "https://api.wildlifedatabase.nl/api/controllers/animals.php";
+final String apiUrlQuestions = "https://api.wildlifedatabase.nl/api/controllers/questions.php";
 
 List<AnimalType> animalTypesApi = [];
 List<Animal> animalsApi = [];
+List<AnimalQuestion> questionsApi = [];
 
 Future<void> fetchData() async {
-  final response = await http.get(Uri.parse(apiUrlAnimalTypes));
-  final response2 = await http.get(Uri.parse(apiUrlAnimals));
-  if (response.statusCode == 200) {
-    final List<dynamic> jsonData = jsonDecode(response.body);
+  final typesResponse = await http.get(Uri.parse(apiUrlAnimalTypes));
+  final animalsResponse = await http.get(Uri.parse(apiUrlAnimals));
+  final questionsResponse = await http.get(Uri.parse(apiUrlQuestions));
+
+  if (typesResponse.statusCode == 200) {
+    final List<dynamic> jsonData = jsonDecode(typesResponse.body);
 
     // Map the raw JSON data into a list of AnimalType objects
     animalTypesApi = jsonData.map((json) {
@@ -73,8 +78,8 @@ Future<void> fetchData() async {
     print('Response failed');
   }
 
-  if (response2.statusCode == 200) {
-    final Map<String, dynamic> jsonData2 = jsonDecode(response2.body);
+  if (animalsResponse.statusCode == 200) {
+    final Map<String, dynamic> jsonData2 = jsonDecode(animalsResponse.body);
 
     // Access the 'results' field
     final List<dynamic> results2 = jsonData2['results'];
@@ -91,6 +96,25 @@ Future<void> fetchData() async {
   } else {
     print('Response failed');
   }
+
+  // if (questionsResponse.statusCode == 200) {
+  //   List<dynamic> jsonData3 = jsonDecode(questionsResponse.body);
+  //
+  //   // Map the raw JSON data into a list of AnimalType objects
+  //   questionsApi = jsonData3.map((json) {
+  //     return AnimalQuestion(
+  //         inputType: json['inputType'] ?? '',
+  //         question: json['question'] ?? '',
+  //         required: json['required'] ?? '',
+  //         fullWidth: json['fullWidth'] ?? '',
+  //         hint: json['hint'] ?? '',
+  //         options: json['options'] ?? '',
+  //     );
+  //   }).toList();
+  //   print(questionsApi);
+  // } else {
+  //   print('Response failed');
+  // }
 }
 
 final List<AnimalQuestion> animalQuestions = [
@@ -175,12 +199,9 @@ final List<AnimalQuestion> animalQuestions = [
     options: [],
   ),
 ];
-
 final animalQuestionsMap = animalQuestions.asMap();
 
 List<String> _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
-String _chosenType = '';
-String _chosenName = '';
 
 class ReportPage extends StatefulWidget {
   ReportPage({super.key});
@@ -197,6 +218,8 @@ class _ReportPageState extends State<ReportPage> {
   }
 
   int _currentStep = 0;
+  String _chosenType = '';
+  String _chosenName = '';
 
   List<Widget> getFilteredAnimals() {
     // Filter animals based on the selected type (_chosenType)
