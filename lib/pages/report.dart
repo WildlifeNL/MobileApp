@@ -203,9 +203,10 @@ class _ReportPageState extends State<ReportPage> {
     List<Animal> filteredAnimals = animalsApi.where((Animal) => Animal.familyId == _chosenType).toList();
 
     // Create widgets for filtered animals
-    return filteredAnimals.map((Animal) => GestureDetector(
-      onTap: (){
-        if(_chosenName != Animal.id) {
+    return filteredAnimals.isNotEmpty
+        ? filteredAnimals.map((Animal) => GestureDetector(
+      onTap: () {
+        if (_chosenName != Animal.id) {
           setState(() {
             _chosenName = Animal.id;
           });
@@ -216,7 +217,7 @@ class _ReportPageState extends State<ReportPage> {
         }
       },
       child: FractionallySizedBox(
-        widthFactor: 1/3.3,
+        widthFactor: 1 / 3.3,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           mainAxisAlignment: MainAxisAlignment.center,
@@ -231,7 +232,9 @@ class _ReportPageState extends State<ReportPage> {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                     side: BorderSide(
-                      color: _chosenName == Animal.id ? AppColors.primary : Colors.white,
+                      color: _chosenName == Animal.id
+                          ? AppColors.primary
+                          : Colors.white,
                       width: 2,
                     ),
                   ),
@@ -243,7 +246,8 @@ class _ReportPageState extends State<ReportPage> {
                   children: [
                     Expanded(
                       child: Image(
-                          image: NetworkImage('https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png')
+                        image: NetworkImage(
+                            'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'),
                       ),
                     ),
                   ],
@@ -259,7 +263,13 @@ class _ReportPageState extends State<ReportPage> {
           ],
         ),
       ),
-    )).toList();
+    )).toList()
+        : [
+      Text(
+        'Geen dieren gevonden :(',
+        style: AppStyles.of(context).data.textStyle.paragraph,
+      ),
+    ];
   }
 
   Future<void> _pickImage(ImageSource source, i) async {
