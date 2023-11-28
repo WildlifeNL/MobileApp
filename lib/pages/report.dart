@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
@@ -10,21 +11,7 @@ import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/app_text_styles.dart';
 import 'package:wildlife_nl_app/widgets/CustomStepper.dart';
-
-class Animals {
-  final String name;
-  final String img;
-
-  Animals({required this.name, required this.img});
-}
-
-class AnimalType {
-  final String name;
-  final String img;
-  final List<Animals> animals;
-
-  AnimalType({required this.name, required this.img, required this.animals});
-}
+import 'package:http/http.dart' as http;
 
 class AnimalQuestion {
   final String inputType;
@@ -35,6 +22,75 @@ class AnimalQuestion {
   final List<String> options;
 
   AnimalQuestion({required this.inputType, required this.question,required this.required, required this.fullWidth, required this.hint, required this.options});
+}
+
+class AnimalType {
+  final String name;
+  final String img;
+  final String id;
+
+  AnimalType({
+    required this.name,
+    required this.img,
+    required this.id,
+  });
+}
+class Animal {
+  final String name;
+  final String img;
+  final String id;
+  final String familyId;
+
+  Animal({
+    required this.name,
+    required this.img,
+    required this.id,
+    required this.familyId,
+  });
+}
+
+final String apiUrlAnimalTypes = "https://api.wildlifedatabase.nl/api/controllers/animals.php/family";
+final String apiUrlAnimals = "https://api.wildlifedatabase.nl/api/controllers/animals.php";
+
+List<AnimalType> animalTypesApi = [];
+List<Animal> animalsApi = [];
+
+Future<void> fetchData() async {
+  final response = await http.get(Uri.parse(apiUrlAnimalTypes));
+  final response2 = await http.get(Uri.parse(apiUrlAnimals));
+  if (response.statusCode == 200) {
+    final List<dynamic> jsonData = jsonDecode(response.body);
+
+    // Map the raw JSON data into a list of AnimalType objects
+    animalTypesApi = jsonData.map((json) {
+      return AnimalType(
+        name: json['name'] ?? '',
+        img: json['img'] ?? '',
+        id: json['id'] ?? ''
+      );
+    }).toList();
+  } else {
+    print('Response failed');
+  }
+
+  if (response2.statusCode == 200) {
+    final Map<String, dynamic> jsonData2 = jsonDecode(response2.body);
+
+    // Access the 'results' field
+    final List<dynamic> results2 = jsonData2['results'];
+
+    // Map the raw JSON data into a list of AnimalType objects
+    animalsApi = results2.map((json) {
+      return Animal(
+        name: json['name'] ?? '',
+        img: json['img'] ?? '',
+        id: json['id'] ?? '',
+        familyId: json['family_id'] ?? '',
+      );
+    }).toList();
+  } else {
+    print('Response failed');
+  }
 }
 
 final List<AnimalQuestion> animalQuestions = [
@@ -134,66 +190,30 @@ class ReportPage extends StatefulWidget {
 }
 
 class _ReportPageState extends State<ReportPage> {
-  int _currentStep = 0;
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
 
-  final List<AnimalType> diersoorten = [
-    AnimalType(
-      name: "Evenhoevigen",
-      img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      animals: [
-        Animals(name: "Damhert", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
-      ],
-    ),
-    AnimalType(
-      name: "Roofdieren",
-      img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      animals: [
-        Animals(name: "Wild zwijn", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
-      ],
-    ),
-    AnimalType(
-      name: "Exoten",
-      img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      animals: [
-        Animals(name: "Ree", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
-      ],
-    ),
-    AnimalType(
-      name: "Insecteneters",
-      img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      animals: [
-        Animals(name: "Edelhert", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
-      ],
-    ),
-    AnimalType(
-      name: "Knaag- & haasachtigen",
-      img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
-      animals: [
-        Animals(name: "Wisent", img: "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png"),
-      ],
-    ),
-  ];
+  int _currentStep = 0;
 
   List<Widget> getFilteredAnimals() {
     // Filter animals based on the selected type (_chosenType)
-    AnimalType selectedType = diersoorten.firstWhere((type) => type.name == _chosenType,
-      orElse: () => AnimalType(name: '', img: '', animals: []),);
-    List<Animals> filteredAnimals = selectedType.animals;
+    List<Animal> filteredAnimals = animalsApi.where((Animal) => Animal.familyId == _chosenType).toList();
 
     // Create widgets for filtered animals
-    return filteredAnimals.map((dier) => GestureDetector(
+    return filteredAnimals.map((Animal) => GestureDetector(
       onTap: (){
-        setState(() {
-          if(_chosenName != dier.name) {
-            setState(() {
-              _chosenName = dier.name;
-            });
-          } else {
-            setState(() {
-              _chosenName = '';
-            });
-          }
-        });
+        if(_chosenName != Animal.id) {
+          setState(() {
+            _chosenName = Animal.id;
+          });
+        } else {
+          setState(() {
+            _chosenName = '';
+          });
+        }
       },
       child: FractionallySizedBox(
         widthFactor: 1/3.3,
@@ -202,50 +222,37 @@ class _ReportPageState extends State<ReportPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Stack(
-              children: [
-                AspectRatio(
-                  aspectRatio: 1.0,
-                  child: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: ShapeDecoration(
-                      color: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: _chosenName == dier.name ? AppColors.primary : Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: Image(
-                              image: NetworkImage(dier.img)
-                          ),
-                        ),
-                      ],
+            AspectRatio(
+              aspectRatio: 1.0,
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: ShapeDecoration(
+                  color: Colors.white,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    side: BorderSide(
+                      color: _chosenName == Animal.id ? AppColors.primary : Colors.white,
+                      width: 2,
                     ),
                   ),
                 ),
-                Positioned(
-                  right: -4,
-                  top: -4,
-                  child: IconButton(
-                      onPressed: (){
-                        print('pressed info button');
-                      },
-                      icon: const Icon(AppIcons.incident)),
-                )
-              ],
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: Image(
+                          image: NetworkImage('https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png')
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
             const SizedBox(height: 4),
             Text(
-              dier.name,
+              Animal.name,
               textAlign: TextAlign.center,
               style: AppStyles.of(context).data.textStyle.paragraph,
             ),
@@ -260,8 +267,6 @@ class _ReportPageState extends State<ReportPage> {
       final pickedFile = await ImagePicker().pickImage(source: source);
 
       if (pickedFile != null) {
-        // Do something with the picked image file
-        // print("Image picked: ${pickedFile.path}");
         _evaluationAnswers[i] = pickedFile.path;
       } else {
         print("No image selected");
@@ -271,8 +276,7 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  Future _cancelReport() async {
-    print(_evaluationAnswers);
+  Future _closeReport() async {
     Navigator.of(context).pop();
     _currentStep = 0;
     _chosenName = '';
@@ -301,7 +305,7 @@ class _ReportPageState extends State<ReportPage> {
                       alignment: Alignment.centerRight,
                         child: IconButton(
                             onPressed: (){
-                              _cancelReport();
+                              _closeReport();
                             },
                             icon: Icon(AppIcons.cross)),
                     ),
@@ -340,41 +344,44 @@ class _ReportPageState extends State<ReportPage> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              Container(
-                                  padding: EdgeInsets.only(top: 4),
-                                  width: double.maxFinite,
-                                  child: Wrap(
-                                      spacing: 16,
-                                      runSpacing: 16,
-                                      children: diersoorten.map((diersoort) => GestureDetector(
-                                        onTap: (){
-                                          if(_chosenType != diersoort.name) {
-                                            setState(() {
-                                              _chosenType = diersoort.name;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              _chosenType = '';
-                                            });
-                                          }
-                                        },
-                                        child: FractionallySizedBox(
-                                          widthFactor: 1/3.3,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              AspectRatio(
+                              FutureBuilder(
+                                future: fetchData(),
+                                builder: (context, snapshot) {
+                                  return Container(
+                                      padding: EdgeInsets.only(top: 4),
+                                      width: double.maxFinite,
+                                      child: Wrap(
+                                          spacing: 16,
+                                          runSpacing: 16,
+                                          children: animalTypesApi.map((animalType) => GestureDetector(
+                                            onTap: (){
+                                              if(_chosenType != animalType.id) {
+                                                setState(() {
+                                                  _chosenType = animalType.id;
+                                                });
+                                              } else {
+                                                setState(() {
+                                                  _chosenType = '';
+                                                });
+                                              }
+                                            },
+                                            child: FractionallySizedBox(
+                                              widthFactor: 1/3.3,
+                                              child: Column(
+                                                mainAxisSize: MainAxisSize.min,
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                crossAxisAlignment: CrossAxisAlignment.center,
+                                                children: [
+                                                  AspectRatio(
                                                     aspectRatio: 1.0,
                                                     child: Container(
                                                       padding: const EdgeInsets.all(8),
                                                       decoration: ShapeDecoration(
                                                         color: Colors.white,
                                                         shape: RoundedRectangleBorder(
-                                                            borderRadius: BorderRadius.circular(8),
+                                                          borderRadius: BorderRadius.circular(8),
                                                           side: BorderSide(
-                                                            color: _chosenType == diersoort.name ? AppColors.primary : Colors.white,
+                                                            color: _chosenType == animalType.id ? AppColors.primary : Colors.white,
                                                             width: 2,
                                                           ),
                                                         ),
@@ -386,24 +393,26 @@ class _ReportPageState extends State<ReportPage> {
                                                         children: [
                                                           Expanded(
                                                             child: Image(
-                                                              image: NetworkImage(diersoort.img)
+                                                                image: NetworkImage('https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png')
                                                             ),
                                                           ),
                                                         ],
                                                       ),
                                                     ),
                                                   ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                  diersoort.name,
-                                                  textAlign: TextAlign.center,
-                                                  style: AppStyles.of(context).data.textStyle.paragraph,
-                                                ),
-                                            ],
-                                          ),
-                                        ),
-                                      )).toList())
-                              ),
+                                                  const SizedBox(height: 4),
+                                                  Text(
+                                                    animalType.name,
+                                                    textAlign: TextAlign.center,
+                                                    style: AppStyles.of(context).data.textStyle.paragraph,
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )).toList())
+                                    );
+                                },
+                              )
                             ],
                           ),
                         )
@@ -423,14 +432,19 @@ class _ReportPageState extends State<ReportPage> {
                                   color: AppColors.primary,
                                 ),
                               ),
-                              Container(
-                                  padding: EdgeInsets.only(top: 4),
-                                  width: double.maxFinite,
-                                  child: Wrap(
-                                      spacing: 16,
-                                      runSpacing: 16,
-                                      children:  getFilteredAnimals(),
-                                  ),
+                              FutureBuilder(
+                                  future: fetchData(),
+                                  builder: (context, snapshot) {
+                                    return Container(
+                                      padding: EdgeInsets.only(top: 4),
+                                      width: double.maxFinite,
+                                      child: Wrap(
+                                          spacing: 16,
+                                          runSpacing: 16,
+                                          children:  getFilteredAnimals(),
+                                      ),
+                                  );
+                                }
                               ),
                             ],
                           ),
@@ -634,7 +648,7 @@ class _ReportPageState extends State<ReportPage> {
                               _currentStep++;
                             });
                             } : ((_currentStep == 2) ? () {
-                            _cancelReport();
+                            _closeReport();
                           }  : null)),
                           // onPressed: null,
                           child: Text(
