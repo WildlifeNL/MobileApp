@@ -50,11 +50,11 @@ class _MapMarkerState extends State<MapMarker>  {
           width: 300.0,
           height: 300.0,
           decoration: new BoxDecoration(
-            color: widget.markerType == 1  ? AppColors.primary : widget.markerType == 2  ? AppColors.incident : AppColors.red_600,
+            color: widget.markerType == 1  ? AppColors.primary : widget.markerType == 2  ? AppColors.neutral_400 : widget.markerType == 3  ? AppColors.incident : AppColors.red_600,
             shape: BoxShape.circle,
           ),
           child:
-          widget.markerType == 1  ? Icon(AppIcons.deer, color: AppColors.neutral_50) : widget.markerType == 2  ? Icon(AppIcons.incident, color: AppColors.neutral_50) : Icon(AppIcons.cancel, color: AppColors.neutral_50)
+          widget.markerType == 1  ? Icon(AppIcons.paw, color: AppColors.neutral_50) : widget.markerType == 2  ? Icon(AppIcons.incident, color: AppColors.neutral_50) :  widget.markerType == 3  ? Icon(AppIcons.incident, color: AppColors.neutral_50) : Icon(AppIcons.cancel, color: AppColors.neutral_50)
       )
     );
 

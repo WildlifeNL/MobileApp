@@ -9,8 +9,9 @@ import 'package:vector_map_tiles/vector_map_tiles.dart';
 import 'package:wildlife_nl_app/state/location.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/widgets/map_marker.dart';
+import 'package:wildlife_nl_app/widgets/map_path_modal.dart';
 import 'package:wildlife_nl_app/widgets/map_settings_modal.dart';
-
+import 'dart:developer' as developer;
 import '../utilities/app_icons.dart';
 
 part 'map.g.dart';
@@ -21,8 +22,86 @@ class MapStyle extends _$MapStyle {
   Future<Style> build() async {
     return await StyleReader(
       uri:
-          'https://api.mapbox.com/styles/v1/daankleinen/clozqxy6v00ga01qj2j6g84wt?access_token=pk.eyJ1IjoiZGFhbmtsZWluZW4iLCJhIjoiY2t4MzFwMTJxMGo2bTJ1bzFncjV6YmJ6ayJ9.FY0BF_wgag5wFw-2dWSLGQ',
+      'https://api.mapbox.com/styles/v1/daankleinen/clozqxy6v00ga01qj2j6g84wt?access_token=pk.eyJ1IjoiZGFhbmtsZWluZW4iLCJhIjoiY2t4MzFwMTJxMGo2bTJ1bzFncjV6YmJ6ayJ9.FY0BF_wgag5wFw-2dWSLGQ',
     ).read();
+  }
+}
+
+@Riverpod(keepAlive: true)
+class Markers extends _$Markers {
+  @override
+  Future<MarkerState> build() async {
+    return MarkerState();
+  }
+
+  toggle1(){
+    state = AsyncData(state.value!.copyWith(toggle1: !state.value!.toggle1));
+  }
+
+  toggle2(){
+    state = AsyncData(state.value!.copyWith(toggle2: !state.value!.toggle2));
+  }
+
+  toggle3(){
+    state = AsyncData(state.value!.copyWith(toggle3: !state.value!.toggle3));
+  }
+
+  toggle4(){
+    state = AsyncData(state.value!.copyWith(toggle4: !state.value!.toggle4));
+  }
+
+  mapToggle1(){
+    state = AsyncData(state.value!.copyWith(mapTypeToggle1: true));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle2: false));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle3: false));
+  }
+
+  mapToggle2(){
+    state = AsyncData(state.value!.copyWith(mapTypeToggle1: false));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle2: true));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle3: false));
+  }
+
+  mapToggle3(){
+    state = AsyncData(state.value!.copyWith(mapTypeToggle1: false));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle2: false));
+    state = AsyncData(state.value!.copyWith(mapTypeToggle3: true));
+  }
+}
+
+class MarkerState {
+  var toggle1 = true;
+  var toggle2 = true;
+  var toggle3 = true;
+  var toggle4 = true;
+  var mapTypeToggle1 = false;
+  var mapTypeToggle2 = false;
+  var mapTypeToggle3 = false;
+
+  MarkerState copyWith({bool? toggle1, bool? toggle2, bool? toggle3, bool? toggle4, bool? mapTypeToggle1, bool? mapTypeToggle2, bool? mapTypeToggle3}){
+    if(toggle1 != null){
+      this.toggle1 = toggle1;
+    }
+    if(toggle2 != null){
+      this.toggle2 = toggle2;
+    }
+    if(toggle3 != null){
+      this.toggle3 = toggle3;
+    }
+    if(toggle4 != null){
+      this.toggle4 = toggle4;
+    }
+    if(mapTypeToggle1 != null){
+      this.mapTypeToggle1 = mapTypeToggle1;
+    }
+    if(mapTypeToggle2 != null){
+      this.mapTypeToggle2 = mapTypeToggle2;
+    }
+    if(mapTypeToggle3 != null){
+      this.mapTypeToggle3 = mapTypeToggle3;
+    }
+
+    return this;
   }
 }
 
@@ -35,17 +114,50 @@ class Map extends ConsumerStatefulWidget {
 
 class _MapState extends ConsumerState<Map> {
   final MapController _controller = MapController();
-  late FollowOnLocationUpdate _followOnLocationUpdate;
-  bool _switchValue = true;
+
+  List MarkersFromDataBase = [
+    {"Lat": 51.45034, "Long": 5.45285, "Type": 1},
+    {"Lat": 51.46034, "Long": 5.45285, "Type": 2},
+    {"Lat": 51.47034, "Long": 5.45285, "Type": 3},
+    {"Lat": 51.48034, "Long": 5.45285, "Type": 4}
+  ];
+
+  List<Marker> markers = [];
+
+
+  Future<List<Marker>> getMarkers(MarkerState? state) async {
+    markers.clear();
+    var test = MarkersFromDataBase.where((i) {
+      return (i["Type"] == 1 && state!.toggle1 ) || (i["Type"] == 2 && state!.toggle2) || (i["Type"] == 3 && state!.toggle3 || (i["Type"] == 4 && state!.toggle4));
+    }).toList();
+    for (var item in test) {
+      markers.add(
+        Marker(
+          width: 32,
+          height: 32,
+          point: LatLng(item["Lat"], item["Long"]),
+          builder: (ctx) =>
+              MapMarker(
+                markerType: item["Type"],
+              ),
+          rotate: false,
+        ),
+      );
+    }
+    return markers;
+  }
+
 
   @override
   Widget build(BuildContext context) {
     var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
+    var markerState = ref.watch(markersProvider);
 
-    if (style.isLoading || location.isLoading) {
+    if (style.isLoading || location.isLoading || markerState.isLoading) {
       return Placeholder();
     }
+    getMarkers(markerState.value);
 
     return Scaffold(
       body: FlutterMap(
@@ -53,15 +165,15 @@ class _MapState extends ConsumerState<Map> {
           options: MapOptions(
               center: !location.isLoading && location.value?.longitude != null
                   ? LatLng(
-                      location.value!.latitude!, location.value!.longitude!)
+                  location.value!.latitude!, location.value!.longitude!)
                   : LatLng(51, 5),
               zoom: 17,
               maxZoom: 22,
               interactiveFlags: InteractiveFlag.drag |
-                  InteractiveFlag.flingAnimation |
-                  InteractiveFlag.pinchMove |
-                  InteractiveFlag.pinchZoom |
-                  InteractiveFlag.doubleTapZoom),
+              InteractiveFlag.flingAnimation |
+              InteractiveFlag.pinchMove |
+              InteractiveFlag.pinchZoom |
+              InteractiveFlag.doubleTapZoom),
           children: [
             // normally you would see TileLayer which provides raster tiles
             // instead this vector tile layer replaces the standard tile layer
@@ -85,17 +197,7 @@ class _MapState extends ConsumerState<Map> {
               ),
             ),
             MarkerLayer(
-              markers: [
-                Marker(
-                  width: 32,
-                  height: 32,
-                  point: LatLng(51.45034, 5.45285),
-                  builder: (ctx) => MapMarker(
-                    markerType: 3,
-                  ),
-                  rotate: false,
-                ),
-              ],
+                markers: markers
             ),
             Align(
                 alignment: Alignment.centerRight,
@@ -116,9 +218,9 @@ class _MapState extends ConsumerState<Map> {
                                 onPressed: () {
                                   _controller.move(
                                       !location.isLoading &&
-                                              location.value?.longitude != null
+                                          location.value?.longitude != null
                                           ? LatLng(location.value!.latitude!,
-                                              location.value!.longitude!)
+                                          location.value!.longitude!)
                                           : LatLng(51.45034, 5.45285),
                                       17.0);
                                 },
@@ -134,7 +236,8 @@ class _MapState extends ConsumerState<Map> {
                                     context: context,
                                     isScrollControlled: true,
                                     builder: (BuildContext context) {
-                                      return Wrap(children: [MapSettingModal()]);
+                                      return Wrap(
+                                          children: [MapSettingModal()]);
                                     },
                                   );
                                 },
@@ -145,7 +248,16 @@ class _MapState extends ConsumerState<Map> {
                               color: AppColors.neutral_50,
                             ),
                             IconButton(
-                                onPressed: () {},
+                                onPressed: () {
+                                  showModalBottomSheet<void>(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    builder: (BuildContext context) {
+                                      return Wrap(
+                                          children: [MapPathModal()]);
+                                    },
+                                  );
+                                },
                                 icon: Icon(AppIcons.settings,
                                     color: AppColors.neutral_50))
                           ],
