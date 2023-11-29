@@ -22,6 +22,15 @@ class F {
     }
   }
 
+  static String get apiUrl {
+    switch(appFlavor){
+      case Flavor.dev:
+        return "https://dev.wildlifedatabase.nl/";
+      case _:
+        return "https://api.wildlifedatabase.nl/";
+    }
+  }
+
   static String get nameHumanized {
     switch (appFlavor) {
       case Flavor.dev:

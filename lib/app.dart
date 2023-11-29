@@ -1,36 +1,22 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:wildlife_nl_app/generated/l10n.dart';
 import 'package:wildlife_nl_app/nav.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 
 import 'utilities/app_colors.dart';
 
 class App extends StatelessWidget {
-  const App({Key? key}) : super(key: key);
+  const App({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppStyleProvider(
       child: ProviderScope(
         child: MaterialApp(
-          localizationsDelegates: const [
-            S.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          supportedLocales: const [
-            Locale('en'),
-            Locale('nl'),
-            Locale('de'),
-          ],
           debugShowCheckedModeBanner: false,
           title: "WildlifeNL",
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+            colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
             navigationBarTheme: NavigationBarThemeData(
               iconTheme: MaterialStateProperty.resolveWith((state) {
                 if (state.contains(MaterialState.selected)) {
