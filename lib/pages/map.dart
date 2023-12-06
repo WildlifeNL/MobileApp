@@ -112,7 +112,7 @@ class MarkerState {
 class Report {
   // final String id;
   // final String user_id;
-  // final String interaction_type;
+  final String interaction_type;
   // final String time;
   // final String image;
   // final String description;
@@ -129,7 +129,7 @@ class Report {
   Report({
     // required this.id,
     // required this.user_id,
-    // required this.interaction_type,
+    required this.interaction_type,
     // required this.time,
     // required this.image,
     // required this.description,
@@ -150,14 +150,14 @@ final String baseUrl = F.apiUrl;
 List<Report> ReportApi = [];
 
 Future<void> fetchData() async {
-  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php'));
+  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/interactions.php'));
 
 
   if (typesResponse.statusCode == 200) {
-    final List<dynamic> jsonData = jsonDecode(typesResponse.body);
+    final Map<String ,dynamic> jsonData = jsonDecode(typesResponse.body);
 
     // Map the raw JSON data into a list of AnimalType objects
-    ReportApi = jsonData.map((json) {
+    ReportApi = jsonData["results"].map<Report>((json) {
       return Report(
           lat: json['lat'] ?? '',
           lon: json['lon'] ?? '',
@@ -169,14 +169,14 @@ Future<void> fetchData() async {
 }
 
 
-class Map extends ConsumerStatefulWidget {
-  const Map({super.key});
+class MapPage extends ConsumerStatefulWidget {
+  const MapPage({super.key});
 
   @override
-  ConsumerState<Map> createState() => _MapState();
+  ConsumerState<MapPage> createState() => _MapState();
 }
 
-class _MapState extends ConsumerState<Map> {
+class _MapState extends ConsumerState<MapPage> {
   final MapController _controller = MapController();
 
   List MarkersFromDataBase = [
@@ -190,16 +190,16 @@ class _MapState extends ConsumerState<Map> {
 
 
   Future<List<Marker>> getMarkers(MarkerState? state) async {
-    markers.clear();
-    var test = MarkersFromDataBase.where((i) {
-      return (i["Type"] == 1 && state!.toggle1 ) || (i["Type"] == 2 && state!.toggle2) || (i["Type"] == 3 && state!.toggle3 || (i["Type"] == 4 && state!.toggle4));
+    fetchData();
+    var test = ReportApi.where((i) {
+      return (i.interaction_type == "86a6b56a-89f0-11ee-919a-1e0034001676" && state!.toggle1 ) || (i.interaction_type == "689a5571-8eb5-11ee-919a-1e0034001676" && state!.toggle2) || (i.interaction_type == 3 && state!.toggle3 || (i.interaction_type == 4 && state!.toggle4));
     }).toList();
     for (var item in test) {
       markers.add(
         Marker(
           width: 32,
           height: 32,
-          point: LatLng(item["Lat"], item["Long"]),
+          point: LatLng(double.parse(item.lat), double.parse(item.lon)),
           builder: (ctx) =>
               MapMarker(
                 markerType: item["Type"],
@@ -214,6 +214,23 @@ class _MapState extends ConsumerState<Map> {
 
   @override
   Widget build(BuildContext context) {
+
+
+    for (var item in ReportApi) {
+      markers.add(
+        Marker(
+          width: 32,
+          height: 32,
+          point: LatLng(double.parse(item.lat), double.parse(item.lon)),
+          builder: (ctx) =>
+              MapMarker(
+                markerType: 1,
+              ),
+          rotate: false,
+        ),
+      );
+    }
+
     var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
     var markerState = ref.watch(markersProvider);
