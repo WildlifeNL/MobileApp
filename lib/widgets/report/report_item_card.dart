@@ -81,7 +81,8 @@ class ActivityItemCard extends ConsumerWidget {
                   ],
                 ),
                 const Spacer(),
-                IconButton(onPressed: () {}, icon: const Icon(AppIcons.arrow_right)),
+                //TODO: Re-enable when working
+                //IconButton(onPressed: () {}, icon: const Icon(AppIcons.arrow_right)),
                 const Padding(
                   padding: EdgeInsets.only(left: 5),
                 ),
