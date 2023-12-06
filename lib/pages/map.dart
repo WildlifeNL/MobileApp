@@ -219,7 +219,7 @@ class _MapState extends ConsumerState<Map> {
     var markerState = ref.watch(markersProvider);
 
     if (style.isLoading || location.isLoading || markerState.isLoading) {
-      return Placeholder();
+      return const Center(child: CircularProgressIndicator());
     }
     getMarkers(markerState.value);
 
