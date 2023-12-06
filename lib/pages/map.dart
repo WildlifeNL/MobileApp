@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -12,8 +15,9 @@ import 'package:wildlife_nl_app/widgets/map_marker.dart';
 import 'package:wildlife_nl_app/widgets/map_path_modal.dart';
 import 'package:wildlife_nl_app/widgets/map_settings_modal.dart';
 import 'dart:developer' as developer;
+import '../flavors.dart';
 import '../utilities/app_icons.dart';
-
+import 'package:http/http.dart' as http;
 part 'map.g.dart';
 
 @riverpod
@@ -104,6 +108,66 @@ class MarkerState {
     return this;
   }
 }
+
+class Report {
+  // final String id;
+  // final String user_id;
+  // final String interaction_type;
+  // final String time;
+  // final String image;
+  // final String description;
+  // final String distance;
+  // final String duration;
+  // final String creation_date;
+  // final String last_modified;
+  final String lat;
+  final String lon;
+  // final String animal_id;
+  // final String animal_count_lower;
+  // final String animal_count_upper;
+
+  Report({
+    // required this.id,
+    // required this.user_id,
+    // required this.interaction_type,
+    // required this.time,
+    // required this.image,
+    // required this.description,
+    // required this.distance,
+    // required this.duration,
+    // required this.creation_date,
+    // required this.last_modified,
+    required this.lat,
+    required this.lon,
+    // required this.animal_id,
+    // required this.animal_count_lower,
+    // required this.animal_count_upper,
+  });
+}
+
+final String baseUrl = F.apiUrl;
+
+List<Report> ReportApi = [];
+
+Future<void> fetchData() async {
+  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php'));
+
+
+  if (typesResponse.statusCode == 200) {
+    final List<dynamic> jsonData = jsonDecode(typesResponse.body);
+
+    // Map the raw JSON data into a list of AnimalType objects
+    ReportApi = jsonData.map((json) {
+      return Report(
+          lat: json['lat'] ?? '',
+          lon: json['lon'] ?? '',
+      );
+    }).toList();
+  } else {
+    print('Response failed');
+  }
+}
+
 
 class Map extends ConsumerStatefulWidget {
   const Map({super.key});
@@ -241,7 +305,7 @@ class _MapState extends ConsumerState<Map> {
                                     },
                                   );
                                 },
-                                icon: Icon(AppIcons.pen,
+                                icon: Icon(AppIcons.mapsettings,
                                     color: AppColors.neutral_50)),
                             Divider(
                               height: 1,
@@ -258,7 +322,7 @@ class _MapState extends ConsumerState<Map> {
                                     },
                                   );
                                 },
-                                icon: Icon(AppIcons.settings,
+                                icon: Icon(AppIcons.paths,
                                     color: AppColors.neutral_50))
                           ],
                         ),
