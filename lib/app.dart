@@ -16,6 +16,7 @@ class App extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: "WildlifeNL",
           theme: ThemeData(
+            scaffoldBackgroundColor: AppColors.neutral_50,
             colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primary),
             navigationBarTheme: NavigationBarThemeData(
               iconTheme: MaterialStateProperty.resolveWith((state) {
