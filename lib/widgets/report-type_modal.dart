@@ -16,8 +16,9 @@ class InteractionType  {
   final String label;
   final String typekey;
   final String color;
+  final String id;
 
-  InteractionType({required this.label, required this.typekey, required this.color});
+  InteractionType({required this.label, required this.typekey, required this.color, required this.id});
 }
 
 List<InteractionType> interactionTypesApi = [];
@@ -32,8 +33,9 @@ Future<void> fetchData() async {
     interactionTypesApi = jsonData.map((json) {
       return InteractionType(
           label: json['label'] ?? '',
-          typekey: json['typekey'] ?? '',
-          color: json['color'] ?? ''
+          typekey: json['type_key'] ?? '',
+          color: json['color'] ?? '',
+          id: json['id'] ?? ''
       );
     }).toList();
   } else {
@@ -74,7 +76,7 @@ class _ReportModalState extends State<ReportTypeModal> {
             children: [
               Container(
                 width: double.maxFinite,
-                padding: const EdgeInsets.only(bottom: 8,),
+                padding: const EdgeInsets.only(bottom: 8),
                 child: Column(
                   children: [
                     Container(
@@ -84,6 +86,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                         child: IconButton(
                             onPressed: (){
                               Navigator.pop(context);
+                              _selectedType = '';
                             },
                             icon: Icon(AppIcons.cross)),
                       ),
@@ -121,42 +124,49 @@ class _ReportModalState extends State<ReportTypeModal> {
                           width: double.infinity,
                           child: Wrap(
                             alignment: WrapAlignment.start,
-                            spacing: 16,
+                            spacing: 8,
                             runSpacing: 8,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  if (_selectedType != interactionTypesApi[1].typekey) {
-                                    setState(() {
-                                      _selectedType = interactionTypesApi[1].typekey;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      _selectedType = '';
-                                    });
-                                  }
-                                },
+                            children: interactionTypesApi.map((interactionType) => GestureDetector(
+                              onTap: (){
+                                if (_selectedType != interactionType.typekey) {
+                                  setState(() {
+                                    _selectedType = interactionType.typekey;
+                                  });
+                                } else {
+                                  setState(() {
+                                    _selectedType = '';
+                                  });
+                                }
+                              },
+                              child: FractionallySizedBox(
+                                widthFactor: 1 / 3.15,
                                 child: Container(
-                                    decoration: ShapeDecoration(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(
-                                          color: _selectedType == interactionTypesApi[1].typekey ? HexColor(interactionTypesApi[1].color) : Colors.white,
-                                          width: 2,
-                                        ),
+                                  decoration: ShapeDecoration(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                      side: BorderSide(
+                                        color: _selectedType == interactionType.typekey ? HexColor(interactionType.color) : Colors.white,
+                                        width: 2,
                                       ),
                                     ),
-                                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                    child: Column(
-                                      children: [
-                                        Icon(AppIcons.paw, size: 20, color: HexColor(interactionTypesApi[1].color)),
-                                        Text(interactionTypesApi[1].label, style: AppStyles.of(context).data.textStyle.paragraph,)
-                                      ],
-                                    ),
+                                  ),
+                                  padding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                  child: Column(
+                                    children: [
+                                      Icon((interactionType.typekey == 'sighting' ? AppIcons.paw :
+                                      (interactionType.typekey == 'incident' ? AppIcons.incident :
+                                      (interactionType.typekey == 'inappropriate_behaviour' ? AppIcons.cancel :
+                                      (interactionType.typekey == 'traffic' ? AppIcons.paw :
+                                      (interactionType.typekey == 'maintenance' ? AppIcons.paw : null))))),
+                                          size: 24, color: HexColor(interactionType.color)),
+                                      SizedBox(height: 4),
+                                      Text(interactionType.label, style: AppStyles.of(context).data.textStyle.paragraph,)
+                                    ],
+                                  ),
                                 ),
                               ),
-                          ]
+                            )).toList(),
                           ),
                         );
                         },

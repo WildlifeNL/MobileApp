@@ -197,6 +197,14 @@ final List<AnimalQuestion> animalQuestions = [
   //   hint: '',
   //   options: [],
   // ),
+  AnimalQuestion(
+    inputType: 'text',
+    question: "Omschrijving:",
+    required: false,
+    fullWidth: true,
+    hint: 'Omschrijf wat plaatsvond',
+    options: [],
+  ),
 ];
 final animalQuestionsMap = animalQuestions.asMap();
 
@@ -582,49 +590,42 @@ class _ReportPageState extends State<ReportPage> {
                                 )
                                 ));
                               }
-                              // else if (question.inputType == 'photo') {
-                              //   return MapEntry(i, Container(
-                              //     child: Column(
-                              //       crossAxisAlignment: CrossAxisAlignment.start,
-                              //       children: [
-                              //         Text(
-                              //           question.question,
-                              //           style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                              //             color: AppColors.primary,
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height:8),
-                              //         Row(
-                              //           children: [
-                              //             ElevatedButton(
-                              //               onPressed: () {
-                              //                 _pickImage(ImageSource.gallery, i); // Open gallery
-                              //               },
-                              //               child: Row(
-                              //                 mainAxisSize: MainAxisSize.min,
-                              //                 children: [
-                              //                   Icon(AppIcons.add, size: 20),
-                              //                   SizedBox(width: 4),
-                              //                   Text("Voeg foto toe"),
-                              //                 ],
-                              //               ),
-                              //               style: ElevatedButton.styleFrom(
-                              //                 primary: AppColors.neutral_50,
-                              //                 onPrimary: AppColors.primary,
-                              //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              //                 shape: RoundedRectangleBorder(
-                              //                     borderRadius: BorderRadius.circular(8),
-                              //                     side: BorderSide(color: AppColors.primary, width: 2)
-                              //                 ),
-                              //                 elevation: 0,
-                              //               ),
-                              //             ),
-                              //           ],
-                              //         )
-                              //       ]
-                              //     )
-                              //   ));
-                              // }
+                              else if (question.inputType == 'text') {
+                                return MapEntry(i, Container(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        question.question,
+                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                          color: AppColors.primary,
+                                        ),
+                                      ),
+                                      const SizedBox(height:8),
+                                      TextFormField(
+                                        onChanged: (value) {
+                                          setState(() {
+                                            _evaluationAnswers[i] = value;
+                                          });
+                                        },
+                                        minLines: 3,
+                                        maxLines: 5,
+                                        style: AppStyles.of(context).data.textStyle.paragraph,
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                                          filled: true,
+                                          fillColor: Colors.white,
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(8.0),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          hintText: question.hint,
+                                        ),
+                                      ),
+                                    ]
+                                  )
+                                ));
+                              }
                               else {
                                 return MapEntry(i, Container());
                               }
@@ -650,6 +651,9 @@ class _ReportPageState extends State<ReportPage> {
                                 setState(() {
                                   _currentStep--; // Verhoog de huidige stap
                                 });
+                                if(_currentStep < 1) {
+                                  _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+                                }
                             },
                             child: Text(
                                 'Vorige',
