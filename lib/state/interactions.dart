@@ -1,5 +1,7 @@
+import 'package:option_result/result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
+import 'package:wildlife_nl_app/models/interaction_type.dart';
 import 'package:wildlife_nl_app/services/interaction.dart';
 
 part 'interactions.g.dart';
@@ -11,11 +13,12 @@ class InteractionState {
 
   final List<Interaction> items;
 
-  InteractionState(
-      {required this.items,
-      required this.currentPage,
-      required this.hasNextPage,
-      required this.isLoadingNewPage});
+  InteractionState({
+    required this.items,
+    required this.currentPage,
+    required this.hasNextPage,
+    required this.isLoadingNewPage,
+  });
 
   InteractionState copyWith({
     List<Interaction>? items,
@@ -35,8 +38,12 @@ class InteractionState {
 class Interactions extends _$Interactions {
   @override
   Future<InteractionState> build(InteractionType? activityType) async {
-    var response =
-        await InteractionService.getInteractions(1, 10, accessToken: "");
+    Result<PaginatedInteractions, String> response;
+    if(activityType != null){
+      response = await InteractionService.getInteractionsByType(activityType.type,1, 10, accessToken: "");
+    } else {
+      response = await InteractionService.getInteractions(1, 10, accessToken: "");
+    }
 
     if (response.isOk()) {
       var paginatedInteractions = response.unwrap();
@@ -67,14 +74,13 @@ class Interactions extends _$Interactions {
 
       state = AsyncData(
         InteractionState(
-          items: [
-            ...state.requireValue.items,
-            ...paginatedInteractions.results
-          ],
-          hasNextPage: paginatedInteractions.meta.nextPageUrl != null,
-          currentPage: state.requireValue.currentPage + 1,
-          isLoadingNewPage: false
-        ),
+            items: [
+              ...state.requireValue.items,
+              ...paginatedInteractions.results
+            ],
+            hasNextPage: paginatedInteractions.meta.nextPageUrl != null,
+            currentPage: state.requireValue.currentPage + 1,
+            isLoadingNewPage: false),
       );
     } else {
       state = AsyncData(state.value!.copyWith(isLoadingNewPage: false));

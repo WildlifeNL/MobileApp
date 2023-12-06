@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/pages/report_list.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -31,15 +30,15 @@ class _BottomNavigationState extends State<BottomNavigation>
   @override
   Widget build(BuildContext context) {
     var items = [
-      (
-        const NavigationDestination(
-          icon: Icon(
-            AppIcons.home,
-          ),
-          label: "Home",
-        ),
-        const ExamplePage(),
-      ),
+      // (
+      //   const NavigationDestination(
+      //     icon: Icon(
+      //       AppIcons.home,
+      //     ),
+      //     label: "Home",
+      //   ),
+      //   const ReportListPage(),
+      // ),
       (
         const NavigationDestination(
           icon: Icon(
@@ -47,16 +46,16 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Activiteit",
         ),
-        const ActivitiesPage(),
+        const ReportListPage(),
       ),
       (
         InkWell(
-          onTap: () {
-            Navigator.of(context).push(
+          onTap: () async {
+            await Navigator.of(context).push(
               MaterialPageRoute(
                 //TODO: Scaffold should be replaced with the create a report page.
                 builder: (context) => Scaffold(
-                  body: Center(child: const Text("Hi"),),
+                  body: const Center(child: Text("Hi"),),
                   appBar: AppBar(),
                 ),
               ),
@@ -72,7 +71,7 @@ class _BottomNavigationState extends State<BottomNavigation>
             enabled: false,
           ),
         ),
-        const ExamplePage(),
+        const ReportListPage(),
       ),
       (
         const NavigationDestination(
@@ -83,15 +82,15 @@ class _BottomNavigationState extends State<BottomNavigation>
         ),
         const Map(),
       ),
-      (
-        const NavigationDestination(
-          icon: Icon(
-            AppIcons.person_outlined,
-          ),
-          label: "Profiel",
-        ),
-        const ExamplePage(),
-      )
+      // (
+      //   const NavigationDestination(
+      //     icon: Icon(
+      //       AppIcons.person_outlined,
+      //     ),
+      //     label: "Profiel",
+      //   ),
+      //   const ReportListPage(),
+      // )
     ];
 
     return Scaffold(

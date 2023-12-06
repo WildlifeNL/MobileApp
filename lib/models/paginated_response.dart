@@ -11,15 +11,15 @@ abstract class PaginatedResponse<T> {
   PaginatedResponse({required this.results, required this.meta});
 }
 
-@JsonSerializable()
+@JsonSerializable(fieldRename: FieldRename.snake)
 class PaginatedMeta {
   final String? nextPageUrl;
   final String? lastPageUrl;
 
   PaginatedMeta({required this.nextPageUrl, required this.lastPageUrl});
 
-  factory PaginatedMeta.fromJson(String json) =>
-      _$PaginatedMetaFromJson(jsonDecode(json));
+  factory PaginatedMeta.fromJson(Map<String, dynamic> json) =>
+      _$PaginatedMetaFromJson(json);
 
-  String toJson() => jsonEncode(_$PaginatedMetaToJson(this));
+  Map<String, dynamic> toJson() => _$PaginatedMetaToJson(this);
 }
