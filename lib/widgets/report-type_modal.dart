@@ -32,7 +32,7 @@ Future<void> fetchData() async {
     interactionTypesApi = jsonData.map((json) {
       return InteractionType(
           label: json['label'] ?? '',
-          typekey: json['typekey'] ?? '',
+          typekey: json['type_key'] ?? '',
           color: json['color'] ?? ''
       );
     }).toList();
