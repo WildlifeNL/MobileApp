@@ -88,7 +88,7 @@ class MapPathModal extends StatelessWidget {
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.asset('assets/symbols/satellite.png'),
+                        Image.asset('assets/symbols/satellite.png', width: 100,),
                         SizedBox(
                           width: 16,
                         ),
