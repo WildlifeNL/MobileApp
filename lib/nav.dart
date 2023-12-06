@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/pages/report.dart';
+import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/widgets/report-type_modal.dart';
@@ -52,7 +53,11 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
         InkWell(
           onTap: () {
-            showModalBottomSheet(context: context, builder: (BuildContext context) {return const Wrap(children: [ReportTypeModal()]);});
+            showModalBottomSheet(
+                context: context,
+                builder: (BuildContext context) {
+                  return const Wrap(children: [ReportTypeModal()]);
+                });
           },
           child: NavigationDestination(
             icon: AnimatedReportIcon(
@@ -73,7 +78,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Kaart",
         ),
-        const ExamplePage(),
+        const Map(),
       ),
       (
         const NavigationDestination(
