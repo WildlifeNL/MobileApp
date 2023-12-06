@@ -23,12 +23,8 @@ class MapSettingModal extends ConsumerStatefulWidget {
 class _MapSettingState extends ConsumerState<MapSettingModal> {
   @override
   Widget build(BuildContext context) {
-
     final markers = ref.watch(markersProvider);
     final markerProvider = ref.read(markersProvider.notifier);
-
-
-
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,

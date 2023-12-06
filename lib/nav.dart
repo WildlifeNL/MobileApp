@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/pages/report.dart';
 import 'package:wildlife_nl_app/pages/map.dart';
+import 'package:wildlife_nl_app/pages/report_list.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/widgets/report-type_modal.dart';
@@ -32,15 +33,15 @@ class _BottomNavigationState extends State<BottomNavigation>
   @override
   Widget build(BuildContext context) {
     var items = [
-      (
-        const NavigationDestination(
-          icon: Icon(
-            AppIcons.home,
-          ),
-          label: "Home",
-        ),
-        const ExamplePage(),
-      ),
+      // (
+      //   const NavigationDestination(
+      //     icon: Icon(
+      //       AppIcons.home,
+      //     ),
+      //     label: "Home",
+      //   ),
+      //   const ReportListPage(),
+      // ),
       (
         const NavigationDestination(
           icon: Icon(
@@ -48,7 +49,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Activiteit",
         ),
-        const ExamplePage(),
+        const ReportListPage(),
       ),
       (
         InkWell(
@@ -69,7 +70,7 @@ class _BottomNavigationState extends State<BottomNavigation>
             enabled: false,
           ),
         ),
-        const ExamplePage(),
+        const ReportListPage(),
       ),
       (
         const NavigationDestination(
@@ -80,15 +81,15 @@ class _BottomNavigationState extends State<BottomNavigation>
         ),
         const Map(),
       ),
-      (
-        const NavigationDestination(
-          icon: Icon(
-            AppIcons.person_outlined,
-          ),
-          label: "Profiel",
-        ),
-        const ExamplePage(),
-      )
+      // (
+      //   const NavigationDestination(
+      //     icon: Icon(
+      //       AppIcons.person_outlined,
+      //     ),
+      //     label: "Profiel",
+      //   ),
+      //   const ReportListPage(),
+      // )
     ];
 
     return Scaffold(
