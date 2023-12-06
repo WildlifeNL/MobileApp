@@ -147,14 +147,14 @@ class _ReportListState extends ConsumerState<ReportList> {
                   color: color);
             case InteractionTypeKey.traffic:
               return ActivityItemCard(
-                  icon: AppIcons.incident,
+                  icon: AppIcons.traffic,
                   title: type.label,
                   subtitle: "Unknown location",
                   date: item.time,
                   color: color);
             case InteractionTypeKey.maintenance:
               return ActivityItemCard(
-                  icon: AppIcons.incident,
+                  icon: AppIcons.maintenance,
                   title: type.label,
                   subtitle: "Unknown location",
                   date: item.time,
