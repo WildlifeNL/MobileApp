@@ -6,6 +6,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:wildlife_nl_app/flavors.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
@@ -50,18 +51,16 @@ class AnimalQuestion {
   AnimalQuestion({required this.inputType, required this.question,required this.required, required this.fullWidth, required this.hint, required this.options});
 }
 
-final String apiUrlAnimalTypes = "https://api.wildlifedatabase.nl/api/controllers/animals.php/family";
-final String apiUrlAnimals = "https://api.wildlifedatabase.nl/api/controllers/animals.php";
-final String apiUrlQuestions = "https://api.wildlifedatabase.nl/api/controllers/questions.php";
+final String baseUrl = F.apiUrl;
 
 List<AnimalType> animalTypesApi = [];
 List<Animal> animalsApi = [];
 List<AnimalQuestion> questionsApi = [];
 
 Future<void> fetchData() async {
-  final typesResponse = await http.get(Uri.parse(apiUrlAnimalTypes));
-  final animalsResponse = await http.get(Uri.parse(apiUrlAnimals));
-  final questionsResponse = await http.get(Uri.parse(apiUrlQuestions));
+  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php/family'));
+  final animalsResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php'));
+  final questionsResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/questions.php'));
 
   if (typesResponse.statusCode == 200) {
     final List<dynamic> jsonData = jsonDecode(typesResponse.body);
@@ -309,7 +308,10 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
-  Future _closeReport() async {
+  Future _closeReport(forceClose) async {
+    !forceClose ? {
+      // Code for what to do when submitting a report
+    } : null;
     Navigator.of(context).pop();
     _currentStep = 0;
     _chosenName = '';
@@ -338,7 +340,7 @@ class _ReportPageState extends State<ReportPage> {
                       alignment: Alignment.centerRight,
                         child: IconButton(
                             onPressed: (){
-                              _closeReport();
+                              _closeReport(true);
                             },
                             icon: Icon(AppIcons.cross)),
                     ),
@@ -681,7 +683,7 @@ class _ReportPageState extends State<ReportPage> {
                               _currentStep++;
                             });
                             } : ((_currentStep == 2) ? () {
-                            _closeReport();
+                            _closeReport(false);
                           }  : null)),
                           // onPressed: null,
                           child: Text(

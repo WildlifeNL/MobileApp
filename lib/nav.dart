@@ -6,6 +6,7 @@ import 'package:wildlife_nl_app/pages/example.dart';
 import 'package:wildlife_nl_app/pages/report.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
+import 'package:wildlife_nl_app/widgets/report-type_modal.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
@@ -51,12 +52,7 @@ class _BottomNavigationState extends State<BottomNavigation>
       (
         InkWell(
           onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                //TODO: Scaffold should be replaced with the create a report page.
-                builder: (context) => ReportPage(),
-              ),
-            );
+            showModalBottomSheet(context: context, builder: (BuildContext context) {return const Wrap(children: [ReportTypeModal()]);});
           },
           child: NavigationDestination(
             icon: AnimatedReportIcon(
