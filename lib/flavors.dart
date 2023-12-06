@@ -26,7 +26,7 @@ class F {
     switch(appFlavor){
       case Flavor.dev:
         return "https://dev.wildlifedatabase.nl/";
-      case _:
+      default:
         return "https://api.wildlifedatabase.nl/";
     }
   }

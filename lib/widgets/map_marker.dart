@@ -54,7 +54,7 @@ class _MapMarkerState extends State<MapMarker>  {
             shape: BoxShape.circle,
           ),
           child:
-          widget.markerType == 1  ? Icon(AppIcons.paw, color: AppColors.neutral_50) : widget.markerType == 2  ? Icon(AppIcons.incident, color: AppColors.neutral_50) :  widget.markerType == 3  ? Icon(AppIcons.incident, color: AppColors.neutral_50) : Icon(AppIcons.cancel, color: AppColors.neutral_50)
+          widget.markerType == 1  ? Icon(AppIcons.paw, color: AppColors.neutral_50) : widget.markerType == 2  ? Icon(AppIcons.traffic, color: AppColors.neutral_50) :  widget.markerType == 3  ? Icon(AppIcons.incident, color: AppColors.neutral_50) : Icon(AppIcons.cancel, color: AppColors.neutral_50)
       )
     );
 
