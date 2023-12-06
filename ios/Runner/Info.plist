@@ -5,6 +5,10 @@
 <dict>
     <key>NSLocationWhenInUseUsageDescription</key>
     <string>Used for adding reports and the map</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Used for adding pictures to a report</string>
+    <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+    <string>Used for adding reports and the map</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
