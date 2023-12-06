@@ -190,86 +190,121 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                       ],
                     ),
                   ),
+                  SizedBox(height: 8),
+                  Container(
+                    decoration: BoxDecoration(
+                        color: AppColors.neutral_50,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(
+                          children: [
+                            SizedBox(width: 8),
+                            Icon(AppIcons.maintenance),
+                            SizedBox(width: 8),
+                            Text("Onderhoud"),
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            Transform.scale(
+                              scale: 0.8,
+                              child: CupertinoSwitch(
+                                value: markers.value!.toggle5,
+                                onChanged: (value) {
+                                  setState(() {
+                                    markerProvider.toggle5();
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 8),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               SizedBox(height: 24),
-              Text("Mode", style: TextStyle(color: AppColors.primary),),
-              SizedBox(height: 8),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  GestureDetector(
-                    onTap: () => {markerProvider.mapToggle1()},
-                    child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: ShapeDecoration(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: markers.value!.mapTypeToggle1
-                                  ? AppColors.primary
-                                  : Colors.white,
-                              width: 2,
-                            ),
-                          ),
-                            image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/symbols/standard.png'),
-                            )
-
-                    )),
-                  ),
-                  GestureDetector(
-                    onTap: () => {markerProvider.mapToggle2()},
-                    child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: ShapeDecoration(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: markers.value!.mapTypeToggle2
-                                  ? AppColors.primary
-                                  : Colors.white,
-                              width: 2,
-                            ),
-                          ),
-
-                            image: DecorationImage(
-                              fit: BoxFit.fill,
-                              image: AssetImage('assets/symbols/satellite.png'),
-                            )
-                        )),
-                  ),
-                  GestureDetector(
-                    onTap: () => {markerProvider.mapToggle3()},
-                    child: Container(
-                        width: 100,
-                        height: 100,
-                        decoration: ShapeDecoration(
-                          color: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(
-                              color: markers.value!.mapTypeToggle3
-                                  ? AppColors.primary
-                                  : Colors.white,
-                              width: 2,
-                            ),
-                          ),
-
-                          image: DecorationImage(
-                            fit: BoxFit.fill,
-                            image: AssetImage('assets/symbols/terrain.png'),
-                          )
-
-                        )),
-                  )
-                ],
-              ),
+              // Text("Mode", style: TextStyle(color: AppColors.primary),),
+              // SizedBox(height: 8),
+              // Row(
+              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              //   children: [
+              //     GestureDetector(
+              //       onTap: () => {markerProvider.mapToggle1()},
+              //       child: Container(
+              //           width: 100,
+              //           height: 100,
+              //           decoration: ShapeDecoration(
+              //             color: Colors.white,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(16),
+              //               side: BorderSide(
+              //                 color: markers.value!.mapTypeToggle1
+              //                     ? AppColors.primary
+              //                     : Colors.white,
+              //                 width: 2,
+              //               ),
+              //             ),
+              //               image: DecorationImage(
+              //                 fit: BoxFit.fill,
+              //                 image: AssetImage('assets/symbols/standard.png'),
+              //               )
+              //
+              //       )),
+              //     ),
+              //     GestureDetector(
+              //       onTap: () => {markerProvider.mapToggle2()},
+              //       child: Container(
+              //           width: 100,
+              //           height: 100,
+              //           decoration: ShapeDecoration(
+              //             color: Colors.white,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(16),
+              //               side: BorderSide(
+              //                 color: markers.value!.mapTypeToggle2
+              //                     ? AppColors.primary
+              //                     : Colors.white,
+              //                 width: 2,
+              //               ),
+              //             ),
+              //
+              //               image: DecorationImage(
+              //                 fit: BoxFit.fill,
+              //                 image: AssetImage('assets/symbols/satellite.png'),
+              //               )
+              //           )),
+              //     ),
+              //     GestureDetector(
+              //       onTap: () => {markerProvider.mapToggle3()},
+              //       child: Container(
+              //           width: 100,
+              //           height: 100,
+              //           decoration: ShapeDecoration(
+              //             color: Colors.white,
+              //             shape: RoundedRectangleBorder(
+              //               borderRadius: BorderRadius.circular(16),
+              //               side: BorderSide(
+              //                 color: markers.value!.mapTypeToggle3
+              //                     ? AppColors.primary
+              //                     : Colors.white,
+              //                 width: 2,
+              //               ),
+              //             ),
+              //
+              //             image: DecorationImage(
+              //               fit: BoxFit.fill,
+              //               image: AssetImage('assets/symbols/terrain.png'),
+              //             )
+              //
+              //           )),
+              //     )
+              //   ],
+              // ),
               SizedBox(height: 24),
               Container(
                 decoration: BoxDecoration(

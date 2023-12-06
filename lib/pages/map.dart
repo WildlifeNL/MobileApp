@@ -53,6 +53,9 @@ class Markers extends _$Markers {
   toggle4(){
     state = AsyncData(state.value!.copyWith(toggle4: !state.value!.toggle4));
   }
+  toggle5(){
+    state = AsyncData(state.value!.copyWith(toggle5: !state.value!.toggle5));
+  }
 
   mapToggle1(){
     state = AsyncData(state.value!.copyWith(mapTypeToggle1: true));
@@ -78,11 +81,12 @@ class MarkerState {
   var toggle2 = true;
   var toggle3 = true;
   var toggle4 = true;
+  var toggle5 = true;
   var mapTypeToggle1 = false;
   var mapTypeToggle2 = false;
   var mapTypeToggle3 = false;
 
-  MarkerState copyWith({bool? toggle1, bool? toggle2, bool? toggle3, bool? toggle4, bool? mapTypeToggle1, bool? mapTypeToggle2, bool? mapTypeToggle3}){
+  MarkerState copyWith({bool? toggle1, bool? toggle2, bool? toggle3, bool? toggle4, bool? toggle5, bool? mapTypeToggle1, bool? mapTypeToggle2, bool? mapTypeToggle3}){
     if(toggle1 != null){
       this.toggle1 = toggle1;
     }
@@ -94,6 +98,9 @@ class MarkerState {
     }
     if(toggle4 != null){
       this.toggle4 = toggle4;
+    }
+    if(toggle5 != null){
+      this.toggle5 = toggle5;
     }
     if(mapTypeToggle1 != null){
       this.mapTypeToggle1 = mapTypeToggle1;
@@ -161,6 +168,7 @@ Future<void> fetchData() async {
       return Report(
           lat: json['lat'] ?? '',
           lon: json['lon'] ?? '',
+          interaction_type: json["interaction_type"] ?? '',
       );
     }).toList();
   } else {
@@ -190,9 +198,9 @@ class _MapState extends ConsumerState<MapPage> {
 
 
   Future<List<Marker>> getMarkers(MarkerState? state) async {
-    fetchData();
+markers.clear();
     var test = ReportApi.where((i) {
-      return (i.interaction_type == "86a6b56a-89f0-11ee-919a-1e0034001676" && state!.toggle1 ) || (i.interaction_type == "689a5571-8eb5-11ee-919a-1e0034001676" && state!.toggle2) || (i.interaction_type == 3 && state!.toggle3 || (i.interaction_type == 4 && state!.toggle4));
+      return (i.interaction_type == "86a6b56a-89f0-11ee-919a-1e0034001676" && state!.toggle1 ) || (i.interaction_type == "689a5571-8eb5-11ee-919a-1e0034001676" && state!.toggle2) || (i.interaction_type == "86a838e1-89f0-11ee-919a-1e0034001676" && state!.toggle3 || (i.interaction_type == "86a5736f-89f0-11ee-919a-1e0034001676" && state!.toggle4)|| (i.interaction_type == "689ccf59-8eb5-11ee-919a-1e0034001676" && state!.toggle5));
     }).toList();
     for (var item in test) {
       markers.add(
@@ -202,7 +210,7 @@ class _MapState extends ConsumerState<MapPage> {
           point: LatLng(double.parse(item.lat), double.parse(item.lon)),
           builder: (ctx) =>
               MapMarker(
-                markerType: item["Type"],
+                markerType: item.interaction_type,
               ),
           rotate: false,
         ),
@@ -215,26 +223,10 @@ class _MapState extends ConsumerState<MapPage> {
   @override
   Widget build(BuildContext context) {
 
-
-    for (var item in ReportApi) {
-      markers.add(
-        Marker(
-          width: 32,
-          height: 32,
-          point: LatLng(double.parse(item.lat), double.parse(item.lon)),
-          builder: (ctx) =>
-              MapMarker(
-                markerType: 1,
-              ),
-          rotate: false,
-        ),
-      );
-    }
-
     var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
     var markerState = ref.watch(markersProvider);
-
+    fetchData();
     if (style.isLoading || location.isLoading || markerState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -305,7 +297,7 @@ class _MapState extends ConsumerState<MapPage> {
                                           : LatLng(51.45034, 5.45285),
                                       17.0);
                                 },
-                                icon: Icon(AppIcons.person,
+                                icon: Icon(AppIcons.userlocation,
                                     color: AppColors.neutral_50)),
                             Divider(
                               height: 1,
@@ -324,23 +316,23 @@ class _MapState extends ConsumerState<MapPage> {
                                 },
                                 icon: Icon(AppIcons.mapsettings,
                                     color: AppColors.neutral_50)),
-                            Divider(
-                              height: 1,
-                              color: AppColors.neutral_50,
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (BuildContext context) {
-                                      return Wrap(
-                                          children: [MapPathModal()]);
-                                    },
-                                  );
-                                },
-                                icon: Icon(AppIcons.paths,
-                                    color: AppColors.neutral_50))
+                            // Divider(
+                            //   height: 1,
+                            //   color: AppColors.neutral_50,
+                            // ),
+                            // IconButton(
+                            //     onPressed: () {
+                            //       showModalBottomSheet<void>(
+                            //         context: context,
+                            //         isScrollControlled: true,
+                            //         builder: (BuildContext context) {
+                            //           return Wrap(
+                            //               children: [MapPathModal()]);
+                            //         },
+                            //       );
+                            //     },
+                            //     icon: Icon(AppIcons.paths,
+                            //         color: AppColors.neutral_50))
                           ],
                         ),
                       ),
