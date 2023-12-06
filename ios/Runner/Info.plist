@@ -3,7 +3,8 @@
 <plist version="1.0">
 
 <dict>
-    <key>NSLocationWhenInUseUsageDescription</key
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>Used for adding reports and the map</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

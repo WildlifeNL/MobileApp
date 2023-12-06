@@ -674,6 +674,7 @@ class _InfiniteGroupState<ItemType, GroupBy, GroupTitle>
                                       ),
                                     ),
                           ),
+                        SliverPadding(padding: EdgeInsets.only(bottom: 40))
                       ]),
                   ),
           );
