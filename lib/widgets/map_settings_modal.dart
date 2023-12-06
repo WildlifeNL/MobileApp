@@ -23,8 +23,12 @@ class MapSettingModal extends ConsumerStatefulWidget {
 class _MapSettingState extends ConsumerState<MapSettingModal> {
   @override
   Widget build(BuildContext context) {
+
     final markers = ref.watch(markersProvider);
     final markerProvider = ref.read(markersProvider.notifier);
+
+
+
 
     return Container(
       height: MediaQuery.of(context).size.height * 0.65,
@@ -92,7 +96,7 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                         Row(
                           children: [
                             SizedBox(width: 8),
-                            Icon(AppIcons.paw),
+                            Icon(AppIcons.traffic),
                             SizedBox(width: 8),
                             Text("Verkeer"),
                           ],
@@ -197,10 +201,12 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                   GestureDetector(
                     onTap: () => {markerProvider.mapToggle1()},
                     child: Container(
+                        width: 100,
+                        height: 100,
                         decoration: ShapeDecoration(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
                               color: markers.value!.mapTypeToggle1
                                   ? AppColors.primary
@@ -208,16 +214,22 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                               width: 2,
                             ),
                           ),
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: AssetImage('assets/symbols/standard.png'),
+                            )
 
-                    ), child: Image.asset('assets/symbols/standard.png')),
+                    )),
                   ),
                   GestureDetector(
                     onTap: () => {markerProvider.mapToggle2()},
                     child: Container(
+                        width: 100,
+                        height: 100,
                         decoration: ShapeDecoration(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
                               color: markers.value!.mapTypeToggle2
                                   ? AppColors.primary
@@ -226,15 +238,21 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                             ),
                           ),
 
-                        ), child: Image.asset('assets/symbols/satellite.png')),
+                            image: DecorationImage(
+                              fit: BoxFit.fill,
+                              image: AssetImage('assets/symbols/satellite.png'),
+                            )
+                        )),
                   ),
                   GestureDetector(
                     onTap: () => {markerProvider.mapToggle3()},
                     child: Container(
+                        width: 100,
+                        height: 100,
                         decoration: ShapeDecoration(
                           color: Colors.white,
                           shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                            borderRadius: BorderRadius.circular(16),
                             side: BorderSide(
                               color: markers.value!.mapTypeToggle3
                                   ? AppColors.primary
@@ -243,7 +261,12 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                             ),
                           ),
 
-                        ), child: Image.asset('assets/symbols/terrain.png')),
+                          image: DecorationImage(
+                            fit: BoxFit.fill,
+                            image: AssetImage('assets/symbols/terrain.png'),
+                          )
+
+                        )),
                   )
                 ],
               ),

@@ -13,14 +13,18 @@ class CurrentLocation extends _$CurrentLocation {
     PermissionStatus _permissionGranted;
     LocationData _locationData;
 
-    if (!await location.serviceEnabled()) {
-      if (!await location.requestService()) {
+    _serviceEnabled = await location.serviceEnabled();
+    if (!_serviceEnabled) {
+      _serviceEnabled = await location.requestService();
+      if (!_serviceEnabled) {
         return null;
       }
     }
 
-    if (await location.hasPermission() == PermissionStatus.denied) {
-      if (await location.requestPermission() != PermissionStatus.granted) {
+    _permissionGranted = await location.hasPermission();
+    if (_permissionGranted == PermissionStatus.denied) {
+      _permissionGranted = await location.requestPermission();
+      if (_permissionGranted != PermissionStatus.granted) {
         return null;
       }
     }

@@ -46,4 +46,8 @@ class AppIcons {
   static const IconData text_bubble = IconData(0xe816, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cross_thin = IconData(0xe817, fontFamily: _kFontFam, fontPackage: _kFontPkg);
   static const IconData cross = IconData(0xe819, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData traffic = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData userlocation = IconData(0xe821, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData paths = IconData(0xe822, fontFamily: _kFontFam, fontPackage: _kFontPkg);
+  static const IconData mapsettings = IconData(0xe820, fontFamily: _kFontFam, fontPackage: _kFontPkg);
 }
