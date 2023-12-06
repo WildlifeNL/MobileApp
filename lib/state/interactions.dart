@@ -40,7 +40,7 @@ class Interactions extends _$Interactions {
   Future<InteractionState> build(InteractionType? activityType) async {
     Result<PaginatedInteractions, String> response;
     if(activityType != null){
-      response = await InteractionService.getInteractionsByType(activityType.type,1, 10, accessToken: "");
+      response = await InteractionService.getInteractionsByType(activityType.typeKey,1, 10, accessToken: "");
     } else {
       response = await InteractionService.getInteractions(1, 10, accessToken: "");
     }

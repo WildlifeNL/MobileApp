@@ -10,12 +10,10 @@ part 'interaction_type.g.dart';
 class InteractionType {
   final String id;
   final String label;
-
-  @JsonKey(name: "typekey")
-  final InteractionTypeKey type;
+  final InteractionTypeKey typeKey;
   final String color;
 
-  InteractionType({required this.id, required this.label, required this.type, required this.color});
+  InteractionType({required this.id, required this.label, required this.typeKey, required this.color});
 
 
   factory InteractionType.fromJsonString(String json) =>
@@ -32,7 +30,7 @@ class InteractionType {
   }
 
   String getSnakeCaseType() {
-    return Casing.snakeCase(type.name);
+    return Casing.snakeCase(typeKey.name);
   }
 }
 

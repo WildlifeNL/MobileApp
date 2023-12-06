@@ -100,7 +100,7 @@ class _ReportListState extends ConsumerState<ReportList> {
           InteractionType type = InteractionType(
               id: "",
               label: "Unknown",
-              type: InteractionTypeKey.sighting,
+              typeKey: InteractionTypeKey.sighting,
               color: "#000000");
           for (var value in interactionTypes.requireValue) {
             if (value.id == item.interactionType) {
@@ -123,7 +123,7 @@ class _ReportListState extends ConsumerState<ReportList> {
 
           var color = HexColor(type.color);
 
-          switch (type.type) {
+          switch (type.typeKey) {
             case InteractionTypeKey.sighting:
               return ActivityItemCard(
                   icon: AppIcons.deer,
