@@ -128,35 +128,35 @@ class _ReportListState extends ConsumerState<ReportList> {
               return ActivityItemCard(
                   icon: AppIcons.deer,
                   title: animal.name,
-                  subtitle: "Unknown location",
+                  subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
             case InteractionTypeKey.incident:
               return ActivityItemCard(
                   icon: AppIcons.incident,
                   title: type.label,
-                  subtitle: "Unknown location",
+                  subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
             case InteractionTypeKey.inappropriateBehaviour:
               return ActivityItemCard(
                   icon: AppIcons.incident,
                   title: type.label,
-                  subtitle: "Unknown location",
+                  subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
             case InteractionTypeKey.traffic:
               return ActivityItemCard(
                   icon: AppIcons.traffic,
                   title: type.label,
-                  subtitle: "Unknown location",
+                  subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
             case InteractionTypeKey.maintenance:
               return ActivityItemCard(
                   icon: AppIcons.maintenance,
                   title: type.label,
-                  subtitle: "Unknown location",
+                  subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
           }
