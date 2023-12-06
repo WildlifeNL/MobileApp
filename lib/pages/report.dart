@@ -69,7 +69,7 @@ Future<void> fetchData() async {
     animalTypesApi = jsonData.map((json) {
       return AnimalType(
         name: json['name'] ?? '',
-        img: json['img'] ?? '',
+        img: json['image'] ?? '',
         id: json['id'] ?? ''
       );
     }).toList();
@@ -87,7 +87,7 @@ Future<void> fetchData() async {
     animalsApi = results2.map((json) {
       return Animal(
         name: json['name'] ?? '',
-        img: json['img'] ?? '',
+        img: json['image'] ?? '',
         id: json['id'] ?? '',
         familyId: json['family_id'] ?? '',
       );
@@ -158,7 +158,7 @@ final List<AnimalQuestion> animalQuestions = [
       required: false,
       fullWidth: true,
       hint: '',
-      options: ['angstig', 'neutraal', 'enthousiast']
+      options: ['Angstig', 'Neutraal', 'Enthousiast']
   ),
   AnimalQuestion(
     inputType: 'dropdown',
@@ -179,7 +179,7 @@ final List<AnimalQuestion> animalQuestions = [
       required: false,
       fullWidth: true,
       hint: '',
-      options: ['angstig', 'neutraal', 'enthousiast']
+      options: ['Angstig', 'Neutraal', 'Enthousiast']
   ),
   AnimalQuestion(
     inputType: 'stars',
@@ -189,14 +189,14 @@ final List<AnimalQuestion> animalQuestions = [
     hint: '',
     options: [],
   ),
-  AnimalQuestion(
-    inputType: 'photo',
-    question: "Heb je foto's van de waarneming?",
-    required: false,
-    fullWidth: true,
-    hint: '',
-    options: [],
-  ),
+  // AnimalQuestion(
+  //   inputType: 'photo',
+  //   question: "Heb je foto's van de waarneming?",
+  //   required: false,
+  //   fullWidth: true,
+  //   hint: '',
+  //   options: [],
+  // ),
 ];
 final animalQuestionsMap = animalQuestions.asMap();
 
@@ -261,7 +261,7 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                   ),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisSize: MainAxisSize.min,
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -269,7 +269,7 @@ class _ReportPageState extends State<ReportPage> {
                     Expanded(
                       child: Image(
                         image: NetworkImage(
-                            'https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png'),
+                            Animal.img),
                       ),
                     ),
                   ],
@@ -428,7 +428,7 @@ class _ReportPageState extends State<ReportPage> {
                                                         children: [
                                                           Expanded(
                                                             child: Image(
-                                                                image: NetworkImage('https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png')
+                                                                image: NetworkImage(animalType.img)
                                                             ),
                                                           ),
                                                         ],
@@ -582,49 +582,49 @@ class _ReportPageState extends State<ReportPage> {
                                 )
                                 ));
                               }
-                              else if (question.inputType == 'photo') {
-                                return MapEntry(i, Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        question.question,
-                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                          color: AppColors.primary,
-                                        ),
-                                      ),
-                                      const SizedBox(height:8),
-                                      Row(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              _pickImage(ImageSource.gallery, i); // Open gallery
-                                            },
-                                            child: Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(AppIcons.add, size: 20),
-                                                SizedBox(width: 4),
-                                                Text("Voeg foto toe"),
-                                              ],
-                                            ),
-                                            style: ElevatedButton.styleFrom(
-                                              primary: AppColors.neutral_50,
-                                              onPrimary: AppColors.primary,
-                                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  side: BorderSide(color: AppColors.primary, width: 2)
-                                              ),
-                                              elevation: 0,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    ]
-                                  )
-                                ));
-                              }
+                              // else if (question.inputType == 'photo') {
+                              //   return MapEntry(i, Container(
+                              //     child: Column(
+                              //       crossAxisAlignment: CrossAxisAlignment.start,
+                              //       children: [
+                              //         Text(
+                              //           question.question,
+                              //           style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                              //             color: AppColors.primary,
+                              //           ),
+                              //         ),
+                              //         const SizedBox(height:8),
+                              //         Row(
+                              //           children: [
+                              //             ElevatedButton(
+                              //               onPressed: () {
+                              //                 _pickImage(ImageSource.gallery, i); // Open gallery
+                              //               },
+                              //               child: Row(
+                              //                 mainAxisSize: MainAxisSize.min,
+                              //                 children: [
+                              //                   Icon(AppIcons.add, size: 20),
+                              //                   SizedBox(width: 4),
+                              //                   Text("Voeg foto toe"),
+                              //                 ],
+                              //               ),
+                              //               style: ElevatedButton.styleFrom(
+                              //                 primary: AppColors.neutral_50,
+                              //                 onPrimary: AppColors.primary,
+                              //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              //                 shape: RoundedRectangleBorder(
+                              //                     borderRadius: BorderRadius.circular(8),
+                              //                     side: BorderSide(color: AppColors.primary, width: 2)
+                              //                 ),
+                              //                 elevation: 0,
+                              //               ),
+                              //             ),
+                              //           ],
+                              //         )
+                              //       ]
+                              //     )
+                              //   ));
+                              // }
                               else {
                                 return MapEntry(i, Container());
                               }

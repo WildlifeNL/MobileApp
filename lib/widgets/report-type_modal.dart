@@ -120,15 +120,15 @@ class _ReportModalState extends State<ReportTypeModal> {
                         return Container(
                           width: double.infinity,
                           child: Wrap(
-                            alignment: WrapAlignment.center,
+                            alignment: WrapAlignment.start,
                             spacing: 16,
                             runSpacing: 8,
-                            children:
-                              interactionTypesApi.map((InteractionType) => GestureDetector(
+                            children: [
+                              GestureDetector(
                                 onTap: (){
-                                  if (_selectedType != InteractionType.typekey) {
+                                  if (_selectedType != interactionTypesApi[1].typekey) {
                                     setState(() {
-                                      _selectedType = InteractionType.typekey;
+                                      _selectedType = interactionTypesApi[1].typekey;
                                     });
                                   } else {
                                     setState(() {
@@ -142,7 +142,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(8),
                                         side: BorderSide(
-                                          color: _selectedType == InteractionType.typekey ? HexColor(InteractionType.color) : Colors.white,
+                                          color: _selectedType == interactionTypesApi[1].typekey ? HexColor(interactionTypesApi[1].color) : Colors.white,
                                           width: 2,
                                         ),
                                       ),
@@ -150,12 +150,13 @@ class _ReportModalState extends State<ReportTypeModal> {
                                     padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                                     child: Column(
                                       children: [
-                                        Icon(AppIcons.paw, size: 20, color: HexColor(InteractionType.color)),
-                                        Text(InteractionType.label, style: AppStyles.of(context).data.textStyle.paragraph,)
+                                        Icon(AppIcons.paw, size: 20, color: HexColor(interactionTypesApi[1].color)),
+                                        Text(interactionTypesApi[1].label, style: AppStyles.of(context).data.textStyle.paragraph,)
                                       ],
                                     ),
                                 ),
-                              )).toList(),
+                              ),
+                          ]
                           ),
                         );
                         },
@@ -174,14 +175,14 @@ class _ReportModalState extends State<ReportTypeModal> {
                       children: [
                         Expanded(
                           child: ElevatedButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => ReportPage(),
-                                ),
-                              );
-                            },
+                            onPressed: _selectedType != '' ? () {
+                                Navigator.pop(context);
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ReportPage(),
+                                  ),
+                                );
+                            } : null,
                             child: Text(
                                 'Volgende',
                                 style: AppStyles.of(context).data.textStyle.buttonText
