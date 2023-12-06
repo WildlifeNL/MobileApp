@@ -49,7 +49,7 @@ class _ReportFilterChipsState extends ConsumerState<ReportFilterChips> {
     Map<InteractionTypeKey, Color> map = {};
 
     for (var value in interactionTypes.value!) {
-      map[value.type] = HexColor(value.color);
+      map[value.typeKey] = HexColor(value.color);
     }
 
     return SliverPadding(
