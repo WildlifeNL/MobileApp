@@ -88,7 +88,7 @@ class _ReportFilterChipsState extends ConsumerState<ReportFilterChips> {
               selected: widget.state == ActivityFilter.incidents,
               title: "Incidenten",
               onSelected: (_) => onSelected(ActivityFilter.incidents),
-              color: map[InteractionTypeKey.incident]!,
+              color: map[InteractionTypeKey.damage]!,
             ),
             const SizedBox(
               width: 8,

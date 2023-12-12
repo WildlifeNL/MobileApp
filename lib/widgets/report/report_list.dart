@@ -131,7 +131,7 @@ class _ReportListState extends ConsumerState<ReportList> {
                   subtitle: "Onbekende locatie",
                   date: item.time,
                   color: color);
-            case InteractionTypeKey.incident:
+            case InteractionTypeKey.damage:
               return ActivityItemCard(
                   icon: AppIcons.incident,
                   title: type.label,

@@ -48,7 +48,7 @@ class _ReportListPageState extends State<ReportListPage> {
               typeKey = InteractionTypeKey.traffic;
               break;
             case ActivityFilter.incidents:
-              typeKey = InteractionTypeKey.incident;
+              typeKey = InteractionTypeKey.damage;
               break;
             case ActivityFilter.maintenance:
               typeKey = InteractionTypeKey.maintenance;
@@ -76,7 +76,7 @@ class _ReportListPageState extends State<ReportListPage> {
           filterChips: filterChips,
           controller: controller,
         );
-      case InteractionTypeKey.incident:
+      case InteractionTypeKey.damage:
         return ReportList(
           key: key4,
           type: typeKey,

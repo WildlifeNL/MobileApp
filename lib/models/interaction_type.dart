@@ -37,7 +37,7 @@ class InteractionType {
 @JsonEnum(fieldRename: FieldRename.snake)
 enum InteractionTypeKey {
   sighting,
-  incident,
+  damage,
   inappropriateBehaviour,
   traffic,
   maintenance,
