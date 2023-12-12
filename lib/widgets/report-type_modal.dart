@@ -132,9 +132,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                         return Container(
                           width: double.infinity,
                           child: Wrap(
-                            alignment: WrapAlignment.start,
                             spacing: 8,
-                            runSpacing: 8,
                             children: interactionTypesApi
                                 .map((interactionType) => GestureDetector(
                                       onTap: () {
@@ -150,53 +148,52 @@ class _ReportModalState extends State<ReportTypeModal> {
                                           });
                                         }
                                       },
-                                      child: FractionallySizedBox(
-                                        widthFactor: 1 / 3.15,
-                                        child: Container(
-                                          decoration: ShapeDecoration(
-                                            color: Colors.white,
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                              side: BorderSide(
-                                                color: _selectedType ==
-                                                        interactionType.typekey
-                                                    ? HexColor(
-                                                        interactionType.color)
-                                                    : Colors.white,
-                                                width: 2,
-                                              ),
-                                            ),
-                                          ),
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: 8, horizontal: 8),
+                                      child: Container(
                                           child: Column(
                                             children: [
-                                              Icon(
-                                                  (interactionType.typekey ==
-                                                          'sighting'
-                                                      ? AppIcons.paw
-                                                      : (interactionType
-                                                                  .typekey ==
-                                                              'incident'
-                                                          ? AppIcons.incident
-                                                          : (interactionType
-                                                                      .typekey ==
-                                                                  'inappropriate_behaviour'
-                                                              ? AppIcons.cancel
-                                                              : (interactionType
-                                                                          .typekey ==
-                                                                      'traffic'
-                                                                  ? AppIcons.paw
-                                                                  : (interactionType
-                                                                              .typekey ==
-                                                                          'maintenance'
-                                                                      ? AppIcons
-                                                                          .paw
-                                                                      : null))))),
-                                                  size: 24,
-                                                  color: HexColor(
-                                                      interactionType.color)),
+                                              Container(
+                                                    decoration: ShapeDecoration(
+                                                      color: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius:
+                                                        BorderRadius.circular(8),
+                                                        side: BorderSide(
+                                                          color: _selectedType ==
+                                                              interactionType.typekey
+                                                              ? HexColor(
+                                                              interactionType.color)
+                                                              : Colors.white,
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Icon(
+                                                        (interactionType.typekey ==
+                                                                'sighting'
+                                                            ? AppIcons.paw
+                                                            : (interactionType
+                                                                        .typekey ==
+                                                                    'damage'
+                                                                ? AppIcons.paw
+                                                                : (interactionType
+                                                                            .typekey ==
+                                                                        'inappropriate_behaviour'
+                                                                    ? AppIcons.cancel
+                                                                    : (interactionType
+                                                                                .typekey ==
+                                                                            'traffic'
+                                                                        ? AppIcons.paw
+                                                                        : (interactionType
+                                                                                    .typekey ==
+                                                                                'maintenance'
+                                                                            ? AppIcons
+                                                                                .paw
+                                                                            : null))))),
+                                                        size: 30,
+                                                        color: HexColor(
+                                                            interactionType.color)),
+                                                padding: EdgeInsets.all(16),
+                                                  ),
                                               SizedBox(height: 4),
                                               Text(
                                                 interactionType.label,
@@ -207,7 +204,6 @@ class _ReportModalState extends State<ReportTypeModal> {
                                               )
                                             ],
                                           ),
-                                        ),
                                       ),
                                     ))
                                 .toList(),
