@@ -15,4 +15,6 @@ class AppColors {
   static const Color red_400 = Color(0xFFF87171);
   static const Color red_500 = Color(0xFFEF4444);
   static const Color red_600 = Color(0xFFDC2626);
+  static const Color purple = Color(0xFF6366F1);
+  static const Color brown = Color(0xFF673615);
 }

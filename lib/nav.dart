@@ -78,7 +78,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Kaart",
         ),
-        const Map(),
+        const MapPage(),
       ),
       // (
       //   const NavigationDestination(

@@ -53,6 +53,9 @@ class Markers extends _$Markers {
   toggle4(){
     state = AsyncData(state.value!.copyWith(toggle4: !state.value!.toggle4));
   }
+  toggle5(){
+    state = AsyncData(state.value!.copyWith(toggle5: !state.value!.toggle5));
+  }
 
   mapToggle1(){
     state = AsyncData(state.value!.copyWith(mapTypeToggle1: true));
@@ -78,11 +81,12 @@ class MarkerState {
   var toggle2 = true;
   var toggle3 = true;
   var toggle4 = true;
+  var toggle5 = true;
   var mapTypeToggle1 = false;
   var mapTypeToggle2 = false;
   var mapTypeToggle3 = false;
 
-  MarkerState copyWith({bool? toggle1, bool? toggle2, bool? toggle3, bool? toggle4, bool? mapTypeToggle1, bool? mapTypeToggle2, bool? mapTypeToggle3}){
+  MarkerState copyWith({bool? toggle1, bool? toggle2, bool? toggle3, bool? toggle4, bool? toggle5, bool? mapTypeToggle1, bool? mapTypeToggle2, bool? mapTypeToggle3}){
     if(toggle1 != null){
       this.toggle1 = toggle1;
     }
@@ -94,6 +98,9 @@ class MarkerState {
     }
     if(toggle4 != null){
       this.toggle4 = toggle4;
+    }
+    if(toggle5 != null){
+      this.toggle5 = toggle5;
     }
     if(mapTypeToggle1 != null){
       this.mapTypeToggle1 = mapTypeToggle1;
@@ -112,7 +119,7 @@ class MarkerState {
 class Report {
   // final String id;
   // final String user_id;
-  // final String interaction_type;
+  final String interaction_type;
   // final String time;
   // final String image;
   // final String description;
@@ -129,7 +136,7 @@ class Report {
   Report({
     // required this.id,
     // required this.user_id,
-    // required this.interaction_type,
+    required this.interaction_type,
     // required this.time,
     // required this.image,
     // required this.description,
@@ -150,17 +157,18 @@ final String baseUrl = F.apiUrl;
 List<Report> ReportApi = [];
 
 Future<void> fetchData() async {
-  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php'));
+  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/interactions.php'));
 
 
   if (typesResponse.statusCode == 200) {
-    final List<dynamic> jsonData = jsonDecode(typesResponse.body);
+    final Map<String ,dynamic> jsonData = jsonDecode(typesResponse.body);
 
     // Map the raw JSON data into a list of AnimalType objects
-    ReportApi = jsonData.map((json) {
+    ReportApi = jsonData["results"].map<Report>((json) {
       return Report(
           lat: json['lat'] ?? '',
           lon: json['lon'] ?? '',
+          interaction_type: json["interaction_type"] ?? '',
       );
     }).toList();
   } else {
@@ -169,14 +177,14 @@ Future<void> fetchData() async {
 }
 
 
-class Map extends ConsumerStatefulWidget {
-  const Map({super.key});
+class MapPage extends ConsumerStatefulWidget {
+  const MapPage({super.key});
 
   @override
-  ConsumerState<Map> createState() => _MapState();
+  ConsumerState<MapPage> createState() => _MapState();
 }
 
-class _MapState extends ConsumerState<Map> {
+class _MapState extends ConsumerState<MapPage> {
   final MapController _controller = MapController();
 
   List MarkersFromDataBase = [
@@ -190,19 +198,19 @@ class _MapState extends ConsumerState<Map> {
 
 
   Future<List<Marker>> getMarkers(MarkerState? state) async {
-    markers.clear();
-    var test = MarkersFromDataBase.where((i) {
-      return (i["Type"] == 1 && state!.toggle1 ) || (i["Type"] == 2 && state!.toggle2) || (i["Type"] == 3 && state!.toggle3 || (i["Type"] == 4 && state!.toggle4));
+markers.clear();
+    var test = ReportApi.where((i) {
+      return (i.interaction_type == "86a6b56a-89f0-11ee-919a-1e0034001676" && state!.toggle1 ) || (i.interaction_type == "689a5571-8eb5-11ee-919a-1e0034001676" && state!.toggle2) || (i.interaction_type == "86a838e1-89f0-11ee-919a-1e0034001676" && state!.toggle3 || (i.interaction_type == "86a5736f-89f0-11ee-919a-1e0034001676" && state!.toggle4)|| (i.interaction_type == "689ccf59-8eb5-11ee-919a-1e0034001676" && state!.toggle5));
     }).toList();
     for (var item in test) {
       markers.add(
         Marker(
           width: 32,
           height: 32,
-          point: LatLng(item["Lat"], item["Long"]),
+          point: LatLng(double.parse(item.lat), double.parse(item.lon)),
           builder: (ctx) =>
               MapMarker(
-                markerType: item["Type"],
+                markerType: item.interaction_type,
               ),
           rotate: false,
         ),
@@ -214,10 +222,11 @@ class _MapState extends ConsumerState<Map> {
 
   @override
   Widget build(BuildContext context) {
+
     var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
     var markerState = ref.watch(markersProvider);
-
+    fetchData();
     if (style.isLoading || location.isLoading || markerState.isLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -288,7 +297,7 @@ class _MapState extends ConsumerState<Map> {
                                           : LatLng(51.45034, 5.45285),
                                       17.0);
                                 },
-                                icon: Icon(AppIcons.person,
+                                icon: Icon(AppIcons.userlocation,
                                     color: AppColors.neutral_50)),
                             Divider(
                               height: 1,
@@ -307,23 +316,23 @@ class _MapState extends ConsumerState<Map> {
                                 },
                                 icon: Icon(AppIcons.mapsettings,
                                     color: AppColors.neutral_50)),
-                            Divider(
-                              height: 1,
-                              color: AppColors.neutral_50,
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (BuildContext context) {
-                                      return Wrap(
-                                          children: [MapPathModal()]);
-                                    },
-                                  );
-                                },
-                                icon: Icon(AppIcons.paths,
-                                    color: AppColors.neutral_50))
+                            // Divider(
+                            //   height: 1,
+                            //   color: AppColors.neutral_50,
+                            // ),
+                            // IconButton(
+                            //     onPressed: () {
+                            //       showModalBottomSheet<void>(
+                            //         context: context,
+                            //         isScrollControlled: true,
+                            //         builder: (BuildContext context) {
+                            //           return Wrap(
+                            //               children: [MapPathModal()]);
+                            //         },
+                            //       );
+                            //     },
+                            //     icon: Icon(AppIcons.paths,
+                            //         color: AppColors.neutral_50))
                           ],
                         ),
                       ),
