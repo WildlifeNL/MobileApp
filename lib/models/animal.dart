@@ -9,7 +9,6 @@ part 'animal.g.dart';
 class Animal {
   final String id;
   final String name;
-  final String familyId;
   final String image;
   final Map<String, String>? specifications;
   final DateTime creationDate;
@@ -20,7 +19,7 @@ class Animal {
   factory Animal.fromJson(Map<String, dynamic> json) =>
       _$AnimalFromJson(json);
 
-  Animal({required this.id, required this.name, required this.familyId, required this.image, required this.specifications, required this.creationDate, required this.lastModified});
+  Animal({required this.id, required this.name, required this.image, required this.specifications, required this.creationDate, required this.lastModified});
 
   Map<String, dynamic> toJson() => _$AnimalToJson(this);
   String toJsonString() => jsonEncode(_$AnimalToJson(this));

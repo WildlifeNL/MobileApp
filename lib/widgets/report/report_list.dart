@@ -110,7 +110,6 @@ class _ReportListState extends ConsumerState<ReportList> {
           Animal animal = Animal(
               id: "",
               name: "",
-              familyId: "",
               image: "",
               specifications: null,
               creationDate: DateTime.now(),
