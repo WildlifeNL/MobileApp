@@ -5,6 +5,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wildlife_nl_app/flavors.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -18,13 +19,11 @@ class Animal {
   final String name;
   final String img;
   final String id;
-  final String familyId;
 
   Animal({
     required this.name,
     required this.img,
     required this.id,
-    required this.familyId,
   });
 }
 
@@ -35,6 +34,8 @@ class AnimalQuestion {
   final String hint;
   final List<dynamic> options;
   final int questionOrder;
+  final List<dynamic> interactionTypes;
+  List<dynamic> answers;
 
   AnimalQuestion({
     required this.inputType,
@@ -43,6 +44,8 @@ class AnimalQuestion {
     required this.hint,
     required this.options,
     required this.questionOrder,
+    required this.interactionTypes,
+    required this.answers,
   });
 }
 
@@ -51,11 +54,9 @@ final String baseUrl = F.apiUrl;
 List<Animal> animalsApi = [];
 List<AnimalQuestion> questionsApi = [];
 
-Future<void> fetchData() async {
+Future<void> fetchAnimalData() async {
   final animalsResponse =
       await http.get(Uri.parse('${baseUrl}api/controllers/animals.php'));
-  final questionsResponse =
-      await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
 
   if (animalsResponse.statusCode == 200) {
     final Map<String, dynamic> jsonData2 = jsonDecode(animalsResponse.body);
@@ -69,12 +70,16 @@ Future<void> fetchData() async {
         name: json['name'] ?? '',
         img: json['image'] ?? '',
         id: json['id'] ?? '',
-        familyId: json['family_id'] ?? '',
       );
     }).toList();
   } else {
     print('Response failed');
   }
+}
+
+Future<void> fetchQuestionsData() async {
+  final questionsResponse =
+  await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
 
   if (questionsResponse.statusCode == 200) {
     final Map<String, dynamic> jsonData3 = jsonDecode(questionsResponse.body);
@@ -85,14 +90,17 @@ Future<void> fetchData() async {
     // Map the raw JSON data into a list of AnimalType objects
     questionsApi = results3.map((json) {
       return AnimalQuestion(
-          inputType: json['type'] ?? '',
-          question: json['question'] ?? '',
-          optional: json['is_optional'] ?? '',
-          hint: json['placeholder'] ?? '',
-          options: json['specifications'] ?? '',
-          questionOrder: int.parse(json['question_order']),
+        inputType: json['type'] ?? '',
+        question: json['question'] ?? '',
+        optional: json['is_optional'] ?? '',
+        hint: json['placeholder'] ?? '',
+        options: json['specifications'] ?? '',
+        questionOrder: json['question_order'],
+        interactionTypes: json['interaction_types'] ?? '',
+        answers: [json['question_order'] == 1 ? '1' : (json['question_order'] == 2 ? '0' : '')],
       );
     }).toList();
+    // Filter questions by chosenType
     questionsApi.sort((a, b) => a.questionOrder.compareTo(b.questionOrder));
   } else {
     print('Response failed');
@@ -100,10 +108,11 @@ Future<void> fetchData() async {
 }
 
 List<String> _evaluationAnswers =
-    ['1', '0'] + List.filled((questionsApi.length - 2), "");
+    ['1', '0'] + List.filled((questionsApi.length - 3), "");
 
 class ReportPage extends StatefulWidget {
-  ReportPage({super.key});
+  final String selectedType;
+  const ReportPage({super.key, required this.selectedType});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -113,7 +122,8 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchAnimalData();
+    fetchQuestionsData();
   }
 
   int _currentStep = 0;
@@ -128,12 +138,28 @@ class _ReportPageState extends State<ReportPage> {
     Navigator.of(context).pop();
     _currentStep = 0;
     _chosenName = '';
-    _evaluationAnswers =
-        ['1', '0'] + List.filled((questionsApi.length - 2), "");
+  }
+
+  Future<void> _getUserLocation() async {
+    try {
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      double latitude = position.latitude;
+      double longitude = position.longitude;
+
+      print('Latitude: $latitude, Longitude: $longitude');
+
+      // Now you have the latitude and longitude, and you can use them as needed.
+    } catch (e) {
+      print('Error getting location: $e');
+      // Handle error getting location
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    _getUserLocation();
     return Scaffold(
       body: Column(
         children: [
@@ -202,78 +228,113 @@ class _ReportPageState extends State<ReportPage> {
                                     color: AppColors.primary,
                                   ),
                             ),
-                            FutureBuilder(
-                                future: fetchData(),
-                                builder: (context, snapshot) {
-                                  return Container(
-                                    padding: EdgeInsets.only(top: 4),
-                                    width: double.maxFinite,
-                                    child: Wrap(
-                                      spacing: 16,
-                                      runSpacing: 16,
-                                      children: animalsApi.map((Animal) => GestureDetector(
-                                        onTap: () {
-                                          if (_chosenName != Animal.id) {
-                                            setState(() {
-                                              _chosenName = Animal.id;
-                                            });
-                                          } else {
-                                            setState(() {
-                                              _chosenName = '';
-                                            });
-                                          }
-                                        },
-                                        child: FractionallySizedBox(
-                                          widthFactor: 1 / 3.3,
-                                          child: Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            mainAxisAlignment: MainAxisAlignment.center,
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            children: [
-                                              AspectRatio(
-                                                aspectRatio: 1.0,
-                                                child: Container(
-                                                  padding: const EdgeInsets.all(8),
-                                                  decoration: ShapeDecoration(
-                                                    color: Colors.white,
-                                                    shape: RoundedRectangleBorder(
-                                                      borderRadius: BorderRadius.circular(8),
-                                                      side: BorderSide(
-                                                        color: _chosenName == Animal.id
-                                                            ? AppColors.primary
-                                                            : Colors.white,
-                                                        width: 2,
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  child: Row(
-                                                    mainAxisSize: MainAxisSize.min,
-                                                    mainAxisAlignment: MainAxisAlignment.center,
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: [
-                                                      Expanded(
-                                                        child: Image(
-                                                          image: NetworkImage(Animal.img),
+                            Container(
+                              child: FutureBuilder(
+                                  future: fetchAnimalData(),
+                                  builder: (context, snapshot) {
+                                    return Container(
+                                      padding: EdgeInsets.only(top: 4),
+                                      width: double.maxFinite,
+                                      child: Wrap(
+                                        spacing: 16,
+                                        runSpacing: 16,
+                                        children: animalsApi.map((Animal) => GestureDetector(
+                                          onTap: () {
+                                            if (_chosenName != Animal.id) {
+                                              setState(() {
+                                                _chosenName = Animal.id;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                _chosenName = '';
+                                              });
+                                            }
+                                          },
+                                          child: FractionallySizedBox(
+                                            widthFactor: 1 / 3.3,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                AspectRatio(
+                                                  aspectRatio: 1.0,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: ShapeDecoration(
+                                                      color: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        side: BorderSide(
+                                                          color: _chosenName == Animal.id
+                                                              ? AppColors.primary
+                                                              : Colors.white,
+                                                          width: 2,
                                                         ),
                                                       ),
-                                                    ],
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Expanded(
+                                                          child: Image(
+                                                            image: NetworkImage(Animal.img),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                Animal.name,
-                                                textAlign: TextAlign.center,
-                                                style: AppStyles.of(context).data.textStyle.paragraph,
-                                              ),
-                                            ],
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  Animal.name,
+                                                  textAlign: TextAlign.center,
+                                                  style: AppStyles.of(context).data.textStyle.paragraph,
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        ),
-                                      ))
-                                          .toList(),
+                                        ))
+                                            .toList(),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _chosenName = value;
+                                      });
+                                    },
+                                    style: AppStyles.of(context)
+                                        .data
+                                        .textStyle
+                                        .paragraph,
+                                    decoration: InputDecoration(
+                                      contentPadding:
+                                      EdgeInsets.symmetric(
+                                          vertical: 8,
+                                          horizontal: 8),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(
+                                            8.0),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      hintText: 'Anders, namelijk:',
                                     ),
-                                  );
-                                }),
+                                  ),
+                                ],
+                              ),
+                            )
                           ],
                         ),
                       )),
@@ -281,16 +342,17 @@ class _ReportPageState extends State<ReportPage> {
                       state: _currentStep >= 1
                           ? CustomStepState.editing
                           : CustomStepState.indexed,
-                      content: FutureBuilder(
-                          future: fetchData(),
-                          builder: (context, snapshot) {
-                          return Container(
+                      content: Container(
                               padding: EdgeInsets.only(top: 4),
                               width: double.maxFinite,
                               child: Wrap(
                                 spacing: 16,
                                 runSpacing: 16,
-                                children: questionsApi.asMap().entries.map((Question) => Container(
+                                children: questionsApi
+                                    .asMap()
+                                    .entries
+                                    .where((Question) => Question.value.interactionTypes.contains(widget.selectedType))
+                                    .map((Question) => Container(
                                   width: Question.key > 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -336,7 +398,7 @@ class _ReportPageState extends State<ReportPage> {
                                               contentPadding: EdgeInsets.symmetric(horizontal: 8)),
                                           onSelected: (String? value) {
                                             setState(() {
-                                              _evaluationAnswers[Question.key - 1] = value!;
+                                              Question.value.answers[0] = value;
                                             });
                                           },
                                           dropdownMenuEntries:
@@ -359,16 +421,16 @@ class _ReportPageState extends State<ReportPage> {
                                             color: AppColors.primary,
                                           ),
                                           onRatingUpdate: (rating) {
-                                            if(_evaluationAnswers[Question.key] != rating) {
-                                              _evaluationAnswers[Question.key] = rating.toString();
-                                            }
-                                          },
+                                            setState(() {
+                                              Question.value.answers[0] = rating.toString();
+                                            });
+                                          }
                                         ),
                                       if(Question.value.inputType == 'text')
                                         TextFormField(
                                           onChanged: (value) {
                                             setState(() {
-                                              _evaluationAnswers[Question.key - 1] = value;
+                                              Question.value.answers[0] = value;
                                             });
                                           },
                                           minLines: 3,
@@ -393,13 +455,12 @@ class _ReportPageState extends State<ReportPage> {
                                             hintText: Question.value.hint,
                                           ),
                                         ),
+                                      Text(Question.value.answers.toString()),
                                     ],
                                   ),
                                 )
                                 ).toList()
-                              ));
-                        }
-                      )),
+                              ))),
                 ]),
           ),
           Column(
@@ -418,10 +479,6 @@ class _ReportPageState extends State<ReportPage> {
                             setState(() {
                               _currentStep--; // Verhoog de huidige stap
                             });
-                            if (_currentStep < 1) {
-                              _evaluationAnswers = ['1', '0'] +
-                                  List.filled((questionsApi.length - 2), "");
-                            }
                           },
                           child: Text('Vorige',
                               style: AppStyles.of(context)
@@ -462,7 +519,7 @@ class _ReportPageState extends State<ReportPage> {
                                       }
                                     : null),
                         // onPressed: null,
-                        child: Text(_currentStep < 2 ? 'Volgende' : 'Opslaan',
+                        child: Text(_currentStep < 1 ? 'Volgende' : 'Opslaan',
                             style: AppStyles.of(context)
                                 .data
                                 .textStyle
@@ -486,43 +543,6 @@ class _ReportPageState extends State<ReportPage> {
           ),
         ],
       ),
-    );
-  }
-}
-
-class MyDropdown extends StatefulWidget {
-  final List<String> options;
-  final String title;
-  final String placeholder;
-  final bool required;
-  final int index;
-
-  MyDropdown(
-      {required this.options,
-      required this.title,
-      required this.placeholder,
-      required this.required,
-      required this.index});
-
-  @override
-  _MyDropdownState createState() => _MyDropdownState();
-}
-
-class _MyDropdownState extends State<MyDropdown> {
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          (widget.title + (widget.required ? '*' : '')),
-          style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                color: AppColors.primary,
-              ),
-        ),
-        const SizedBox(height: 8),
-
-      ],
     );
   }
 }

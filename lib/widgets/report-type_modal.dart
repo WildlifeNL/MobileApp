@@ -137,10 +137,10 @@ class _ReportModalState extends State<ReportTypeModal> {
                                 .map((interactionType) => GestureDetector(
                                       onTap: () {
                                         if (_selectedType !=
-                                            interactionType.typekey) {
+                                            interactionType.id) {
                                           setState(() {
                                             _selectedType =
-                                                interactionType.typekey;
+                                                interactionType.id;
                                           });
                                         } else {
                                           setState(() {
@@ -159,7 +159,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                                                         BorderRadius.circular(8),
                                                         side: BorderSide(
                                                           color: _selectedType ==
-                                                              interactionType.typekey
+                                                              interactionType.id
                                                               ? HexColor(
                                                               interactionType.color)
                                                               : Colors.white,
@@ -167,6 +167,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                                                         ),
                                                       ),
                                                     ),
+                                                padding: EdgeInsets.all(16),
                                                     child: Icon(
                                                         (interactionType.typekey ==
                                                                 'sighting'
@@ -174,7 +175,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                                                             : (interactionType
                                                                         .typekey ==
                                                                     'damage'
-                                                                ? AppIcons.paw
+                                                                ? AppIcons.incident
                                                                 : (interactionType
                                                                             .typekey ==
                                                                         'inappropriate_behaviour'
@@ -182,17 +183,15 @@ class _ReportModalState extends State<ReportTypeModal> {
                                                                     : (interactionType
                                                                                 .typekey ==
                                                                             'traffic'
-                                                                        ? AppIcons.paw
+                                                                        ? AppIcons.traffic
                                                                         : (interactionType
                                                                                     .typekey ==
                                                                                 'maintenance'
-                                                                            ? AppIcons
-                                                                                .paw
+                                                                            ? AppIcons.maintenance
                                                                             : null))))),
                                                         size: 30,
                                                         color: HexColor(
                                                             interactionType.color)),
-                                                padding: EdgeInsets.all(16),
                                                   ),
                                               SizedBox(height: 4),
                                               Text(
@@ -230,7 +229,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                                   Navigator.pop(context);
                                   Navigator.of(context).push(
                                     MaterialPageRoute(
-                                      builder: (context) => ReportPage(),
+                                      builder: (context) => ReportPage(selectedType: _selectedType),
                                     ),
                                   );
                                 }
