@@ -12,19 +12,24 @@ import 'package:http/http.dart' as http;
 
 final String baseUrl = F.apiUrl;
 
-class InteractionType  {
+class InteractionType {
   final String label;
   final String typekey;
   final String color;
+  final String id;
 
-  InteractionType({required this.label, required this.typekey, required this.color});
+  InteractionType(
+      {required this.label,
+      required this.typekey,
+      required this.color,
+      required this.id});
 }
 
 List<InteractionType> interactionTypesApi = [];
 
 Future<void> fetchData() async {
-  final typesResponse = await http.get(
-      Uri.parse(baseUrl + 'api/controllers/interactions.php/types'));
+  final typesResponse = await http
+      .get(Uri.parse(baseUrl + 'api/controllers/interactions.php/types'));
 
   if (typesResponse.statusCode == 200) {
     final List<dynamic> jsonData = jsonDecode(typesResponse.body);
@@ -33,8 +38,8 @@ Future<void> fetchData() async {
       return InteractionType(
           label: json['label'] ?? '',
           typekey: json['type_key'] ?? '',
-          color: json['color'] ?? ''
-      );
+          color: json['color'] ?? '',
+          id: json['id'] ?? '');
     }).toList();
   } else {
     print('Response failed');
@@ -60,152 +65,204 @@ class _ReportModalState extends State<ReportTypeModal> {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: ShapeDecoration(
-          color: AppColors.neutral_50,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32),
-            side: BorderSide.none,
-            ),
-          ),
-        width: double.maxFinite,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
-          child: Column(
-            children: [
-              Container(
-                width: double.maxFinite,
-                padding: const EdgeInsets.only(bottom: 8,),
-                child: Column(
-                  children: [
-                    Container(
-                      width: double.maxFinite,
-                      child: Align(
-                        alignment: Alignment.centerRight,
-                        child: IconButton(
-                            onPressed: (){
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(AppIcons.cross)),
-                      ),
-                    ),
-                    SizedBox(
-                      width: double.maxFinite,
-                      child: Text(
-                        'Nieuwe melding',
-                        textAlign: TextAlign.center,
-                        style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(
-                            color: AppColors.primary
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Container(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Wat wil je melden?',
-                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                          color: AppColors.primary,
-                        ),
-                      ),
-                      const SizedBox(height:8),
-                      FutureBuilder(
-                        future: fetchData(),
-                        builder: (context, snapshot) {
-                        return Container(
-                          width: double.infinity,
-                          child: Wrap(
-                            alignment: WrapAlignment.start,
-                            spacing: 16,
-                            runSpacing: 8,
-                            children: [
-                              GestureDetector(
-                                onTap: (){
-                                  if (_selectedType != interactionTypesApi[1].typekey) {
-                                    setState(() {
-                                      _selectedType = interactionTypesApi[1].typekey;
-                                    });
-                                  } else {
-                                    setState(() {
-                                      _selectedType = '';
-                                    });
-                                  }
-                                },
-                                child: Container(
-                                    decoration: ShapeDecoration(
-                                      color: Colors.white,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                        side: BorderSide(
-                                          color: _selectedType == interactionTypesApi[1].typekey ? HexColor(interactionTypesApi[1].color) : Colors.white,
-                                          width: 2,
-                                        ),
-                                      ),
-                                    ),
-                                    padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                    child: Column(
-                                      children: [
-                                        Icon(AppIcons.paw, size: 20, color: HexColor(interactionTypesApi[1].color)),
-                                        Text(interactionTypesApi[1].label, style: AppStyles.of(context).data.textStyle.paragraph,)
-                                      ],
-                                    ),
-                                ),
-                              ),
-                          ]
-                          ),
-                        );
-                        },
-                      )
-                    ],
-                  ),
-                ),
-              ),
-              Column(
-                mainAxisAlignment: MainAxisAlignment.end,
+      decoration: ShapeDecoration(
+        color: AppColors.neutral_50,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(32),
+          side: BorderSide.none,
+        ),
+      ),
+      width: double.maxFinite,
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+        child: Column(
+          children: [
+            Container(
+              width: double.maxFinite,
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Column(
                 children: [
                   Container(
-                    padding: EdgeInsets.symmetric(horizontal: 8,vertical: 8),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: _selectedType != '' ? () {
-                                Navigator.pop(context);
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ReportPage(),
-                                  ),
-                                );
-                            } : null,
-                            child: Text(
-                                'Volgende',
-                                style: AppStyles.of(context).data.textStyle.buttonText
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary:AppColors.primary,
-                              onPrimary: Colors.white,
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              elevation: 0,
-                            ),
-                          ),
-                        ),
-                      ],
+                    width: double.maxFinite,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            _selectedType = '';
+                          },
+                          icon: Icon(AppIcons.cross)),
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.maxFinite,
+                    child: Text(
+                      'Nieuwe melding',
+                      textAlign: TextAlign.center,
+                      style: AppStyles.of(context)
+                          .data
+                          .textStyle
+                          .headerMedium
+                          .copyWith(color: AppColors.primary),
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
+            ),
+            Container(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Wat wil je melden?',
+                      style: AppStyles.of(context)
+                          .data
+                          .textStyle
+                          .cardTitle
+                          .copyWith(
+                            color: AppColors.primary,
+                          ),
+                    ),
+                    const SizedBox(height: 8),
+                    FutureBuilder(
+                      future: fetchData(),
+                      builder: (context, snapshot) {
+                        return Container(
+                          width: double.infinity,
+                          child: Wrap(
+                            spacing: 8,
+                            runSpacing: 8,
+                            children: interactionTypesApi
+                                .map((interactionType) => GestureDetector(
+                                      onTap: () {
+                                        if (_selectedType !=
+                                            interactionType.id) {
+                                          setState(() {
+                                            _selectedType =
+                                                interactionType.id;
+                                          });
+                                        } else {
+                                          setState(() {
+                                            _selectedType = '';
+                                          });
+                                        }
+                                      },
+                                      child: FractionallySizedBox(
+                                        widthFactor: 1/3.2,
+                                        child: Container(
+                                          decoration: ShapeDecoration(
+                                            color: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(8),
+                                              side: BorderSide(
+                                                color: _selectedType ==
+                                                    interactionType.id
+                                                    ? HexColor(
+                                                    interactionType.color)
+                                                    : Colors.white,
+                                                width: 2,
+                                              ),
+                                            ),
+                                          ),
+                                            padding: EdgeInsets.symmetric(vertical: 4),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                      child: Icon(
+                                                          (interactionType.typekey ==
+                                                                  'sighting'
+                                                              ? AppIcons.paw
+                                                              : (interactionType
+                                                                          .typekey ==
+                                                                      'damage'
+                                                                  ? AppIcons.incident
+                                                                  : (interactionType
+                                                                              .typekey ==
+                                                                          'inappropriate_behaviour'
+                                                                      ? AppIcons.cancel
+                                                                      : (interactionType
+                                                                                  .typekey ==
+                                                                              'traffic'
+                                                                          ? AppIcons.traffic
+                                                                          : (interactionType
+                                                                                      .typekey ==
+                                                                                  'maintenance'
+                                                                              ? AppIcons.maintenance
+                                                                              : null))))),
+                                                          size: 30,
+                                                          color: HexColor(
+                                                              interactionType.color)),
+                                                    ),
+                                                  Text(
+                                                    textAlign: TextAlign.center,
+                                                    interactionType.label,
+                                                    style: AppStyles.of(context)
+                                                        .data
+                                                        .textStyle
+                                                        .paragraph,
+                                                  ),
+                                              ],
+                                            ),
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                          ),
+                        );
+                      },
+                    )
+                  ],
+                ),
+              ),
+            ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: _selectedType != ''
+                              ? () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => ReportPage(selectedType: _selectedType),
+                                    ),
+                                  );
+                                }
+                              : null,
+                          child: Text('Volgende',
+                              style: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .buttonText),
+                          style: ElevatedButton.styleFrom(
+                            primary: AppColors.primary,
+                            onPrimary: Colors.white,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
-      );
+      ),
+    );
   }
 }

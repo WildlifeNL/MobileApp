@@ -4,7 +4,9 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wildlife_nl_app/flavors.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
@@ -14,68 +16,51 @@ import 'package:wildlife_nl_app/utilities/app_text_styles.dart';
 import 'package:wildlife_nl_app/widgets/CustomStepper.dart';
 import 'package:http/http.dart' as http;
 
-
-class AnimalType {
-  final String name;
-  final String img;
-  final String id;
-
-  AnimalType({
-    required this.name,
-    required this.img,
-    required this.id,
-  });
-}
 class Animal {
   final String name;
   final String img;
   final String id;
-  final String familyId;
 
   Animal({
     required this.name,
     required this.img,
     required this.id,
-    required this.familyId,
   });
 }
 
 class AnimalQuestion {
   final String inputType;
   final String question;
-  final bool required;
-  final bool fullWidth;
+  final bool optional;
   final String hint;
-  final List<String> options;
+  final List<dynamic> options;
+  final int questionOrder;
+  final List<dynamic> interactionTypes;
+  List<dynamic> answers;
 
-  AnimalQuestion({required this.inputType, required this.question,required this.required, required this.fullWidth, required this.hint, required this.options});
+  AnimalQuestion({
+    required this.inputType,
+    required this.question,
+    required this.optional,
+    required this.hint,
+    required this.options,
+    required this.questionOrder,
+    required this.interactionTypes,
+    required this.answers,
+  });
 }
 
 final String baseUrl = F.apiUrl;
 
-List<AnimalType> animalTypesApi = [];
 List<Animal> animalsApi = [];
-List<AnimalQuestion> questionsApi = [];
+List<AnimalQuestion> questionsApi = [
+  AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel dieren?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['1']),
+  AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel Jonge?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['0'])
+];
 
-Future<void> fetchData() async {
-  final typesResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php/family'));
-  final animalsResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/animals.php'));
-  final questionsResponse = await http.get(Uri.parse(baseUrl + 'api/controllers/questions.php'));
-
-  if (typesResponse.statusCode == 200) {
-    final List<dynamic> jsonData = jsonDecode(typesResponse.body);
-
-    // Map the raw JSON data into a list of AnimalType objects
-    animalTypesApi = jsonData.map((json) {
-      return AnimalType(
-        name: json['name'] ?? '',
-        img: json['image'] ?? '',
-        id: json['id'] ?? ''
-      );
-    }).toList();
-  } else {
-    print('Response failed');
-  }
+Future<void> fetchAnimalData() async {
+  final animalsResponse =
+      await http.get(Uri.parse('${baseUrl}api/controllers/animals.php'));
 
   if (animalsResponse.statusCode == 200) {
     final Map<String, dynamic> jsonData2 = jsonDecode(animalsResponse.body);
@@ -89,121 +74,54 @@ Future<void> fetchData() async {
         name: json['name'] ?? '',
         img: json['image'] ?? '',
         id: json['id'] ?? '',
-        familyId: json['family_id'] ?? '',
       );
     }).toList();
   } else {
     print('Response failed');
   }
-
-  // if (questionsResponse.statusCode == 200) {
-  //   List<dynamic> jsonData3 = jsonDecode(questionsResponse.body);
-  //
-  //   // Map the raw JSON data into a list of AnimalType objects
-  //   questionsApi = jsonData3.map((json) {
-  //     return AnimalQuestion(
-  //         inputType: json['inputType'] ?? '',
-  //         question: json['question'] ?? '',
-  //         required: json['required'] ?? '',
-  //         fullWidth: json['fullWidth'] ?? '',
-  //         hint: json['hint'] ?? '',
-  //         options: json['options'] ?? '',
-  //     );
-  //   }).toList();
-  //   print(questionsApi);
-  // } else {
-  //   print('Response failed');
-  // }
 }
 
-final List<AnimalQuestion> animalQuestions = [
-  AnimalQuestion(
-    inputType: 'dropdown',
-    question: "Aantal dieren:",
-    required: true,
-    fullWidth: false,
-    hint: "Selecteer aantal",
-    options: ['0','1','2','3','4','5+'],
-  ),
-  AnimalQuestion(
-    inputType: 'dropdown',
-    question: "Aantal jonge:",
-    required: true,
-    fullWidth: false,
-    hint: "Selecteer aantal",
-    options: ['0','1','2','3','4','5+'],
-  ),
-  AnimalQuestion(
-    inputType: 'dropdown',
-    question: "Wat was je aan het doen toen je het dier zag?",
-    required: false,
-    fullWidth: true,
-    hint: "Selecteer handeling",
-    options: [
-      'Er op af rennen',
-      'Luide geluiden maken',
-      'Langzaam er naar toe lopen',
-      'Een selfie maken',
-      'Wegrennen',
-      'Een foto maken',
-      'Langs het dier lopen',
-      'Stil blijven staan',
-      'Naar het dier kijken',
-      'Langzaam weglopen',
-    ],
-  ),
-  AnimalQuestion(
-      inputType: 'horizontalOptions',
-      question: 'Hoe voelde je je toen je het dier zag?',
-      required: false,
-      fullWidth: true,
-      hint: '',
-      options: ['Angstig', 'Neutraal', 'Enthousiast']
-  ),
-  AnimalQuestion(
-    inputType: 'dropdown',
-    question: "Wat deed het dier?",
-    required: false,
-    fullWidth: true,
-    hint: "Selecteer handeling",
-    options: [
-      'Het deed zijn eigen ding',
-      'Het toonde interesse in mij',
-      'Het rende weg van mij',
-      'Het toonde agressief gedrag',
-    ],
-  ),
-  AnimalQuestion(
-      inputType: 'horizontalOptions',
-      question: 'Hoe denk je dat het dier zich voelde?',
-      required: false,
-      fullWidth: true,
-      hint: '',
-      options: ['Angstig', 'Neutraal', 'Enthousiast']
-  ),
-  AnimalQuestion(
-    inputType: 'stars',
-    question: 'Hoe zou je de interactie beoordelen?',
-    required: false,
-    fullWidth: true,
-    hint: '',
-    options: [],
-  ),
-  // AnimalQuestion(
-  //   inputType: 'photo',
-  //   question: "Heb je foto's van de waarneming?",
-  //   required: false,
-  //   fullWidth: true,
-  //   hint: '',
-  //   options: [],
-  // ),
-];
-final animalQuestionsMap = animalQuestions.asMap();
+Future<void> fetchQuestionsData(selectedType) async {
+  print(selectedType);
+  final questionsResponse =
+  await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
 
-List<String> _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+  if (questionsResponse.statusCode == 200) {
+    final Map<String, dynamic> jsonData3 = jsonDecode(questionsResponse.body);
+
+    // Access the 'results' field
+    final List<dynamic> results3 = jsonData3['results'];
+
+    // Map the raw JSON data into a list of AnimalType objects
+    List<AnimalQuestion> newQuestions = results3
+        .where((json) => json['interaction_types'] != null && json['interaction_types'].contains(selectedType))
+        .map((json) {
+      return AnimalQuestion(
+        inputType: json['type'] ?? '',
+        question: json['question'] ?? '',
+        optional: json['is_optional'] ?? '',
+        hint: json['placeholder'] ?? '',
+        options: json['specifications'] ?? '',
+        questionOrder: json['question_order'],
+        interactionTypes: json['interaction_types'] ?? '',
+        answers: [''],
+      );
+    }).toList();
+    if(selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' || selectedType == '689a5571-8eb5-11ee-919a-1e0034001676') {
+      questionsApi.addAll(newQuestions);
+    } else {
+      questionsApi = newQuestions;
+    }
+    // Filter questions by chosenType
+    questionsApi.sort((a, b) => a.questionOrder.compareTo(b.questionOrder));
+  } else {
+    print('Response failed');
+  }
+}
 
 class ReportPage extends StatefulWidget {
-  ReportPage({super.key});
+  final String selectedType;
+  const ReportPage({super.key, required this.selectedType});
 
   @override
   State<ReportPage> createState() => _ReportPageState();
@@ -213,574 +131,588 @@ class _ReportPageState extends State<ReportPage> {
   @override
   void initState() {
     super.initState();
-    fetchData();
+    fetchAnimalData();
+    fetchQuestionsData(widget.selectedType);
   }
 
   int _currentStep = 0;
-  String _chosenType = '';
-  String _chosenName = '';
+  String _chosenAnimal = '';
+  double latitude = 0;
+  double longitude = 0;
+  File? image;
 
-  List<Widget> getFilteredAnimals() {
-    // Filter animals based on the selected type (_chosenType)
-    List<Animal> filteredAnimals = animalsApi.where((Animal) => Animal.familyId == _chosenType).toList();
-
-    // Create widgets for filtered animals
-    return filteredAnimals.isNotEmpty
-        ? filteredAnimals.map((Animal) => GestureDetector(
-      onTap: () {
-        if (_chosenName != Animal.id) {
-          setState(() {
-            _chosenName = Animal.id;
-          });
-        } else {
-          setState(() {
-            _chosenName = '';
-          });
+  Future _closeReport(forceClose) async {
+    !forceClose
+      ? {
+          // Code for what to do when submitting a report
+          await _getUserLocation(),
+          pushReportToApi(),
         }
-      },
-      child: FractionallySizedBox(
-        widthFactor: 1 / 3.3,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            AspectRatio(
-              aspectRatio: 1.0,
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: ShapeDecoration(
-                  color: Colors.white,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    side: BorderSide(
-                      color: _chosenName == Animal.id
-                          ? AppColors.primary
-                          : Colors.white,
-                      width: 2,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: Image(
-                        image: NetworkImage(
-                            Animal.img),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              Animal.name,
-              textAlign: TextAlign.center,
-              style: AppStyles.of(context).data.textStyle.paragraph,
-            ),
-          ],
-        ),
-      ),
-    )).toList()
-        : [
-      Text(
-        'Geen dieren gevonden :(',
-        style: AppStyles.of(context).data.textStyle.paragraph,
-      ),
+      : null;
+    Navigator.of(context).pop();
+
+    // Reset all to default
+    questionsApi = [
+      AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel dieren?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['1']),
+      AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel Jonge?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['0'])
     ];
+    _currentStep = 0;
+    _chosenAnimal = '';
   }
 
-  Future<void> _pickImage(ImageSource source, i) async {
+  Future<void> _getUserLocation() async {
     try {
-      final pickedFile = await ImagePicker().pickImage(source: source);
+      Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      latitude = position.latitude;
+      longitude = position.longitude;
 
-      if (pickedFile != null) {
-        _evaluationAnswers[i] = pickedFile.path;
-      } else {
-        print("No image selected");
-      }
+      // Now you have the latitude and longitude, and you can use them as needed.
     } catch (e) {
-      print("Error picking image: $e");
+      print('Error getting location: $e');
+      // Handle error getting location
     }
   }
 
-  Future _closeReport(forceClose) async {
-    !forceClose ? {
-      // Code for what to do when submitting a report
-    } : null;
-    Navigator.of(context).pop();
-    _currentStep = 0;
-    _chosenName = '';
-    _chosenType= '';
-    _evaluationAnswers = ['1', '0'] + List.filled((animalQuestions.length - 2), "");
+  Future<void> pushReportToApi() async {
+  //   Push to interactions db
+    final String apiUrl = '${baseUrl}api/controllers/interactions.php';
+
+    Map<String, dynamic> report = {
+      'user_id': "0e6df1f1-400f-4e8d-8e69-16b1a55b400a",
+      'interaction_type': widget.selectedType,
+      'lat': latitude,
+      'lon': longitude,
+      'animal_id': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' || widget.selectedType == '689a5571-8eb5-11ee-919a-1e0034001676' ? _chosenAnimal : null,
+      'animal_count_upper': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ?  questionsApi[0].answers[0] : null,
+      'juvenil_animal_count_upper': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ?  questionsApi[1].answers[0] : null,
+    };
+
+    String jsonData = jsonEncode(report);
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: jsonData,
+      );
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        print('Data pushed successfully');
+        print(response.body);
+      } else {
+        print('Failed to push data. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+
+      print('Error: $error');
+    }
+
+    // Push to interaction questions db
+
+    print(report);
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    final imagePicker = ImagePicker();
+    try {
+      final pickedFile = await imagePicker.pickImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          image = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-          children: [
-            Container(
-              width: double.maxFinite,
-              padding: const EdgeInsets.only(
-                left: 8,
-                right: 8,
-                bottom: 4,
-                top: 35,
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: double.maxFinite,
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                        child: IconButton(
-                            onPressed: (){
-                              _closeReport(true);
-                            },
-                            icon: Icon(AppIcons.cross)),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.maxFinite,
-                    child: Text(
-                      'Nieuwe melding',
-                      textAlign: TextAlign.center,
-                      style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(
-                        color: AppColors.primary
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+        children: [
+          Container(
+            width: double.maxFinite,
+            padding: const EdgeInsets.only(
+              left: 8,
+              right: 8,
+              bottom: 4,
+              top: 35,
             ),
-            Flexible(
-              child: CustomStepper(
-                  elevation: 0,
-                  currentStep: _currentStep,
-                  controlsBuilder: (context, details) => Text(""),
-                  steps: [
-                    CustomStep(
-                        state: _currentStep == 0 ? CustomStepState.editing : CustomStepState.complete,
-                        content: Container(
-                          width: double.maxFinite,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Wat is de diersoort?',
-                                style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              FutureBuilder(
-                                future: fetchData(),
-                                builder: (context, snapshot) {
-                                  return Container(
-                                      padding: EdgeInsets.only(top: 4),
-                                      width: double.maxFinite,
-                                      child: Wrap(
-                                          spacing: 16,
-                                          runSpacing: 16,
-                                          children: animalTypesApi.map((animalType) => GestureDetector(
-                                            onTap: (){
-                                              if(_chosenType != animalType.id) {
-                                                setState(() {
-                                                  _chosenType = animalType.id;
-                                                });
-                                              } else {
-                                                setState(() {
-                                                  _chosenType = '';
-                                                });
-                                              }
-                                            },
-                                            child: FractionallySizedBox(
-                                              widthFactor: 1/3.3,
-                                              child: Column(
-                                                mainAxisSize: MainAxisSize.min,
-                                                mainAxisAlignment: MainAxisAlignment.center,
-                                                crossAxisAlignment: CrossAxisAlignment.center,
-                                                children: [
-                                                  AspectRatio(
-                                                    aspectRatio: 1.0,
-                                                    child: Container(
-                                                      padding: const EdgeInsets.all(8),
-                                                      decoration: ShapeDecoration(
-                                                        color: Colors.white,
-                                                        shape: RoundedRectangleBorder(
-                                                          borderRadius: BorderRadius.circular(8),
-                                                          side: BorderSide(
-                                                            color: _chosenType == animalType.id ? AppColors.primary : Colors.white,
-                                                            width: 2,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      child: Row(
-                                                        mainAxisSize: MainAxisSize.min,
-                                                        mainAxisAlignment: MainAxisAlignment.center,
-                                                        crossAxisAlignment: CrossAxisAlignment.center,
-                                                        children: [
-                                                          Expanded(
-                                                            child: Image(
-                                                                image: NetworkImage(animalType.img)
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  Text(
-                                                    animalType.name,
-                                                    textAlign: TextAlign.center,
-                                                    style: AppStyles.of(context).data.textStyle.paragraph,
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          )).toList())
-                                    );
-                                },
-                              )
-                            ],
-                          ),
-                        )
-                    ),
-                    CustomStep(
-                      state: _currentStep < 1 ? CustomStepState.indexed : (_currentStep > 1 ? CustomStepState.complete : CustomStepState.editing),
-                        content: Container(
-                          width: double.maxFinite,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Wat is het dier?',
-                                style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                              FutureBuilder(
-                                  future: fetchData(),
+            child: Column(
+              children: [
+                Container(
+                  width: double.maxFinite,
+                  child: Align(
+                    alignment: Alignment.centerRight,
+                    child: IconButton(
+                        onPressed: () {
+                          _closeReport(true);
+                        },
+                        icon: Icon(AppIcons.cross)),
+                  ),
+                ),
+                SizedBox(
+                  width: double.maxFinite,
+                  child: Text(
+                    'Nieuwe melding',
+                    textAlign: TextAlign.center,
+                    style: AppStyles.of(context)
+                        .data
+                        .textStyle
+                        .headerMedium
+                        .copyWith(color: AppColors.primary),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Flexible(
+            child: CustomStepper(
+                elevation: 0,
+                currentStep: _currentStep,
+                controlsBuilder: (context, details) => Text(""),
+                steps: [
+                  CustomStep(
+                      state: _currentStep < 0
+                          ? CustomStepState.indexed
+                          : (_currentStep > 0
+                              ? CustomStepState.complete
+                              : CustomStepState.editing),
+                      content: Container(
+                        width: double.maxFinite,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Wat is het dier?',
+                              style: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .cardTitle
+                                  .copyWith(
+                                    color: AppColors.primary,
+                                  ),
+                            ),
+                            Container(
+                              child: FutureBuilder(
+                                  future: fetchAnimalData(),
                                   builder: (context, snapshot) {
                                     return Container(
                                       padding: EdgeInsets.only(top: 4),
                                       width: double.maxFinite,
                                       child: Wrap(
-                                          spacing: 16,
-                                          runSpacing: 16,
-                                          children:  getFilteredAnimals(),
-                                      ),
-                                  );
-                                }
-                              ),
-                            ],
-                          ),
-                        )
-                    ),
-                    CustomStep(
-                        state: _currentStep >= 2 ? CustomStepState.editing : CustomStepState.indexed,
-                        content: Container(
-                          padding: EdgeInsets.only(top: 4),
-                          width: double.maxFinite,
-                          child: Wrap(
-                            spacing: 16,
-                            runSpacing: 16,
-                            children: animalQuestionsMap.map((i, question) {
-                              if (question.inputType == "dropdown") {
-                                return MapEntry(i,
-                                    MyDropdown(
-                                      options: question.options,
-                                      title: question.question,
-                                      placeholder: question.hint,
-                                      fullWidth: question.fullWidth,
-                                      required: question.required,
-                                      index: i,
-                                    )
-                                );
-                              } else if (question.inputType == 'horizontalOptions') {
-                                return MapEntry(i, Container(
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        question.question,
-                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                                          color: AppColors.primary,
-                                        ),
-                                      ),
-                                      const SizedBox(height:8),
-                                      Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        children: question.options.map((option) => GestureDetector(
-                                          onTap: (){
-                                            if(_evaluationAnswers[i] != option) {
+                                        spacing: 16,
+                                        runSpacing: 16,
+                                        children: animalsApi.map((Animal) => GestureDetector(
+                                          onTap: () {
+                                            if (_chosenAnimal != Animal.id) {
                                               setState(() {
-                                                _evaluationAnswers[i] = option;
+                                                _chosenAnimal = Animal.id;
                                               });
                                             } else {
-                                                setState(() {
-                                                  _evaluationAnswers[i] = '';
-                                                });
+                                              setState(() {
+                                                _chosenAnimal = '';
+                                              });
                                             }
                                           },
-                                          child: Container(
-                                              decoration: ShapeDecoration(
-                                                color: Colors.white,
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius: BorderRadius.circular(8),
-                                                  side: BorderSide(
-                                                    color: _evaluationAnswers[i] == option ? AppColors.primary : Colors.white,
-                                                    width: 2,
+                                          child: FractionallySizedBox(
+                                            widthFactor: 1 / 3.3,
+                                            child: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment: CrossAxisAlignment.center,
+                                              children: [
+                                                AspectRatio(
+                                                  aspectRatio: 1.0,
+                                                  child: Container(
+                                                    padding: const EdgeInsets.all(8),
+                                                    decoration: ShapeDecoration(
+                                                      color: Colors.white,
+                                                      shape: RoundedRectangleBorder(
+                                                        borderRadius: BorderRadius.circular(8),
+                                                        side: BorderSide(
+                                                          color: _chosenAnimal == Animal.id
+                                                              ? AppColors.primary
+                                                              : Colors.white,
+                                                          width: 2,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    child: Row(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      mainAxisAlignment: MainAxisAlignment.center,
+                                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                                      children: [
+                                                        Expanded(
+                                                          child: Image(
+                                                            image: NetworkImage(Animal.img),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                                              child: Text(option, style: AppStyles.of(context).data.textStyle.paragraph,)
+                                                const SizedBox(height: 4),
+                                                Text(
+                                                  Animal.name,
+                                                  textAlign: TextAlign.center,
+                                                  style: AppStyles.of(context).data.textStyle.paragraph,
+                                                ),
+                                              ],
+                                            ),
                                           ),
-                                        )).toList(),
-                                      )
-                                    ],
+                                        ))
+                                            .toList(),
+                                      ),
+                                    );
+                                  }),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 24),
+                              child: Column(
+                                children: [
+                                  TextFormField(
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _chosenAnimal = value;
+                                      });
+                                    },
+                                    style: AppStyles.of(context)
+                                        .data
+                                        .textStyle
+                                        .paragraph,
+                                    decoration: InputDecoration(
+                                      contentPadding:
+                                      EdgeInsets.symmetric(
+                                          vertical: 8,
+                                          horizontal: 8),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                      border: OutlineInputBorder(
+                                        borderRadius:
+                                        BorderRadius.circular(
+                                            8.0),
+                                        borderSide: BorderSide.none,
+                                      ),
+                                      hintText: 'Anders, namelijk:',
+                                    ),
                                   ),
-                                ));
-                              }
-                              else if (question.inputType == 'stars'){
-                                return MapEntry(i, Container(
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      )),
+                  CustomStep(
+                      state: _currentStep >= 1
+                          ? CustomStepState.editing
+                          : CustomStepState.indexed,
+                      content: Container(
+                              padding: EdgeInsets.only(top: 4),
+                              width: double.maxFinite,
+                              child: Wrap(
+                                spacing: 16,
+                                runSpacing: 16,
+                                children: questionsApi
+                                    .asMap()
+                                    .entries
+                                    .map((Question) => Container(
+                                  width: Question.value.questionOrder >= 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        question.question,
-                                        style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                                        Question.value.question + (!Question.value.optional ? '*' : ''),
+                                        style: AppStyles.of(context)
+                                            .data
+                                            .textStyle
+                                            .cardTitle
+                                            .copyWith(
                                           color: AppColors.primary,
                                         ),
                                       ),
-                                      RatingBar.builder(
-                                        minRating: 1,
-                                        direction: Axis.horizontal,
-                                        allowHalfRating: true,
-                                        itemCount: 5,
-                                        itemPadding: EdgeInsets.symmetric(horizontal: 0),
-                                        itemBuilder: (context, _) => Icon(
-                                          Icons.star,
-                                          color: AppColors.primary,
+                                      SizedBox(height: 4),
+                                      if(Question.value.inputType == 'dropdown' || Question.value.inputType == 'multiselect')
+                                        DropdownMenu<String>(
+                                          width: Question.key > 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
+                                          initialSelection:
+                                            Question.key == 0 ? '1' : (Question.key == 1 ? '0' : null),
+                                          trailingIcon: Transform.translate(
+                                              offset: Offset(10, 0),
+                                              child: const Icon(AppIcons.arrow_down, size: 16)),
+                                          selectedTrailingIcon: Transform.translate(
+                                              offset: Offset(10, 0),
+                                              child: Transform.rotate(
+                                                  angle: 180 * pi / 180,
+                                                  child: const Icon(AppIcons.arrow_down, size: 16))),
+                                          hintText: Question.value.hint,
+                                          textStyle: AppStyles.of(context).data.textStyle.paragraph,
+                                          menuStyle: const MenuStyle(
+                                            backgroundColor: MaterialStatePropertyAll(Colors.white),
+                                            visualDensity: VisualDensity.compact,
+                                          ),
+                                          inputDecorationTheme: const InputDecorationTheme(
+                                              constraints: BoxConstraints(maxHeight: 40),
+                                              isDense: true,
+                                              border: OutlineInputBorder(
+                                                  borderRadius: BorderRadius.all(Radius.circular(8)),
+                                                  borderSide: BorderSide.none),
+                                              fillColor: Colors.white,
+                                              filled: true,
+                                              contentPadding: EdgeInsets.symmetric(horizontal: 8)),
+                                          onSelected: (String? value) {
+                                            setState(() {
+                                              Question.value.answers[0] = value;
+                                            });
+                                          },
+                                          dropdownMenuEntries:
+                                          Question.value.options.map<DropdownMenuEntry<String>>((value) {
+                                            return DropdownMenuEntry<String>(
+                                              value: value,
+                                              label: value,
+                                            );
+                                          }).toList(),
                                         ),
-                                        onRatingUpdate: (rating) {
-                                          if(_evaluationAnswers[i] != rating) {
-                                              _evaluationAnswers[i] = rating.toString();
+                                      if(Question.value.inputType == 'star')
+                                        RatingBar.builder(
+                                          minRating: 1,
+                                          direction: Axis.horizontal,
+                                          allowHalfRating: true,
+                                          itemCount: 5,
+                                          itemPadding: EdgeInsets.symmetric(horizontal: 0),
+                                          itemBuilder: (context, _) => Icon(
+                                            Icons.star,
+                                            color: AppColors.primary,
+                                          ),
+                                          onRatingUpdate: (rating) {
+                                            setState(() {
+                                              Question.value.answers[0] = rating.toString();
+                                            });
                                           }
-                                        },
-                                      ),
-                                    ]
+                                        ),
+                                      if(Question.value.inputType == 'text')
+                                        TextFormField(
+                                          onChanged: (value) {
+                                            setState(() {
+                                              Question.value.answers[0] = value;
+                                            });
+                                          },
+                                          minLines: 3,
+                                          maxLines: 5,
+                                          style: AppStyles.of(context)
+                                              .data
+                                              .textStyle
+                                              .paragraph,
+                                          decoration: InputDecoration(
+                                            contentPadding:
+                                            EdgeInsets.symmetric(
+                                                vertical: 8,
+                                                horizontal: 8),
+                                            filled: true,
+                                            fillColor: Colors.white,
+                                            border: OutlineInputBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(
+                                                  8.0),
+                                              borderSide: BorderSide.none,
+                                            ),
+                                            hintText: Question.value.hint,
+                                          ),
+                                        ),
+                                      if(Question.value.inputType == 'file')
+                                        Row(
+                                          children: [
+                                            if(image != null)
+                                              Row(
+                                                children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          image = null;
+                                                        });
+                                                      },
+                                                      child: Image(
+                                                        image: FileImage(image!),
+                                                        height: 45,
+                                                        width: 45,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 8),
+                                                ]
+                                              ),
+                                            ElevatedButton(
+                                                onPressed: () {
+                                                  _showPickerDialog();
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: AppColors.neutral_50,
+                                                  onPrimary: AppColors.primary,
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 16, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      side: BorderSide(
+                                                          color: AppColors.primary, width: 2)),
+                                                  elevation: 0,
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(AppIcons.add, size: 20),
+                                                    SizedBox(width:4),
+                                                    Text('Voeg foto toe'),
+                                                  ]
+                                                )
+                                            ),
+                                          ],
+                                        )
+                                      
+                                    ],
+                                  ),
                                 )
-                                ));
-                              }
-                              // else if (question.inputType == 'photo') {
-                              //   return MapEntry(i, Container(
-                              //     child: Column(
-                              //       crossAxisAlignment: CrossAxisAlignment.start,
-                              //       children: [
-                              //         Text(
-                              //           question.question,
-                              //           style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
-                              //             color: AppColors.primary,
-                              //           ),
-                              //         ),
-                              //         const SizedBox(height:8),
-                              //         Row(
-                              //           children: [
-                              //             ElevatedButton(
-                              //               onPressed: () {
-                              //                 _pickImage(ImageSource.gallery, i); // Open gallery
-                              //               },
-                              //               child: Row(
-                              //                 mainAxisSize: MainAxisSize.min,
-                              //                 children: [
-                              //                   Icon(AppIcons.add, size: 20),
-                              //                   SizedBox(width: 4),
-                              //                   Text("Voeg foto toe"),
-                              //                 ],
-                              //               ),
-                              //               style: ElevatedButton.styleFrom(
-                              //                 primary: AppColors.neutral_50,
-                              //                 onPrimary: AppColors.primary,
-                              //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              //                 shape: RoundedRectangleBorder(
-                              //                     borderRadius: BorderRadius.circular(8),
-                              //                     side: BorderSide(color: AppColors.primary, width: 2)
-                              //                 ),
-                              //                 elevation: 0,
-                              //               ),
-                              //             ),
-                              //           ],
-                              //         )
-                              //       ]
-                              //     )
-                              //   ));
-                              // }
-                              else {
-                                return MapEntry(i, Container());
-                              }
-                            }).values.toList(),
-                          )
-                        )
-                    ),
-                  ]),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Container(
-                  padding: EdgeInsets.all(16.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Visibility(
-                        visible: _currentStep > 0,
-                        child: Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                                setState(() {
-                                  _currentStep--; // Verhoog de huidige stap
-                                });
-                            },
-                            child: Text(
-                                'Vorige',
-                                style: AppStyles.of(context).data.textStyle.buttonText
-                            ),
-                            style: ElevatedButton.styleFrom(
-                              primary: AppColors.neutral_50,
-                              onPrimary: AppColors.primary,
-                              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide(color: AppColors.primary, width: 2)
-                              ),
-                              elevation: 0,
-                            ),
-                          ),
-                        ),
-                      ),
-                      Visibility(
-                        visible: _currentStep > 0,
-                        child: SizedBox(width: 16.0), // Space between buttons if 2nd button is visible
-                      ),
-                      Expanded(
+                                ).toList()
+                              ))),
+                ]),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Visibility(
+                      visible: _currentStep > 0,
+                      child: Expanded(
                         child: ElevatedButton(
-                          onPressed: (_chosenType.isNotEmpty && _currentStep == 0) ? () {
+                          onPressed: () {
                             setState(() {
-                              _currentStep++;
+                              _currentStep--; // Verhoog de huidige stap
                             });
-                          } : ((_chosenName.isNotEmpty && _currentStep == 1) ? () {
-                            setState(() {
-                              _currentStep++;
-                            });
-                            } : ((_currentStep == 2) ? () {
-                            _closeReport(false);
-                          }  : null)),
-                          // onPressed: null,
-                          child: Text(
-                            _currentStep < 2 ? 'Volgende' : 'Opslaan',
-                            style: AppStyles.of(context).data.textStyle.buttonText
-                          ),
+                          },
+                          child: Text('Vorige',
+                              style: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .buttonText),
                           style: ElevatedButton.styleFrom(
-                            primary:AppColors.primary,
-                            onPrimary: Colors.white,
-                            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            primary: AppColors.neutral_50,
+                            onPrimary: AppColors.primary,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                            ),
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(
+                                    color: AppColors.primary, width: 2)),
                             elevation: 0,
                           ),
                         ),
                       ),
+                    ),
+                    Visibility(
+                      visible: _currentStep > 0,
+                      child: SizedBox(
+                          width:
+                              16.0), // Space between buttons if 2nd button is visible
+                    ),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                                ? () {
+                                    setState(() {
+                                      _currentStep++;
+                                    });
+                                  }
+                                : ((_currentStep == 1)
+                                    ? () {
+                                        _closeReport(false);
+                                      }
+                                    : null),
+                        // onPressed: null,
+                        child: Text(_currentStep < 1 ? 'Volgende' : 'Opslaan',
+                            style: AppStyles.of(context)
+                                .data
+                                .textStyle
+                                .buttonText),
+                        style: ElevatedButton.styleFrom(
+                          primary: AppColors.primary,
+                          onPrimary: Colors.white,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          elevation: 0,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPickerDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            padding: EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.image_search, size: 28),
+                      const SizedBox(height: 4),
+                      Text('Galerij',
+                          style: AppStyles.of(context)
+                          .data
+                          .textStyle
+                          .buttonText),
                     ],
                   ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(ImageSource.gallery);
+                  },
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.camera_alt_outlined, size: 28),
+                      const SizedBox(height: 4),
+                      Text('Camera',
+                          style: AppStyles.of(context)
+                              .data
+                              .textStyle
+                              .buttonText),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(ImageSource.camera);
+                  },
                 ),
               ],
             ),
-          ],
-        ),
-    );
-  }
-}
-
-class MyDropdown extends StatefulWidget {
-  final List<String> options;
-  final String title;
-  final String placeholder;
-  final bool required;
-  final bool fullWidth;
-  final int index;
-
-  MyDropdown({required this.options, required this.title, required this.placeholder, required this.required, required this.fullWidth, required this.index});
-
-  @override
-  _MyDropdownState createState() => _MyDropdownState();
-}
-
-class _MyDropdownState extends State<MyDropdown> {
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          (widget.title + (widget.required ? '*' : '')),
-          style: AppStyles
-              .of(context)
-              .data
-              .textStyle
-              .cardTitle
-              .copyWith(
-            color: AppColors.primary,
           ),
-        ),
-        const SizedBox(height: 8),
-        DropdownMenu<String>(
-          initialSelection: widget.index == 0 ? '1' : (widget.index == 1 ? '0' : null),
-          trailingIcon: Transform.translate(offset: Offset(10, 0),child: const Icon(AppIcons.arrow_down, size: 16)),
-          selectedTrailingIcon: Transform.translate(offset: Offset(10, 0),child: Transform.rotate(angle: 180 * pi / 180, child: const Icon(AppIcons.arrow_down, size: 16))),
-          width: widget.fullWidth ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
-          hintText: widget.placeholder,
-          textStyle: AppStyles
-              .of(context)
-              .data
-              .textStyle
-              .paragraph,
-          menuStyle: const MenuStyle(
-            backgroundColor: MaterialStatePropertyAll(Colors.white),
-            visualDensity: VisualDensity.compact,
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            constraints: BoxConstraints(maxHeight: 40),
-            isDense: true,
-            border: OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(8)), borderSide: BorderSide.none),
-            fillColor: Colors.white,
-            filled: true,
-            contentPadding: EdgeInsets.symmetric(horizontal: 8)
-          ),
-          onSelected: (String? value) {
-              setState(() {
-                _evaluationAnswers[widget.index] = value!;
-              });
-          },
-          dropdownMenuEntries: widget.options.map<DropdownMenuEntry<String>>((String value) {
-            return DropdownMenuEntry<String>(
-              value: value,
-              label: value,
-            );
-          }).toList(),
-        ),
-      ],
+        );
+      },
     );
   }
 }
