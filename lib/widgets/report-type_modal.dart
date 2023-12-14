@@ -133,6 +133,7 @@ class _ReportModalState extends State<ReportTypeModal> {
                           width: double.infinity,
                           child: Wrap(
                             spacing: 8,
+                            runSpacing: 8,
                             children: interactionTypesApi
                                 .map((interactionType) => GestureDetector(
                                       onTap: () {
@@ -148,61 +149,64 @@ class _ReportModalState extends State<ReportTypeModal> {
                                           });
                                         }
                                       },
-                                      child: Container(
-                                          child: Column(
-                                            children: [
-                                              Container(
-                                                    decoration: ShapeDecoration(
-                                                      color: Colors.white,
-                                                      shape: RoundedRectangleBorder(
-                                                        borderRadius:
-                                                        BorderRadius.circular(8),
-                                                        side: BorderSide(
-                                                          color: _selectedType ==
-                                                              interactionType.id
-                                                              ? HexColor(
-                                                              interactionType.color)
-                                                              : Colors.white,
-                                                          width: 2,
-                                                        ),
-                                                      ),
-                                                    ),
-                                                padding: EdgeInsets.all(16),
-                                                    child: Icon(
-                                                        (interactionType.typekey ==
-                                                                'sighting'
-                                                            ? AppIcons.paw
-                                                            : (interactionType
-                                                                        .typekey ==
-                                                                    'damage'
-                                                                ? AppIcons.incident
-                                                                : (interactionType
-                                                                            .typekey ==
-                                                                        'inappropriate_behaviour'
-                                                                    ? AppIcons.cancel
-                                                                    : (interactionType
-                                                                                .typekey ==
-                                                                            'traffic'
-                                                                        ? AppIcons.traffic
-                                                                        : (interactionType
-                                                                                    .typekey ==
-                                                                                'maintenance'
-                                                                            ? AppIcons.maintenance
-                                                                            : null))))),
-                                                        size: 30,
-                                                        color: HexColor(
-                                                            interactionType.color)),
-                                                  ),
-                                              SizedBox(height: 4),
-                                              Text(
-                                                interactionType.label,
-                                                style: AppStyles.of(context)
-                                                    .data
-                                                    .textStyle
-                                                    .paragraph,
-                                              )
-                                            ],
+                                      child: FractionallySizedBox(
+                                        widthFactor: 1/3.2,
+                                        child: Container(
+                                          decoration: ShapeDecoration(
+                                            color: Colors.white,
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                              BorderRadius.circular(8),
+                                              side: BorderSide(
+                                                color: _selectedType ==
+                                                    interactionType.id
+                                                    ? HexColor(
+                                                    interactionType.color)
+                                                    : Colors.white,
+                                                width: 2,
+                                              ),
+                                            ),
                                           ),
+                                            padding: EdgeInsets.symmetric(vertical: 4),
+                                            child: Column(
+                                              children: [
+                                                Container(
+                                                      child: Icon(
+                                                          (interactionType.typekey ==
+                                                                  'sighting'
+                                                              ? AppIcons.paw
+                                                              : (interactionType
+                                                                          .typekey ==
+                                                                      'damage'
+                                                                  ? AppIcons.incident
+                                                                  : (interactionType
+                                                                              .typekey ==
+                                                                          'inappropriate_behaviour'
+                                                                      ? AppIcons.cancel
+                                                                      : (interactionType
+                                                                                  .typekey ==
+                                                                              'traffic'
+                                                                          ? AppIcons.traffic
+                                                                          : (interactionType
+                                                                                      .typekey ==
+                                                                                  'maintenance'
+                                                                              ? AppIcons.maintenance
+                                                                              : null))))),
+                                                          size: 30,
+                                                          color: HexColor(
+                                                              interactionType.color)),
+                                                    ),
+                                                  Text(
+                                                    textAlign: TextAlign.center,
+                                                    interactionType.label,
+                                                    style: AppStyles.of(context)
+                                                        .data
+                                                        .textStyle
+                                                        .paragraph,
+                                                  ),
+                                              ],
+                                            ),
+                                        ),
                                       ),
                                     ))
                                 .toList(),

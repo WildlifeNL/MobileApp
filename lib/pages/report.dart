@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
@@ -52,7 +53,10 @@ class AnimalQuestion {
 final String baseUrl = F.apiUrl;
 
 List<Animal> animalsApi = [];
-List<AnimalQuestion> questionsApi = [];
+List<AnimalQuestion> questionsApi = [
+  AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel dieren?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['1']),
+  AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel Jonge?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['0'])
+];
 
 Future<void> fetchAnimalData() async {
   final animalsResponse =
@@ -77,7 +81,7 @@ Future<void> fetchAnimalData() async {
   }
 }
 
-Future<void> fetchQuestionsData() async {
+Future<void> fetchQuestionsData(selectedType) async {
   final questionsResponse =
   await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
 
@@ -88,7 +92,9 @@ Future<void> fetchQuestionsData() async {
     final List<dynamic> results3 = jsonData3['results'];
 
     // Map the raw JSON data into a list of AnimalType objects
-    questionsApi = results3.map((json) {
+    List<AnimalQuestion> newQuestions = results3
+        .where((json) => json['interaction_types'].contains(selectedType))
+        .map((json) {
       return AnimalQuestion(
         inputType: json['type'] ?? '',
         question: json['question'] ?? '',
@@ -97,18 +103,20 @@ Future<void> fetchQuestionsData() async {
         options: json['specifications'] ?? '',
         questionOrder: json['question_order'],
         interactionTypes: json['interaction_types'] ?? '',
-        answers: [json['question_order'] == 1 ? '1' : (json['question_order'] == 2 ? '0' : '')],
+        answers: [''],
       );
     }).toList();
+    if(selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' || selectedType == '689a5571-8eb5-11ee-919a-1e0034001676') {
+      questionsApi.addAll(newQuestions);
+    } else {
+      questionsApi = newQuestions;
+    }
     // Filter questions by chosenType
     questionsApi.sort((a, b) => a.questionOrder.compareTo(b.questionOrder));
   } else {
     print('Response failed');
   }
 }
-
-List<String> _evaluationAnswers =
-    ['1', '0'] + List.filled((questionsApi.length - 3), "");
 
 class ReportPage extends StatefulWidget {
   final String selectedType;
@@ -123,21 +131,32 @@ class _ReportPageState extends State<ReportPage> {
   void initState() {
     super.initState();
     fetchAnimalData();
-    fetchQuestionsData();
+    fetchQuestionsData(widget.selectedType);
   }
 
   int _currentStep = 0;
-  String _chosenName = '';
+  String _chosenAnimal = '';
+  double latitude = 0;
+  double longitude = 0;
+  File? image;
 
   Future _closeReport(forceClose) async {
     !forceClose
-        ? {
-            // Code for what to do when submitting a report
-          }
-        : null;
+      ? {
+          // Code for what to do when submitting a report
+          await _getUserLocation(),
+          pushReportToApi(),
+        }
+      : null;
     Navigator.of(context).pop();
+
+    // Reset all to default
+    questionsApi = [
+      AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel dieren?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['1']),
+      AnimalQuestion(inputType: 'dropdown', question: 'Hoeveel Jonge?', optional: false, hint: '', options: ["0", "1", "2", "3", "4", "5+"], questionOrder: 0, interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'], answers: ['0'])
+    ];
     _currentStep = 0;
-    _chosenName = '';
+    _chosenAnimal = '';
   }
 
   Future<void> _getUserLocation() async {
@@ -145,10 +164,8 @@ class _ReportPageState extends State<ReportPage> {
       Position position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
       );
-      double latitude = position.latitude;
-      double longitude = position.longitude;
-
-      print('Latitude: $latitude, Longitude: $longitude');
+      latitude = position.latitude;
+      longitude = position.longitude;
 
       // Now you have the latitude and longitude, and you can use them as needed.
     } catch (e) {
@@ -157,9 +174,61 @@ class _ReportPageState extends State<ReportPage> {
     }
   }
 
+  Future<void> pushReportToApi() async {
+  //   Push to interactions db
+    final String apiUrl = '${baseUrl}api/controllers/interactions.php';
+
+    Map<String, dynamic> report = {
+      'user_id': "0e6df1f1-400f-4e8d-8e69-16b1a55b400a",
+      'interaction_type': widget.selectedType,
+      'lat': latitude,
+      'lon': longitude,
+      'animal_id': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' || widget.selectedType == '689a5571-8eb5-11ee-919a-1e0034001676' ? _chosenAnimal : null,
+      'animal_count_upper': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ?  questionsApi[0].answers[0] : null,
+      'juvenil_animal_count_upper': widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ?  questionsApi[1].answers[0] : null,
+    };
+
+    String jsonData = jsonEncode(report);
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: jsonData,
+      );
+
+      // Check the response status
+      if (response.statusCode == 200) {
+        print('Data pushed successfully');
+        print(response.body);
+      } else {
+        print('Failed to push data. Status code: ${response.statusCode}');
+      }
+    } catch (error) {
+
+      print('Error: $error');
+    }
+
+    // Push to interaction questions db
+
+    print(report);
+  }
+
+  Future<void> pickImage(ImageSource source) async {
+    final imagePicker = ImagePicker();
+    try {
+      final pickedFile = await imagePicker.pickImage(source: source);
+      if (pickedFile != null) {
+        setState(() {
+          image = File(pickedFile.path);
+        });
+      }
+    } catch (e) {
+      print('Error picking image: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    _getUserLocation();
     return Scaffold(
       body: Column(
         children: [
@@ -240,13 +309,13 @@ class _ReportPageState extends State<ReportPage> {
                                         runSpacing: 16,
                                         children: animalsApi.map((Animal) => GestureDetector(
                                           onTap: () {
-                                            if (_chosenName != Animal.id) {
+                                            if (_chosenAnimal != Animal.id) {
                                               setState(() {
-                                                _chosenName = Animal.id;
+                                                _chosenAnimal = Animal.id;
                                               });
                                             } else {
                                               setState(() {
-                                                _chosenName = '';
+                                                _chosenAnimal = '';
                                               });
                                             }
                                           },
@@ -266,7 +335,7 @@ class _ReportPageState extends State<ReportPage> {
                                                       shape: RoundedRectangleBorder(
                                                         borderRadius: BorderRadius.circular(8),
                                                         side: BorderSide(
-                                                          color: _chosenName == Animal.id
+                                                          color: _chosenAnimal == Animal.id
                                                               ? AppColors.primary
                                                               : Colors.white,
                                                           width: 2,
@@ -309,7 +378,7 @@ class _ReportPageState extends State<ReportPage> {
                                   TextFormField(
                                     onChanged: (value) {
                                       setState(() {
-                                        _chosenName = value;
+                                        _chosenAnimal = value;
                                       });
                                     },
                                     style: AppStyles.of(context)
@@ -351,9 +420,8 @@ class _ReportPageState extends State<ReportPage> {
                                 children: questionsApi
                                     .asMap()
                                     .entries
-                                    .where((Question) => Question.value.interactionTypes.contains(widget.selectedType))
                                     .map((Question) => Container(
-                                  width: Question.key > 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
+                                  width: Question.value.questionOrder >= 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
@@ -368,7 +436,7 @@ class _ReportPageState extends State<ReportPage> {
                                         ),
                                       ),
                                       SizedBox(height: 4),
-                                      if(Question.value.inputType == 'dropdown')
+                                      if(Question.value.inputType == 'dropdown' || Question.value.inputType == 'multiselect')
                                         DropdownMenu<String>(
                                           width: Question.key > 1 ? MediaQuery.of(context).size.width - 32 : (MediaQuery.of(context).size.width / 2) - 24,
                                           initialSelection:
@@ -455,7 +523,54 @@ class _ReportPageState extends State<ReportPage> {
                                             hintText: Question.value.hint,
                                           ),
                                         ),
-                                      Text(Question.value.answers.toString()),
+                                      if(Question.value.inputType == 'file')
+                                        Row(
+                                          children: [
+                                            if(image != null)
+                                              Row(
+                                                children: [
+                                                    GestureDetector(
+                                                      onTap: () {
+                                                        setState(() {
+                                                          image = null;
+                                                        });
+                                                      },
+                                                      child: Image(
+                                                        image: FileImage(image!),
+                                                        height: 45,
+                                                        width: 45,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  SizedBox(width: 8),
+                                                ]
+                                              ),
+                                            ElevatedButton(
+                                                onPressed: () {
+                                                  _showPickerDialog();
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  primary: AppColors.neutral_50,
+                                                  onPrimary: AppColors.primary,
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 16, vertical: 8),
+                                                  shape: RoundedRectangleBorder(
+                                                      borderRadius: BorderRadius.circular(8),
+                                                      side: BorderSide(
+                                                          color: AppColors.primary, width: 2)),
+                                                  elevation: 0,
+                                                ),
+                                                child: Row(
+                                                  children: [
+                                                    Icon(AppIcons.add, size: 20),
+                                                    SizedBox(width:4),
+                                                    Text('Voeg foto toe'),
+                                                  ]
+                                                )
+                                            ),
+                                          ],
+                                        )
+                                      
                                     ],
                                   ),
                                 )
@@ -507,7 +622,7 @@ class _ReportPageState extends State<ReportPage> {
                     ),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: (_chosenName.isNotEmpty && _currentStep == 0)
+                        onPressed: (_chosenAnimal.isNotEmpty && _currentStep == 0)
                                 ? () {
                                     setState(() {
                                       _currentStep++;
@@ -543,6 +658,60 @@ class _ReportPageState extends State<ReportPage> {
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showPickerDialog() async {
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: SingleChildScrollView(
+            padding: EdgeInsets.only(left: 24, right: 24, top: 12, bottom: 6),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.image_search, size: 28),
+                      const SizedBox(height: 4),
+                      Text('Galerij',
+                          style: AppStyles.of(context)
+                          .data
+                          .textStyle
+                          .buttonText),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(ImageSource.gallery);
+                  },
+                ),
+                const SizedBox(height: 16),
+                GestureDetector(
+                  child: Column(
+                    children: [
+                      const Icon(Icons.camera_alt_outlined, size: 28),
+                      const SizedBox(height: 4),
+                      Text('Camera',
+                          style: AppStyles.of(context)
+                              .data
+                              .textStyle
+                              .buttonText),
+                    ],
+                  ),
+                  onTap: () {
+                    Navigator.pop(context);
+                    pickImage(ImageSource.camera);
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
