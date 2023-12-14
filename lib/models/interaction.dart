@@ -9,11 +9,11 @@ part 'interaction.g.dart';
 class Interaction {
   final String id;
   final String userId;
-  final String animalId;
+  final String? animalId;
   final String interactionType;
   final DateTime time;
   final String? image;
-  final String description;
+  final String? description;
   final String? distance;
   final String? duration;
   final DateTime? creationDate;
