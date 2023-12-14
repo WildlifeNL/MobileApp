@@ -16,8 +16,8 @@ class Interaction {
   final String description;
   final String? distance;
   final String? duration;
-  final DateTime creationDate;
-  final DateTime lastModified;
+  final DateTime? creationDate;
+  final DateTime? lastModified;
   final String lat;
   final String lon;
 
