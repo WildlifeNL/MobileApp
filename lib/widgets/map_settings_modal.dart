@@ -31,7 +31,7 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
 
 
     return Container(
-      height: MediaQuery.of(context).size.height * 0.65,
+      padding: const EdgeInsets.only(bottom: 40),
       decoration: BoxDecoration(
           color: AppColors.neutral_100,
           borderRadius: BorderRadius.only(
@@ -228,91 +228,91 @@ class _MapSettingState extends ConsumerState<MapSettingModal> {
                 ],
               ),
               SizedBox(height: 24),
-              // Text("Mode", style: TextStyle(color: AppColors.primary),),
-              // SizedBox(height: 8),
-              // Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              //   children: [
-              //     GestureDetector(
-              //       onTap: () => {markerProvider.mapToggle1()},
-              //       child: Container(
-              //           width: 100,
-              //           height: 100,
-              //           decoration: ShapeDecoration(
-              //             color: Colors.white,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(16),
-              //               side: BorderSide(
-              //                 color: markers.value!.mapTypeToggle1
-              //                     ? AppColors.primary
-              //                     : Colors.white,
-              //                 width: 2,
-              //               ),
-              //             ),
-              //               image: DecorationImage(
-              //                 fit: BoxFit.fill,
-              //                 image: AssetImage('assets/symbols/standard.png'),
-              //               )
-              //
-              //       )),
-              //     ),
-              //     GestureDetector(
-              //       onTap: () => {markerProvider.mapToggle2()},
-              //       child: Container(
-              //           width: 100,
-              //           height: 100,
-              //           decoration: ShapeDecoration(
-              //             color: Colors.white,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(16),
-              //               side: BorderSide(
-              //                 color: markers.value!.mapTypeToggle2
-              //                     ? AppColors.primary
-              //                     : Colors.white,
-              //                 width: 2,
-              //               ),
-              //             ),
-              //
-              //               image: DecorationImage(
-              //                 fit: BoxFit.fill,
-              //                 image: AssetImage('assets/symbols/satellite.png'),
-              //               )
-              //           )),
-              //     ),
-              //     GestureDetector(
-              //       onTap: () => {markerProvider.mapToggle3()},
-              //       child: Container(
-              //           width: 100,
-              //           height: 100,
-              //           decoration: ShapeDecoration(
-              //             color: Colors.white,
-              //             shape: RoundedRectangleBorder(
-              //               borderRadius: BorderRadius.circular(16),
-              //               side: BorderSide(
-              //                 color: markers.value!.mapTypeToggle3
-              //                     ? AppColors.primary
-              //                     : Colors.white,
-              //                 width: 2,
-              //               ),
-              //             ),
-              //
-              //             image: DecorationImage(
-              //               fit: BoxFit.fill,
-              //               image: AssetImage('assets/symbols/terrain.png'),
-              //             )
-              //
-              //           )),
-              //     )
-              //   ],
-              // ),
-              SizedBox(height: 24),
-              Container(
-                decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(8)),
-                width: double.infinity,
-                child: TextButton(onPressed: (){Navigator.pop(context);}, child: Text("Toepassen"), style: TextButton.styleFrom(foregroundColor: AppColors.neutral_50),),
-              ),
+            //   Text("Mode", style: TextStyle(color: AppColors.primary),),
+            //   SizedBox(height: 8),
+            //   Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       GestureDetector(
+            //         onTap: () => {markerProvider.mapToggle1()},
+            //         child: Container(
+            //             width: 100,
+            //             height: 100,
+            //             decoration: ShapeDecoration(
+            //               color: Colors.white,
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(16),
+            //                 side: BorderSide(
+            //                   color: markers.value!.mapTypeToggle1
+            //                       ? AppColors.primary
+            //                       : Colors.white,
+            //                   width: 2,
+            //                 ),
+            //               ),
+            //                 image: DecorationImage(
+            //                   fit: BoxFit.fill,
+            //                   image: AssetImage('assets/symbols/standard.png'),
+            //                 )
+            //
+            //         )),
+            //       ),
+            //       GestureDetector(
+            //         onTap: () => {markerProvider.mapToggle2()},
+            //         child: Container(
+            //             width: 100,
+            //             height: 100,
+            //             decoration: ShapeDecoration(
+            //               color: Colors.white,
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(16),
+            //                 side: BorderSide(
+            //                   color: markers.value!.mapTypeToggle2
+            //                       ? AppColors.primary
+            //                       : Colors.white,
+            //                   width: 2,
+            //                 ),
+            //               ),
+            //
+            //                 image: DecorationImage(
+            //                   fit: BoxFit.fill,
+            //                   image: AssetImage('assets/symbols/satellite.png'),
+            //                 )
+            //             )),
+            //       ),
+            //       GestureDetector(
+            //         onTap: () => {markerProvider.mapToggle3()},
+            //         child: Container(
+            //             width: 100,
+            //             height: 100,
+            //             decoration: ShapeDecoration(
+            //               color: Colors.white,
+            //               shape: RoundedRectangleBorder(
+            //                 borderRadius: BorderRadius.circular(16),
+            //                 side: BorderSide(
+            //                   color: markers.value!.mapTypeToggle3
+            //                       ? AppColors.primary
+            //                       : Colors.white,
+            //                   width: 2,
+            //                 ),
+            //               ),
+            //
+            //               image: DecorationImage(
+            //                 fit: BoxFit.fill,
+            //                 image: AssetImage('assets/symbols/terrain.png'),
+            //               )
+            //
+            //             )),
+            //       )
+            //     ],
+            //   ),
+            //   SizedBox(height: 24),
+            //   Container(
+            //     decoration: BoxDecoration(
+            //         color: AppColors.primary,
+            //         borderRadius: BorderRadius.circular(8)),
+            //     width: double.infinity,
+            //     child: TextButton(onPressed: (){Navigator.pop(context);}, child: Text("Toepassen"), style: TextButton.styleFrom(foregroundColor: AppColors.neutral_50),),
+            //   ),
             ]),
       ),
     );
