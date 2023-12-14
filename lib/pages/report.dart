@@ -82,6 +82,7 @@ Future<void> fetchAnimalData() async {
 }
 
 Future<void> fetchQuestionsData(selectedType) async {
+  print(selectedType);
   final questionsResponse =
   await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
 
@@ -93,7 +94,7 @@ Future<void> fetchQuestionsData(selectedType) async {
 
     // Map the raw JSON data into a list of AnimalType objects
     List<AnimalQuestion> newQuestions = results3
-        .where((json) => json['interaction_types'].contains(selectedType))
+        .where((json) => json['interaction_types'] != null && json['interaction_types'].contains(selectedType))
         .map((json) {
       return AnimalQuestion(
         inputType: json['type'] ?? '',
