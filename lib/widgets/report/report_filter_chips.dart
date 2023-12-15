@@ -46,10 +46,11 @@ class _ReportFilterChipsState extends ConsumerState<ReportFilterChips> {
       return const SliverPadding(padding: EdgeInsets.all(0));
     }
 
-    Map<InteractionTypeKey, Color> map = {};
+    Map<InteractionTypeKey, InteractionType> type = {};
+
 
     for (var value in interactionTypes.value!) {
-      map[value.typeKey] = HexColor(value.color);
+      type[value.typeKey] = value;
     }
 
     return SliverPadding(
@@ -61,53 +62,53 @@ class _ReportFilterChipsState extends ConsumerState<ReportFilterChips> {
               selected: widget.state == ActivityFilter.all,
               title: "Alles",
               onSelected: (_) => onSelected(ActivityFilter.all),
-              color: map[InteractionTypeKey.sighting]!,
+              color: HexColor(type[InteractionTypeKey.sighting]!.color),
             ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
               selected: widget.state == ActivityFilter.sightings,
-              title: "Waarnemingen",
+              title: type[InteractionTypeKey.sighting]!.label,
               onSelected: (_) => onSelected(ActivityFilter.sightings),
-              color: map[InteractionTypeKey.sighting]!,
+              color: HexColor(type[InteractionTypeKey.sighting]!.color),
             ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
               selected: widget.state == ActivityFilter.traffic,
-              title: "Verkeer",
+              title: type[InteractionTypeKey.traffic]!.label,
               onSelected: (_) => onSelected(ActivityFilter.traffic),
-              color: map[InteractionTypeKey.traffic]!,
+              color: HexColor(type[InteractionTypeKey.traffic]!.color),
             ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
               selected: widget.state == ActivityFilter.incidents,
-              title: "Incidenten",
+              title: type[InteractionTypeKey.damage]!.label,
               onSelected: (_) => onSelected(ActivityFilter.incidents),
-              color: map[InteractionTypeKey.damage]!,
+              color: HexColor(type[InteractionTypeKey.damage]!.color),
             ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
               selected: widget.state == ActivityFilter.inappropriateBehaviour,
-              title: "Ongepast Gedrag",
+              title: type[InteractionTypeKey.inappropriateBehaviour]!.label,
               onSelected: (_) =>
                   onSelected(ActivityFilter.inappropriateBehaviour),
-              color: map[InteractionTypeKey.inappropriateBehaviour]!,
+              color: HexColor(type[InteractionTypeKey.inappropriateBehaviour]!.color),
             ),
             const SizedBox(
               width: 8,
             ),
             ActivityFilterChip(
               selected: widget.state == ActivityFilter.maintenance,
-              title: "Onderhoud",
+              title: type[InteractionTypeKey.maintenance]!.label,
               onSelected: (_) => onSelected(ActivityFilter.maintenance),
-              color: map[InteractionTypeKey.maintenance]!,
+              color: HexColor(type[InteractionTypeKey.maintenance]!.color),
             ),
           ],
         ),
