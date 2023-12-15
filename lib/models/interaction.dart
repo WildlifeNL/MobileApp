@@ -9,17 +9,26 @@ part 'interaction.g.dart';
 class Interaction {
   final String id;
   final String userId;
-  final String? animalId;
   final String interactionType;
   final DateTime time;
   final String? image;
+  final String lat;
+  final String lon;
   final String? description;
   final String? distance;
   final String? duration;
   final DateTime? creationDate;
   final DateTime? lastModified;
-  final String lat;
-  final String lon;
+  final String? animalId;
+  final String? animalCountLower;
+
+  final String? animalCountUpper;
+
+  final String? juvenileCountLower;
+
+  final String? juvenileCountUpper;
+
+  final String? trafficEvent;
 
   Interaction({
     required this.id,
@@ -35,6 +44,11 @@ class Interaction {
     required this.lastModified,
     required this.lat,
     required this.lon,
+    required this.animalCountLower,
+    required this.animalCountUpper,
+    required this.juvenileCountLower,
+    required this.juvenileCountUpper,
+    required this.trafficEvent,
   });
 
   factory Interaction.fromJson(Map<String,dynamic> json) =>

@@ -280,7 +280,6 @@ class _MapState extends ConsumerState<MapPage> {
 
     return Scaffold(
       body: FlutterMap(
-
           mapController: _controller,
           options: MapOptions(
               center: !location.isLoading && location.value?.longitude != null

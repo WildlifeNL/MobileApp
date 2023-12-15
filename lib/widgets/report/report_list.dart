@@ -90,10 +90,13 @@ class _ReportListState extends ConsumerState<ReportList> {
         groupBy: (item) => item.time,
         groupTitleBuilder: (title, groupBy, isPinned, scrollPercentage) =>
             Padding(
-          padding: const EdgeInsets.only(left: 12.0,bottom: 12.0, top: 12.0),
+          padding: const EdgeInsets.only(left: 12.0, bottom: 12.0, top: 12.0),
           child: Text(
             title,
-            style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(color: HexColor("#737373"), fontWeight: FontWeight.bold,),
+            style: AppStyles.of(context).data.textStyle.headerMedium.copyWith(
+                  color: HexColor("#737373"),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
         ),
         itemBuilder: (item) {
@@ -107,13 +110,7 @@ class _ReportListState extends ConsumerState<ReportList> {
               type = value;
             }
           }
-          Animal animal = Animal(
-              id: "",
-              name: "",
-              image: "",
-              specifications: null,
-              creationDate: DateTime.now(),
-              lastModified: DateTime.now());
+          Animal? animal;
           for (var value in animals.requireValue) {
             if (value.id == item.animalId) {
               animal = value;
@@ -122,43 +119,11 @@ class _ReportListState extends ConsumerState<ReportList> {
 
           var color = HexColor(type.color);
 
-          switch (type.typeKey) {
-            case InteractionTypeKey.sighting:
-              return ActivityItemCard(
-                  icon: AppIcons.deer,
-                  title: animal.name,
-                  subtitle: "Onbekende locatie",
-                  date: item.time,
-                  color: color);
-            case InteractionTypeKey.damage:
-              return ActivityItemCard(
-                  icon: AppIcons.incident,
-                  title: type.label,
-                  subtitle: "Onbekende locatie",
-                  date: item.time,
-                  color: color);
-            case InteractionTypeKey.inappropriateBehaviour:
-              return ActivityItemCard(
-                  icon: AppIcons.incident,
-                  title: type.label,
-                  subtitle: "Onbekende locatie",
-                  date: item.time,
-                  color: color);
-            case InteractionTypeKey.traffic:
-              return ActivityItemCard(
-                  icon: AppIcons.traffic,
-                  title: type.label,
-                  subtitle: "Onbekende locatie",
-                  date: item.time,
-                  color: color);
-            case InteractionTypeKey.maintenance:
-              return ActivityItemCard(
-                  icon: AppIcons.maintenance,
-                  title: type.label,
-                  subtitle: "Onbekende locatie",
-                  date: item.time,
-                  color: color);
-          }
+          return ActivityItemCard(
+            type: type,
+            interaction: item,
+            animal: animal,
+          );
         },
         onLoadMore: (info) async => await onLoadMore(info.page),
         loadMoreItemsErrorWidget: (lol) => const Padding(
