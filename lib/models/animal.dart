@@ -9,10 +9,10 @@ part 'animal.g.dart';
 class Animal {
   final String id;
   final String name;
-  final String image;
-  final Map<String, String>? specifications;
-  final DateTime creationDate;
-  final DateTime lastModified;
+  final String? image;
+  final List<dynamic>? specifications;
+  final DateTime? creationDate;
+  final DateTime? lastModified;
   factory Animal.fromJsonString(String json) =>
       _$AnimalFromJson(jsonDecode(json));
 

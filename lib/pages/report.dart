@@ -13,7 +13,7 @@ import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/app_text_styles.dart';
-import 'package:wildlife_nl_app/widgets/CustomStepper.dart';
+import 'package:wildlife_nl_app/widgets/custom_stepper.dart';
 import 'package:http/http.dart' as http;
 
 class Animal {

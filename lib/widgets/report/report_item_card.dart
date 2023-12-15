@@ -3,28 +3,26 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:wildlife_nl_app/models/animal.dart';
+import 'package:wildlife_nl_app/models/interaction.dart';
+import 'package:wildlife_nl_app/models/interaction_type.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
+import 'package:wildlife_nl_app/widgets/report/report_item_modal.dart';
 
 class ActivityItemCard extends ConsumerWidget {
   const ActivityItemCard({
     super.key,
-    required this.icon,
-    required this.title,
-    required this.subtitle,
-    required this.date,
-    required this.color,
-    this.description,
-  }) : assert(title.length <= 21);
+    required this.interaction,
+    required this.type,
+    this.animal,
+  });
 
-  final IconData icon;
-  final String title;
-  final String subtitle;
-  final DateTime date;
-  final Color color;
-  final String? description;
+  final Interaction interaction;
+  final Animal? animal;
+  final InteractionType type;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -51,9 +49,15 @@ class ActivityItemCard extends ConsumerWidget {
                       width: 40,
                       height: 40,
                       decoration:
-                          BoxDecoration(shape: BoxShape.circle, color: color),
+                          BoxDecoration(shape: BoxShape.circle, color: HexColor(type.color)),
                       child: Icon(
-                        icon,
+                        switch(type.typeKey){
+                          InteractionTypeKey.sighting => AppIcons.deer,
+                          InteractionTypeKey.damage => AppIcons.incident,
+                          InteractionTypeKey.inappropriateBehaviour => AppIcons.incident,
+                          InteractionTypeKey.traffic => AppIcons.traffic,
+                          InteractionTypeKey.maintenance => AppIcons.maintenance,
+                        },
                         color: Colors.white,
                         size: 24,
                       ),
@@ -64,15 +68,15 @@ class ActivityItemCard extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          title,
+                          type.typeKey == InteractionTypeKey.sighting ? animal!.name : type.label,
                           style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(color: HexColor("#737373")),
                         ),
                         Text(
-                          formatter.format(date),
+                          formatter.format(interaction.time),
                           style: AppStyles.of(context).data.textStyle.paragraph.copyWith(color: AppColors.neutral_400),
                         ),
                         Text(
-                          subtitle,
+                          "[${interaction.lat},${interaction.lon}]",
                           softWrap: true,
                           style: AppStyles.of(context).data.textStyle.paragraph.copyWith(color: AppColors.neutral_400),
                         ),
@@ -81,8 +85,15 @@ class ActivityItemCard extends ConsumerWidget {
                   ],
                 ),
                 const Spacer(),
-                //TODO: Re-enable when working
-                //IconButton(onPressed: () {}, icon: const Icon(AppIcons.arrow_right)),
+                IconButton(onPressed: () {
+                  showModalBottomSheet<void>(
+                    context: context,
+                    isScrollControlled: true,
+                    builder: (BuildContext context) {
+                      return Wrap(children: [ReportItemModal(interaction: interaction, type: type, animal: animal,)]);
+                    },
+                  );
+                }, icon: const Icon(AppIcons.arrow_right)),
                 const Padding(
                   padding: EdgeInsets.only(left: 5),
                 ),

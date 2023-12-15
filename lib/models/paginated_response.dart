@@ -14,9 +14,9 @@ abstract class PaginatedResponse<T> {
 @JsonSerializable(fieldRename: FieldRename.snake)
 class PaginatedMeta {
   final String? nextPageUrl;
-  final String? lastPageUrl;
+  final String? previousPageUrl;
 
-  PaginatedMeta({required this.nextPageUrl, required this.lastPageUrl});
+  PaginatedMeta({required this.nextPageUrl, required this.previousPageUrl});
 
   factory PaginatedMeta.fromJson(Map<String, dynamic> json) =>
       _$PaginatedMetaFromJson(json);
