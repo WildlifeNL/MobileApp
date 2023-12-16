@@ -85,6 +85,7 @@ class SettingState with _$SettingState {
     required MapType mapType,
   }) = _SettingState;
 }
+
 extension SettingStateExt on SettingState {
   List<InteractionTypeKey> allowedTypes() {
     List<InteractionTypeKey> allowedTypes = [];
@@ -148,10 +149,11 @@ class _MapPageState extends ConsumerState<MapPage> {
     }
     List<Marker> markers = [];
     var interactionTypesList = interactionTypes.value!;
-    var interactionsList = interactions.value!.items
-        .where((i) => settingState.allowedTypes().contains(interactionTypesList
-        .firstWhere((type) => type.id == i.interactionType)
-        .typeKey));
+    var interactionsList = interactions.value!.items.where((i) => settingState
+        .allowedTypes()
+        .contains(interactionTypesList
+            .firstWhere((type) => type.id == i.interactionType)
+            .typeKey));
     for (var item in interactionsList) {
       final InteractionType interactionType = interactionTypesList
           .firstWhere((type) => type.id == item.interactionType);
@@ -185,6 +187,10 @@ class _MapPageState extends ConsumerState<MapPage> {
               zoom: 15,
               maxZoom: 18,
               minZoom: 7,
+              maxBounds: LatLngBounds(
+                const LatLng(53.79841012278817, 7.797161079786122), //Top Right
+                const LatLng(48.827529576991, 2.227490788147122),  //Bottom Left
+              ),
               interactiveFlags: InteractiveFlag.drag |
                   InteractiveFlag.flingAnimation |
                   InteractiveFlag.pinchMove |
