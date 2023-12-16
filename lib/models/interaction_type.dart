@@ -2,29 +2,25 @@ import 'dart:convert';
 
 import 'package:dart_casing/dart_casing.dart';
 import 'package:flutter/material.dart';
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'interaction_type.g.dart';
+part 'interaction_type.freezed.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
-class InteractionType {
-  final String id;
-  final String label;
-  final InteractionTypeKey typeKey;
-  final String color;
+@freezed
+class InteractionType with _$InteractionType {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory InteractionType({
+    required String id,
+    required String label,
+    required InteractionTypeKey typeKey,
+    required String color,
+  }) = _InteractionType;
 
-  InteractionType({required this.id, required this.label, required this.typeKey, required this.color});
+  factory InteractionType.fromJson(Map<String, Object?> json) => _$InteractionTypeFromJson(json);
+}
 
-
-  factory InteractionType.fromJsonString(String json) =>
-      _$InteractionTypeFromJson(jsonDecode(json));
-  factory InteractionType.fromJson(Map<String, dynamic> json) =>
-      _$InteractionTypeFromJson(json);
-
-  Map<String, dynamic> toJson() => _$InteractionTypeToJson(this);
-
-  String toJsonString() => jsonEncode(_$InteractionTypeToJson(this));
-
+extension InteractionTypeExtensions on InteractionType {
   Color getColor(){
     return Color(int.parse(color.replaceAll('#', '0xff')));
   }

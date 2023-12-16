@@ -6,7 +6,6 @@ import 'package:option_result/option_result.dart';
 import 'package:wildlife_nl_app/flavors.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
 import 'package:wildlife_nl_app/models/interaction_type.dart';
-import 'package:wildlife_nl_app/models/paginated_response.dart';
 
 class InteractionService {
   static Future<Result<PaginatedInteractions, String>> getInteractionsByUserId(

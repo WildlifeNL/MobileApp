@@ -1,60 +1,38 @@
 import 'dart:convert';
 
-import 'package:json_annotation/json_annotation.dart';
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:wildlife_nl_app/models/paginated_response.dart';
+
+part 'interaction.freezed.dart';
 
 part 'interaction.g.dart';
 
-@JsonSerializable(fieldRename: FieldRename.snake)
-class Interaction {
-  final String id;
-  final String userId;
-  final String interactionType;
-  final DateTime time;
-  final String? image;
-  final String lat;
-  final String lon;
-  final String? description;
-  final String? distance;
-  final String? duration;
-  final DateTime? creationDate;
-  final DateTime? lastModified;
-  final String? animalId;
-  final String? animalCountLower;
+@freezed
+class Interaction with _$Interaction {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory Interaction({
+    required String id,
+    required String userId,
+    required String interactionType,
+    required DateTime time,
+    required String? image,
+    required String lat,
+    required String lon,
+    required String? description,
+    required String? distance,
+    required String? duration,
+    required DateTime? creationDate,
+    required DateTime? lastModified,
+    required String? animalId,
+    required String? animalCountLower,
+    required String? animalCountUpper,
+    required String? juvenileCountLower,
+    required String? juvenileCountUpper,
+    required String? trafficEvent,
+  }) = _Interaction;
 
-  final String? animalCountUpper;
-
-  final String? juvenileCountLower;
-
-  final String? juvenileCountUpper;
-
-  final String? trafficEvent;
-
-  Interaction({
-    required this.id,
-    required this.userId,
-    required this.animalId,
-    required this.interactionType,
-    required this.time,
-    required this.image,
-    required this.description,
-    required this.distance,
-    required this.duration,
-    required this.creationDate,
-    required this.lastModified,
-    required this.lat,
-    required this.lon,
-    required this.animalCountLower,
-    required this.animalCountUpper,
-    required this.juvenileCountLower,
-    required this.juvenileCountUpper,
-    required this.trafficEvent,
-  });
-
-  factory Interaction.fromJson(Map<String,dynamic> json) =>
+  factory Interaction.fromJson(Map<String, Object?> json) =>
       _$InteractionFromJson(json);
-
-  Map<String,dynamic> toJson() => _$InteractionToJson(this);
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)

@@ -1,3 +1,4 @@
+import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:option_result/result.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
@@ -5,33 +6,20 @@ import 'package:wildlife_nl_app/models/interaction_type.dart';
 import 'package:wildlife_nl_app/services/interaction.dart';
 
 part 'interactions.g.dart';
+part 'interactions.freezed.dart';
 
-class InteractionState {
-  final int currentPage;
-  final bool hasNextPage;
-  final bool isLoadingNewPage;
 
-  final List<Interaction> items;
+@freezed
+class InteractionState with _$InteractionState {
+  const factory InteractionState({
+    required int currentPage,
+    required bool hasNextPage,
+    required bool isLoadingNewPage,
+    required List<Interaction> items,
+  }) = _InteractionState;
 
-  InteractionState({
-    required this.items,
-    required this.currentPage,
-    required this.hasNextPage,
-    required this.isLoadingNewPage,
-  });
-
-  InteractionState copyWith({
-    List<Interaction>? items,
-    int? currentPage,
-    bool? hasNextPage,
-    bool? isLoadingNewPage,
-  }) =>
-      InteractionState(
-        items: items ?? this.items,
-        currentPage: currentPage ?? this.currentPage,
-        hasNextPage: hasNextPage ?? this.hasNextPage,
-        isLoadingNewPage: isLoadingNewPage ?? this.isLoadingNewPage,
-      );
+  factory InteractionState.fromJson(Map<String, Object?> json)
+  => _$InteractionStateFromJson(json);
 }
 
 @riverpod
@@ -86,4 +74,27 @@ class Interactions extends _$Interactions {
       state = AsyncData(state.value!.copyWith(isLoadingNewPage: false));
     }
   }
+}
+
+@riverpod
+class MapInteractions extends _$MapInteractions {
+  @override
+  Future<InteractionState> build() async {
+    Result<PaginatedInteractions, String> response;
+    response = await InteractionService.getInteractions(1, 9999, accessToken: "");
+
+    if (response.isOk()) {
+      var paginatedInteractions = response.unwrap();
+      return InteractionState(
+        items: paginatedInteractions.results,
+        hasNextPage: paginatedInteractions.meta.nextPageUrl != null,
+        currentPage: 1,
+        isLoadingNewPage: false,
+      );
+    } else {
+      throw Exception(response.unwrapErr());
+    }
+  }
+
+
 }
