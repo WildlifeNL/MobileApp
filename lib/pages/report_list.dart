@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
 import 'package:wildlife_nl_app/models/interaction_type.dart';
 import 'package:wildlife_nl_app/widgets/custom_infinite_grouped_list.dart';

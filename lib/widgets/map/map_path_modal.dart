@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
+import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
-
-import '../utilities/app_colors.dart';
 
 class MapPathModal extends StatelessWidget {
   const MapPathModal({super.key});

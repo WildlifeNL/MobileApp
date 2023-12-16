@@ -1,7 +1,7 @@
+import 'package:intl/intl.dart' as intl;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:intl/intl.dart' as intl;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/models/animal.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
@@ -10,7 +10,7 @@ import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
-import 'package:wildlife_nl_app/widgets/report/report_item_modal.dart';
+import 'package:wildlife_nl_app/widgets/report_item_modal.dart';
 
 class ActivityItemCard extends ConsumerWidget {
   const ActivityItemCard({
@@ -197,7 +197,6 @@ class _ActivityItemDescriptionState extends State<ActivityItemDescription> {
                   padding: const EdgeInsets.only(top: 5),
                   child: GestureDetector(
                     onTap: () {
-                      var wasExpanded = expanded;
                       setState(() {
                         expanded = !expanded;
                       });

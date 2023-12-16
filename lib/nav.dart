@@ -7,7 +7,7 @@ import 'package:wildlife_nl_app/pages/map.dart';
 import 'package:wildlife_nl_app/pages/report_list.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
-import 'package:wildlife_nl_app/widgets/report_type_modal.dart';
+import 'package:wildlife_nl_app/widgets/add_report/report_type_modal.dart';
 
 class BottomNavigation extends StatefulWidget {
   const BottomNavigation({super.key});
@@ -78,7 +78,7 @@ class _BottomNavigationState extends State<BottomNavigation>
           ),
           label: "Kaart",
         ),
-        const MapPage(),
+        MapPage(),
       ),
       // (
       //   const NavigationDestination(

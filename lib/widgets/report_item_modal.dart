@@ -12,8 +12,12 @@ class ReportItemModal extends StatelessWidget {
   final InteractionType type;
   final Animal? animal;
 
-  const ReportItemModal(
-      {super.key, required this.interaction, required this.type, this.animal});
+  const ReportItemModal({
+    super.key,
+    required this.interaction,
+    required this.type,
+    this.animal,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,11 +26,12 @@ class ReportItemModal extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.only(bottom: 40.0),
       decoration: const BoxDecoration(
-          color: AppColors.neutral_100,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(16),
-            topRight: Radius.circular(16),
-          )),
+        color: AppColors.neutral_100,
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
       width: MediaQuery.of(context).size.width,
       child: Padding(
         padding: const EdgeInsets.only(left: 24, right: 24),
@@ -44,43 +49,25 @@ class ReportItemModal extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 Container(
-                    width: 75.0,
-                    height: 75.0,
-                    decoration: BoxDecoration(
-                      color: HexColor(type.color),
-                      shape: BoxShape.circle,
-                    ),
-                    child: type.typeKey == InteractionTypeKey.sighting
-                        ? const Icon(
-                            AppIcons.paw,
-                            color: AppColors.neutral_50,
-                            size: 50,
-                          )
-                        : type.typeKey == InteractionTypeKey.traffic
-                            ? const Icon(
-                                AppIcons.traffic,
-                                color: AppColors.neutral_50,
-                                size: 50,
-                              )
-                            : type.typeKey == InteractionTypeKey.damage
-                                ? const Icon(
-                                    AppIcons.incident,
-                                    color: AppColors.neutral_50,
-                                    size: 50,
-                                  )
-                                : type.typeKey ==
-                                        InteractionTypeKey
-                                            .inappropriateBehaviour
-                                    ? const Icon(
-                                        AppIcons.cancel,
-                                        color: AppColors.neutral_50,
-                                        size: 50,
-                                      )
-                                    : const Icon(
-                                        AppIcons.maintenance,
-                                        color: AppColors.neutral_50,
-                                        size: 50,
-                                      )),
+                  width: 75.0,
+                  height: 75.0,
+                  decoration: BoxDecoration(
+                    color: HexColor(type.color),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    switch (type.typeKey) {
+                      InteractionTypeKey.sighting => AppIcons.paw,
+                      InteractionTypeKey.damage => AppIcons.incident,
+                      InteractionTypeKey.inappropriateBehaviour =>
+                        AppIcons.cancel,
+                      InteractionTypeKey.traffic => AppIcons.traffic,
+                      InteractionTypeKey.maintenance => AppIcons.maintenance,
+                    },
+                    color: AppColors.neutral_50,
+                    size: 50,
+                  ),
+                ),
               ],
             ),
           ),
