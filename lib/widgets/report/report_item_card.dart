@@ -1,7 +1,11 @@
-import 'package:intl/intl.dart' as intl;
+//import 'package:intl/intl.dart';
+import 'dart:io';
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:wildlife_nl_app/models/animal.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
@@ -26,7 +30,7 @@ class ActivityItemCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final formatter = intl.DateFormat.yMd().add_jm();
+    final formatter = DateFormat.yMd(Platform.localeName).add_jm();
 
     return Card(
       color: Colors.white,
@@ -137,7 +141,7 @@ class _ActivityItemDescriptionState extends State<ActivityItemDescription> {
           final span = TextSpan(text: widget.description, style: style);
           final tp = TextPainter(
               text: span,
-              textDirection: TextDirection.ltr,
+              textDirection: ui.TextDirection.ltr,
               textScaler: MediaQuery.of(context).textScaler);
           tp.layout(maxWidth: constraints.maxWidth);
           final numLines = tp.computeLineMetrics().length;

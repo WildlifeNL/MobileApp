@@ -7,7 +7,6 @@ import 'package:wildlife_nl_app/services/interaction.dart';
 import 'package:wildlife_nl_app/state/animal_types.dart';
 import 'package:wildlife_nl_app/state/interaction_types.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
-import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
 import 'package:wildlife_nl_app/widgets/custom_infinite_grouped_list.dart';
@@ -15,11 +14,12 @@ import 'package:wildlife_nl_app/widgets/report/report_filter_chips.dart';
 import 'package:wildlife_nl_app/widgets/report/report_item_card.dart';
 
 class ReportList extends ConsumerStatefulWidget {
-  const ReportList(
-      {super.key,
-      required this.type,
-      required this.filterChips,
-      required this.controller});
+  const ReportList({
+    super.key,
+    required this.type,
+    required this.filterChips,
+    required this.controller,
+  });
 
   final InfiniteGroupedListController<Interaction, DateTime, String> controller;
 
