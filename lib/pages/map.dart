@@ -204,7 +204,6 @@ class _MapPageState extends ConsumerState<MapPage> {
                 sprites: style.value!.sprites,
                 tileOffset: TileOffset.mapbox,
                 tileProviders: style.value!.providers),
-
             CurrentLocationLayer(
               turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
               style: const LocationMarkerStyle(

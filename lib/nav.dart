@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -92,9 +93,19 @@ class _BottomNavigationState extends State<BottomNavigation>
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 0,
-        backgroundColor: AppColors.neutral_50,
+      extendBodyBehindAppBar: true,
+      appBar: PreferredSize(
+        preferredSize: const Size(0, 0),
+        child: ClipRRect(
+            child: BackdropFilter(
+              // For some reason iOS blur is different from Android blur
+                filter: Platform.isAndroid
+                    ? ImageFilter.blur(sigmaX: 1.5, sigmaY: 1.5)
+                    : ImageFilter.blur(sigmaX: 2, sigmaY: 2),
+                blendMode: BlendMode.srcIn,
+                child: Container(
+                  color: AppColors.neutral_50.withOpacity(0.7),
+                ))),
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark,
