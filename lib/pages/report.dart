@@ -671,8 +671,12 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                 }),
                           if (question.value.type == 'text')
                             TextFormField(
-                              onChanged: (value) {
+                              onChanged: (String? value) {
                                 setState(() {
+                                  if (answers[question.key].isEmpty) {
+                                    answers[question.key].add(null);
+                                  }
+
                                   answers[question.key][0] = value;
                                 });
                               },
