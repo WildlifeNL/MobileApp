@@ -264,28 +264,6 @@ class _MapPageState extends ConsumerState<MapPage> {
                                 },
                                 icon: const Icon(AppIcons.mapsettings,
                                     color: AppColors.neutral_50)),
-                            Divider(
-                              height: 1,
-                              color: AppColors.neutral_50,
-                            ),
-                            IconButton(
-                                onPressed: () {
-                                  showModalBottomSheet<void>(
-                                    context: context,
-                                    isScrollControlled: true,
-                                    builder: (BuildContext context) {
-                                      return Padding(
-                                          padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context)
-                                                  .viewInsets
-                                                  .bottom),
-                                          child: Wrap(
-                                              children: [ReportOtherModal()]));
-                                    },
-                                  );
-                                },
-                                icon: Icon(AppIcons.paths,
-                                    color: AppColors.neutral_50))
                           ],
                         ),
                       ),
