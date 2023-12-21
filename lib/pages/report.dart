@@ -88,6 +88,12 @@ class _ReportPageState extends ConsumerState<ReportPage> {
           widget.selectedType.typeKey == InteractionTypeKey.sighting
               ? answers[1][0]
               : null,
+      "questions": [
+        answers.map((answer) => {
+          "question_id": answer["id"],
+          "answer": answer["answers"].toString(),
+        }).toList()
+      ]
     };
 
     String jsonData = jsonEncode(report);
@@ -111,8 +117,6 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     } catch (error) {
       developer.log('Error: $error');
     }
-
-    // Push to interaction questions db
 
     developer.log(report.toString());
   }
