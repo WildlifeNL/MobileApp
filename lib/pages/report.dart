@@ -39,7 +39,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
   double longitude = 0;
   File? image;
 
-  List<List<String?>> answers = [];
+  List<Map<String, dynamic>> answers = [];
 
   Future _closeReport(forceClose) async {
     if (!forceClose) {
@@ -189,14 +189,14 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     while (answers.length < questions.value!.length) {
       if (widget.selectedType.typeKey == InteractionTypeKey.sighting || widget.selectedType.typeKey == InteractionTypeKey.traffic) {
         if (index == 0) {
-          answers.add(["1"]);
+          answers.add({'answers': ["1"], 'id': null});
         } else if (index == 1) {
-          answers.add(["0"]);
+          answers.add({'answers': ["0"], 'id': null});
         } else {
-          answers.add([]);
+          answers.add({'answers': [], 'id': questions.value![index].id});
         }
       } else {
-        answers.add([]);
+        answers.add({'answers': [], 'id': questions.value![index].id});
       }
         index++;
     }
@@ -589,7 +589,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                       EdgeInsets.symmetric(horizontal: 16)),
                               onSelected: (String? value) {
                                 setState(() {
-                                  answers[question.key][0] = value;
+                                  answers[question.key]["answers"][0] = value;
                                 });
                               },
                               dropdownMenuEntries: question.value.specifications
@@ -612,18 +612,18 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                               borderRadius: 8,
                               onOptionSelected: (selectedOptions) {
                                 setState(() {
-                                  answers[question.key] = [];
+                                  answers[question.key]["answers"] = [];
 
                                   if(selectedOptions.isNotEmpty) {
                                     for (var option in selectedOptions) {
                                       int index = selectedOptions.indexOf(
                                           option);
                                       // Ensure the list has enough elements before accessing the index
-                                      while (answers[question.key].length <=
+                                      while (answers[question.key]["answers"].length <=
                                           index) {
-                                        answers[question.key].add(null);
+                                        answers[question.key]["answers"].add(null);
                                       }
-                                      answers[question.key][index] =
+                                      answers[question.key]["answers"][index] =
                                           option.value.toString();
                                     }
                                   }
@@ -665,7 +665,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     ),
                                 onRatingUpdate: (rating) {
                                   setState(() {
-                                    answers[question.key][0] =
+                                    answers[question.key]["answers"][0] =
                                         rating.toString();
                                   });
                                 }),
@@ -673,11 +673,11 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             TextFormField(
                               onChanged: (String? value) {
                                 setState(() {
-                                  if (answers[question.key].isEmpty) {
-                                    answers[question.key].add(null);
+                                  if (answers[question.key]["answers"].isEmpty) {
+                                    answers[question.key]["answers"].add(null);
                                   }
 
-                                  answers[question.key][0] = value;
+                                  answers[question.key]["answers"][0] = value;
                                 });
                               },
                               minLines: 3,
@@ -742,7 +742,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     ])),
                               ],
                             ),
-                          Text(answers[question.key].toString()),
+                          Text(answers[question.key]["answers"].toString()),
                         ],
                       ),
                     ))
