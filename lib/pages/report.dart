@@ -187,15 +187,18 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     var index = 0;
 
     while (answers.length < questions.value!.length) {
-      if (index == 0) {
-        answers.add(["1"]);
-      } else if (index == 1) {
-        answers.add(["0"]);
+      if (widget.selectedType.typeKey == InteractionTypeKey.sighting || widget.selectedType.typeKey == InteractionTypeKey.traffic) {
+        if (index == 0) {
+          answers.add(["1"]);
+        } else if (index == 1) {
+          answers.add(["0"]);
+        } else {
+          answers.add([]);
+        }
       } else {
         answers.add([]);
       }
-
-      index++;
+        index++;
     }
 
     return Scaffold(
@@ -607,7 +610,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                               selectedOptionBackgroundColor: AppColors.primary,
                               selectedOptionTextColor: Colors.white,
                               borderRadius: 8,
-                              onOptionSelected: (selectedOptions) {},
+                              onOptionSelected: (selectedOptions) {
+                                setState(() {
+                                  answers[question.key] = [];
+
+                                  if(selectedOptions.isNotEmpty) {
+                                    for (var option in selectedOptions) {
+                                      int index = selectedOptions.indexOf(
+                                          option);
+                                      // Ensure the list has enough elements before accessing the index
+                                      while (answers[question.key].length <=
+                                          index) {
+                                        answers[question.key].add(null);
+                                      }
+                                      answers[question.key][index] =
+                                          option.value.toString();
+                                    }
+                                  }
+                                });
+                              },
                               options: question.value.specifications
                                   .map<ValueItem<String>>((value) {
                                 return ValueItem(
