@@ -78,23 +78,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
       'lon': longitude,
       'animal_id': widget.selectedType.typeKey == InteractionTypeKey.sighting ||
               widget.selectedType.typeKey == InteractionTypeKey.traffic
-          ? _chosenAnimal
+          ?_chosenAnimal
           : null,
       'animal_count_upper':
           widget.selectedType.typeKey == InteractionTypeKey.sighting
-              ? answers[0][0]
+              ? answers[0]["answers"][0]
               : null,
       'juvenil_animal_count_upper':
           widget.selectedType.typeKey == InteractionTypeKey.sighting
-              ? answers[1][0]
+              ? answers[1]["answers"][0]
               : null,
       "questions": [
         answers.map((answer) => {
           "question_id": answer["id"],
-          "answer": answer["answers"].toString(),
+          "answer": answer["answers"],
         }).toList()
       ]
     };
+
+    developer.log(jsonEncode(report));
 
     String jsonData = jsonEncode(report);
 
