@@ -71,7 +71,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     //   Push to interactions db
     final String apiUrl = '${F.apiUrl}api/controllers/interactions.php';
 
-    Map<String, dynamic> report = {
+    Map<String, Object?> report = {
       'user_id': "0e6df1f1-400f-4e8d-8e69-16b1a55b400a",
       'interaction_type': widget.selectedType.id,
       'lat': latitude,
@@ -88,17 +88,14 @@ class _ReportPageState extends ConsumerState<ReportPage> {
           widget.selectedType.typeKey == InteractionTypeKey.sighting
               ? answers[1]["answers"][0]
               : null,
-      "questions": [
-        answers.map((answer) => {
+      "questions": answers.skip(2).map((answer) => {
           "question_id": answer["id"],
-          "answer": answer["answers"],
+          "answer": jsonEncode(answer["answers"]),
         }).toList()
-      ]
     };
 
-    developer.log(jsonEncode(report));
-
     String jsonData = jsonEncode(report);
+    developer.log(jsonData);
 
     try {
       final response = await http.post(
