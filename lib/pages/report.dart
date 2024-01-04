@@ -668,6 +668,10 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     ),
                                 onRatingUpdate: (rating) {
                                   setState(() {
+                                    if (answers[question.key]["answers"].isEmpty) {
+                                      answers[question.key]["answers"].add(null);
+                                    }
+
                                     answers[question.key]["answers"][0] =
                                         rating.toString();
                                   });
