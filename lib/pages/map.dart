@@ -13,6 +13,7 @@ import 'package:wildlife_nl_app/state/interaction_types.dart';
 import 'package:wildlife_nl_app/state/interactions.dart';
 import 'package:wildlife_nl_app/state/location.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
+import 'package:wildlife_nl_app/widgets/add_report/report_other_animal.dart';
 import 'package:wildlife_nl_app/widgets/map/map_marker.dart';
 import 'package:wildlife_nl_app/widgets/map/map_settings_modal.dart';
 
@@ -189,7 +190,7 @@ class _MapPageState extends ConsumerState<MapPage> {
               minZoom: 7,
               maxBounds: LatLngBounds(
                 const LatLng(53.79841012278817, 7.797161079786122), //Top Right
-                const LatLng(48.827529576991, 2.227490788147122),  //Bottom Left
+                const LatLng(48.827529576991, 2.227490788147122), //Bottom Left
               ),
               interactiveFlags: InteractiveFlag.drag |
                   InteractiveFlag.flingAnimation |
@@ -263,23 +264,6 @@ class _MapPageState extends ConsumerState<MapPage> {
                                 },
                                 icon: const Icon(AppIcons.mapsettings,
                                     color: AppColors.neutral_50)),
-                            // Divider(
-                            //   height: 1,
-                            //   color: AppColors.neutral_50,
-                            // ),
-                            // IconButton(
-                            //     onPressed: () {
-                            //       showModalBottomSheet<void>(
-                            //         context: context,
-                            //         isScrollControlled: true,
-                            //         builder: (BuildContext context) {
-                            //           return Wrap(
-                            //               children: [MapPathModal()]);
-                            //         },
-                            //       );
-                            //     },
-                            //     icon: Icon(AppIcons.paths,
-                            //         color: AppColors.neutral_50))
                           ],
                         ),
                       ),
