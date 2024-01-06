@@ -33,77 +33,101 @@ class ActivityItemCard extends ConsumerWidget {
     final formatter = DateFormat.yMd(Platform.localeName).add_jm();
 
     return Card(
-      color: Colors.white,
-      surfaceTintColor: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.only(
-            top: 8.0,
-            left: 8.0,
-            right: 8.0,
-            bottom: 8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration:
-                          BoxDecoration(shape: BoxShape.circle, color: HexColor(type.color)),
-                      child: Icon(
-                        switch(type.typeKey){
-                          InteractionTypeKey.sighting => AppIcons.deer,
-                          InteractionTypeKey.damage => AppIcons.incident,
-                          InteractionTypeKey.inappropriateBehaviour => AppIcons.incident,
-                          InteractionTypeKey.traffic => AppIcons.traffic,
-                          InteractionTypeKey.maintenance => AppIcons.maintenance,
-                        },
-                        color: Colors.white,
-                        size: 24,
+        color: Colors.white,
+        surfaceTintColor: Colors.white,
+        child: InkWell(
+          onTap: () {
+            showModalBottomSheet<void>(
+              context: context,
+              isScrollControlled: true,
+              builder: (BuildContext context) {
+                return Wrap(children: [ReportItemModal(interaction: interaction, type: type, animal: animal,)]);
+              },
+            );
+          },
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+          padding:
+              const EdgeInsets.only(top: 8.0, left: 8.0, right: 8.0, bottom: 8.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: HexColor(type.color)),
+                        child: Icon(
+                          switch (type.typeKey) {
+                            InteractionTypeKey.sighting => AppIcons.deer,
+                            InteractionTypeKey.damage => AppIcons.incident,
+                            InteractionTypeKey.inappropriateBehaviour =>
+                              AppIcons.cancel,
+                            InteractionTypeKey.traffic => AppIcons.traffic,
+                            InteractionTypeKey.maintenance =>
+                              AppIcons.maintenance,
+                          },
+                          color: Colors.white,
+                          size: 24,
+                        ),
                       ),
-                    ),
-                    const Padding(padding: EdgeInsets.only(left: 8)),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          type.typeKey == InteractionTypeKey.sighting ? animal!.name : type.label,
-                          style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(color: HexColor("#737373")),
-                        ),
-                        Text(
-                          formatter.format(interaction.time),
-                          style: AppStyles.of(context).data.textStyle.paragraph.copyWith(color: AppColors.neutral_400),
-                        ),
-                        Text(
-                          "[${interaction.lat},${interaction.lon}]",
-                          softWrap: true,
-                          style: AppStyles.of(context).data.textStyle.paragraph.copyWith(color: AppColors.neutral_400),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                IconButton(onPressed: () {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (BuildContext context) {
-                      return Wrap(children: [ReportItemModal(interaction: interaction, type: type, animal: animal,)]);
-                    },
-                  );
-                }, icon: const Icon(AppIcons.arrow_right)),
-                const Padding(
-                  padding: EdgeInsets.only(left: 5),
-                ),
-              ],
-            ),
-          ],
+                      const Padding(padding: EdgeInsets.only(left: 8)),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            type.typeKey == InteractionTypeKey.sighting
+                                ? animal!.name
+                                : type.label,
+                            style: AppStyles.of(context)
+                                .data
+                                .textStyle
+                                .cardTitle
+                                .copyWith(color: HexColor("#737373")),
+                          ),
+                          Text(
+                            formatter.format(interaction.time),
+                            style: AppStyles.of(context)
+                                .data
+                                .textStyle
+                                .paragraph
+                                .copyWith(color: AppColors.neutral_400),
+                          ),
+                          Text(
+                            "[${interaction.lat},${interaction.lon}]",
+                            softWrap: true,
+                            style: AppStyles.of(context)
+                                .data
+                                .textStyle
+                                .paragraph
+                                .copyWith(color: AppColors.neutral_400),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  const Icon(
+                    Symbols.info,
+                    fill: 0,
+                    size: 28,
+                    color: AppColors.neutral_400,
+                    grade: 200,
+                    opticalSize: 48,
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.only(left: 5),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
