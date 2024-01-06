@@ -54,7 +54,7 @@ class _ReportFilterChipsState extends ConsumerState<ReportFilterChips> {
     }
 
     return SliverPadding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
+      padding: const EdgeInsets.only(left: 8, right: 8, top: 60),
       sliver: SliverToBoxAdapter(
         child: Wrap(
           children: [
