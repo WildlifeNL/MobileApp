@@ -78,7 +78,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
       'lon': longitude,
       'animal_id': widget.selectedType.typeKey == InteractionTypeKey.sighting ||
               widget.selectedType.typeKey == InteractionTypeKey.traffic
-          ?_chosenAnimal
+          ? _chosenAnimal
           : null,
       'animal_count_upper':
           widget.selectedType.typeKey == InteractionTypeKey.sighting
@@ -88,10 +88,13 @@ class _ReportPageState extends ConsumerState<ReportPage> {
           widget.selectedType.typeKey == InteractionTypeKey.sighting
               ? answers[1]["answers"][0]
               : null,
-      "questions": answers.skip(2).map((answer) => {
-          "question_id": answer["id"],
-          "answer": jsonEncode(answer["answers"]),
-        }).toList()
+      "questions": answers
+          .skip(2)
+          .map((answer) => {
+                "question_id": answer["id"],
+                "answer": jsonEncode(answer["answers"]),
+              })
+          .toList()
     };
 
     String jsonData = jsonEncode(report);
@@ -140,14 +143,6 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     final interactionTypes = ref.watch(interactionTypesProvider);
     final questions = ref.watch(questionsProvider(widget.selectedType));
 
-    developer.log(animals.hasError.toString());
-    developer.log(interactionTypes.hasError.toString());
-    developer.log(questions.hasError.toString());
-
-    if (questions.hasError) {
-      developer.log(questions.asError!.stackTrace.toString());
-    }
-
     if (animals.isLoading ||
         animals.hasError ||
         interactionTypes.isLoading ||
@@ -190,18 +185,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     var index = 0;
 
     while (answers.length < questions.value!.length) {
-      if (widget.selectedType.typeKey == InteractionTypeKey.sighting || widget.selectedType.typeKey == InteractionTypeKey.traffic) {
+      if (widget.selectedType.typeKey == InteractionTypeKey.sighting ||
+          widget.selectedType.typeKey == InteractionTypeKey.traffic) {
         if (index == 0) {
-          answers.add({'answers': ["1"], 'id': null});
+          answers.add({
+            'answers': ["1"],
+            'id': null
+          });
         } else if (index == 1) {
-          answers.add({'answers': ["0"], 'id': null});
+          answers.add({
+            'answers': ["0"],
+            'id': null
+          });
         } else {
           answers.add({'answers': [], 'id': questions.value![index].id});
         }
       } else {
         answers.add({'answers': [], 'id': questions.value![index].id});
       }
-        index++;
+      index++;
     }
 
     return Scaffold(
@@ -617,14 +619,16 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                 setState(() {
                                   answers[question.key]["answers"] = [];
 
-                                  if(selectedOptions.isNotEmpty) {
+                                  if (selectedOptions.isNotEmpty) {
                                     for (var option in selectedOptions) {
-                                      int index = selectedOptions.indexOf(
-                                          option);
+                                      int index =
+                                          selectedOptions.indexOf(option);
                                       // Ensure the list has enough elements before accessing the index
-                                      while (answers[question.key]["answers"].length <=
+                                      while (answers[question.key]["answers"]
+                                              .length <=
                                           index) {
-                                        answers[question.key]["answers"].add(null);
+                                        answers[question.key]["answers"]
+                                            .add(null);
                                       }
                                       answers[question.key]["answers"][index] =
                                           option.value.toString();
@@ -668,8 +672,10 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     ),
                                 onRatingUpdate: (rating) {
                                   setState(() {
-                                    if (answers[question.key]["answers"].isEmpty) {
-                                      answers[question.key]["answers"].add(null);
+                                    if (answers[question.key]["answers"]
+                                        .isEmpty) {
+                                      answers[question.key]["answers"]
+                                          .add(null);
                                     }
 
                                     answers[question.key]["answers"][0] =
@@ -680,7 +686,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             TextFormField(
                               onChanged: (String? value) {
                                 setState(() {
-                                  if (answers[question.key]["answers"].isEmpty) {
+                                  if (answers[question.key]["answers"]
+                                      .isEmpty) {
                                     answers[question.key]["answers"].add(null);
                                   }
 
@@ -749,7 +756,6 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     ])),
                               ],
                             ),
-                          Text(answers[question.key]["answers"].toString()),
                         ],
                       ),
                     ))
