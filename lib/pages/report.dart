@@ -9,101 +9,22 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_dropdown/multiselect_dropdown.dart';
 import 'package:wildlife_nl_app/flavors.dart';
+import 'package:wildlife_nl_app/models/animal.dart';
+import 'package:wildlife_nl_app/models/interaction_type.dart';
+import 'package:wildlife_nl_app/models/question.dart';
 import 'package:wildlife_nl_app/state/animal_types.dart';
+import 'package:wildlife_nl_app/state/interaction_types.dart';
+import 'package:wildlife_nl_app/state/interactions.dart';
+import 'package:wildlife_nl_app/state/questions.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/widgets/custom_stepper.dart';
 
-class AnimalQuestion {
-  final String inputType;
-  final String question;
-  final bool optional;
-  final String hint;
-  final List<dynamic> options;
-  final int questionOrder;
-  final List<dynamic> interactionTypes;
-  List<dynamic> answers;
-
-  AnimalQuestion({
-    required this.inputType,
-    required this.question,
-    required this.optional,
-    required this.hint,
-    required this.options,
-    required this.questionOrder,
-    required this.interactionTypes,
-    required this.answers,
-  });
-}
-
-final String baseUrl = F.apiUrl;
-
-List<AnimalQuestion> questionsApi = [
-  AnimalQuestion(
-      inputType: 'dropdown',
-      question: 'Hoeveel dieren?',
-      optional: false,
-      hint: '',
-      options: ["0", "1", "2", "3", "4", "5+"],
-      questionOrder: 0,
-      interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'],
-      answers: ['1']),
-  AnimalQuestion(
-      inputType: 'dropdown',
-      question: 'Hoeveel Jonge?',
-      optional: false,
-      hint: '',
-      options: ["0", "1", "2", "3", "4", "5+"],
-      questionOrder: 0,
-      interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'],
-      answers: ['0'])
-];
-
-Future<void> fetchQuestionsData(selectedType) async {
-  developer.log(selectedType);
-  final questionsResponse =
-      await http.get(Uri.parse('${baseUrl}api/controllers/questions.php'));
-
-  if (questionsResponse.statusCode == 200) {
-    final Map<String, dynamic> jsonData3 = jsonDecode(questionsResponse.body);
-
-    // Access the 'results' field
-    final List<dynamic> results3 = jsonData3['results'];
-
-    // Map the raw JSON data into a list of AnimalType objects
-    List<AnimalQuestion> newQuestions = results3
-        .where((json) =>
-            json['interaction_types'] != null &&
-            json['interaction_types'].contains(selectedType))
-        .map((json) {
-      return AnimalQuestion(
-        inputType: json['type'] ?? '',
-        question: json['question'] ?? '',
-        optional: json['is_optional'] ?? '',
-        hint: json['placeholder'] ?? '',
-        options: json['specifications'] ?? '',
-        questionOrder: json['question_order'],
-        interactionTypes: json['interaction_types'] ?? '',
-        answers: [''],
-      );
-    }).toList();
-    if (selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ||
-        selectedType == '689a5571-8eb5-11ee-919a-1e0034001676') {
-      questionsApi.addAll(newQuestions);
-    } else {
-      questionsApi = newQuestions;
-    }
-    // Filter questions by chosenType
-    questionsApi.sort((a, b) => a.questionOrder.compareTo(b.questionOrder));
-  } else {
-    developer.log('Response failed');
-  }
-}
-
 class ReportPage extends ConsumerStatefulWidget {
-  final String selectedType;
+  final InteractionType selectedType;
 
   const ReportPage({super.key, required this.selectedType});
 
@@ -112,48 +33,22 @@ class ReportPage extends ConsumerStatefulWidget {
 }
 
 class _ReportPageState extends ConsumerState<ReportPage> {
-  @override
-  void initState() {
-    super.initState();
-    fetchQuestionsData(widget.selectedType);
-  }
-
   int _currentStep = 0;
   String _chosenAnimal = '';
   double latitude = 0;
   double longitude = 0;
   File? image;
 
+  List<Map<String, dynamic>> answers = [];
+
   Future _closeReport(forceClose) async {
     if (!forceClose) {
-      await _getUserLocation();
-      pushReportToApi();
+      pushReportToApi().then((value) {
+        Navigator.of(context).pop();
+      });
+    } else {
+      Navigator.of(context).pop();
     }
-    Navigator.of(context).pop();
-
-    // Reset all to default
-    questionsApi = [
-      AnimalQuestion(
-          inputType: 'dropdown',
-          question: 'Hoeveel dieren?',
-          optional: false,
-          hint: '',
-          options: ["0", "1", "2", "3", "4", "5+"],
-          questionOrder: 0,
-          interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'],
-          answers: ['1']),
-      AnimalQuestion(
-          inputType: 'dropdown',
-          question: 'Hoeveel Jonge?',
-          optional: false,
-          hint: '',
-          options: ["0", "1", "2", "3", "4", "5+"],
-          questionOrder: 0,
-          interactionTypes: ['86a6b56a-89f0-11ee-919a-1e0034001676'],
-          answers: ['0'])
-    ];
-    _currentStep = 0;
-    _chosenAnimal = '';
   }
 
   Future<void> _getUserLocation() async {
@@ -172,30 +67,35 @@ class _ReportPageState extends ConsumerState<ReportPage> {
   }
 
   Future<void> pushReportToApi() async {
+    await _getUserLocation();
     //   Push to interactions db
-    final String apiUrl = '${baseUrl}api/controllers/interactions.php';
+    final String apiUrl = '${F.apiUrl}api/controllers/interactions.php';
 
-    Map<String, dynamic> report = {
+    Map<String, Object?> report = {
       'user_id': "0e6df1f1-400f-4e8d-8e69-16b1a55b400a",
-      'interaction_type': widget.selectedType,
+      'interaction_type': widget.selectedType.id,
       'lat': latitude,
       'lon': longitude,
-      'animal_id':
-          widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676' ||
-                  widget.selectedType == '689a5571-8eb5-11ee-919a-1e0034001676'
-              ? _chosenAnimal
-              : null,
+      'animal_id': widget.selectedType.typeKey == InteractionTypeKey.sighting ||
+              widget.selectedType.typeKey == InteractionTypeKey.traffic
+          ?_chosenAnimal
+          : null,
       'animal_count_upper':
-          widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676'
-              ? questionsApi[0].answers[0]
+          widget.selectedType.typeKey == InteractionTypeKey.sighting
+              ? answers[0]["answers"][0]
               : null,
       'juvenil_animal_count_upper':
-          widget.selectedType == '86a6b56a-89f0-11ee-919a-1e0034001676'
-              ? questionsApi[1].answers[0]
+          widget.selectedType.typeKey == InteractionTypeKey.sighting
+              ? answers[1]["answers"][0]
               : null,
+      "questions": answers.skip(2).map((answer) => {
+          "question_id": answer["id"],
+          "answer": jsonEncode(answer["answers"]),
+        }).toList()
     };
 
     String jsonData = jsonEncode(report);
+    developer.log(jsonData);
 
     try {
       final response = await http.post(
@@ -205,6 +105,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
 
       // Check the response status
       if (response.statusCode == 200) {
+        ref.invalidate(interactionsProvider);
+        ref.invalidate(mapInteractionsProvider);
         developer.log('Data pushed successfully');
         developer.log(response.body);
       } else {
@@ -214,8 +116,6 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     } catch (error) {
       developer.log('Error: $error');
     }
-
-    // Push to interaction questions db
 
     developer.log(report.toString());
   }
@@ -237,8 +137,23 @@ class _ReportPageState extends ConsumerState<ReportPage> {
   @override
   Widget build(BuildContext context) {
     final animals = ref.watch(animalTypesProvider);
+    final interactionTypes = ref.watch(interactionTypesProvider);
+    final questions = ref.watch(questionsProvider(widget.selectedType));
 
-    if (animals.isLoading || animals.hasError) {
+    developer.log(animals.hasError.toString());
+    developer.log(interactionTypes.hasError.toString());
+    developer.log(questions.hasError.toString());
+
+    if (questions.hasError) {
+      developer.log(questions.asError!.stackTrace.toString());
+    }
+
+    if (animals.isLoading ||
+        animals.hasError ||
+        interactionTypes.isLoading ||
+        interactionTypes.hasError ||
+        questions.isLoading ||
+        questions.hasError) {
       return Scaffold(
         body: Column(children: [
           Container(
@@ -270,6 +185,23 @@ class _ReportPageState extends ConsumerState<ReportPage> {
           ),
         ]),
       );
+    }
+
+    var index = 0;
+
+    while (answers.length < questions.value!.length) {
+      if (widget.selectedType.typeKey == InteractionTypeKey.sighting || widget.selectedType.typeKey == InteractionTypeKey.traffic) {
+        if (index == 0) {
+          answers.add({'answers': ["1"], 'id': null});
+        } else if (index == 1) {
+          answers.add({'answers': ["0"], 'id': null});
+        } else {
+          answers.add({'answers': [], 'id': questions.value![index].id});
+        }
+      } else {
+        answers.add({'answers': [], 'id': questions.value![index].id});
+      }
+        index++;
     }
 
     return Scaffold(
@@ -312,26 +244,303 @@ class _ReportPageState extends ConsumerState<ReportPage> {
             ),
           ),
           Flexible(
-            child: CustomStepper(
-                elevation: 0,
-                currentStep: _currentStep,
-                controlsBuilder: (context, details) => const Text(""),
-                steps: [
-                  CustomStep(
-                    state: _currentStep < 0
-                        ? CustomStepState.indexed
-                        : (_currentStep > 0
-                            ? CustomStepState.complete
-                            : CustomStepState.editing),
-                    content: SizedBox(
-                      width: double.maxFinite,
+            child: switch (widget.selectedType.typeKey) {
+              InteractionTypeKey.sighting => CustomStepper(
+                    elevation: 0,
+                    currentStep: _currentStep,
+                    controlsBuilder: (context, details) => const Text(""),
+                    steps: [
+                      CustomStep(
+                        state: _currentStep < 0
+                            ? CustomStepState.indexed
+                            : (_currentStep > 0
+                                ? CustomStepState.complete
+                                : CustomStepState.editing),
+                        content: pickAnimalStep(animals),
+                      ),
+                      CustomStep(
+                          state: _currentStep >= 1
+                              ? CustomStepState.editing
+                              : CustomStepState.indexed,
+                          content: evaluationQuestions(questions)),
+                    ]),
+              InteractionTypeKey.damage => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: evaluationQuestions(questions)),
+              InteractionTypeKey.inappropriateBehaviour => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: evaluationQuestions(questions)),
+              InteractionTypeKey.traffic => CustomStepper(
+                    elevation: 0,
+                    currentStep: _currentStep,
+                    controlsBuilder: (context, details) => const Text(""),
+                    steps: [
+                      CustomStep(
+                        state: _currentStep < 0
+                            ? CustomStepState.indexed
+                            : (_currentStep > 0
+                                ? CustomStepState.complete
+                                : CustomStepState.editing),
+                        content: pickAnimalStep(animals),
+                      ),
+                      CustomStep(
+                          state: _currentStep >= 1
+                              ? CustomStepState.editing
+                              : CustomStepState.indexed,
+                          content: evaluationQuestions(questions)),
+                    ]),
+              InteractionTypeKey.maintenance => Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: evaluationQuestions(questions)),
+            },
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                Visibility(
+                  visible: _currentStep > 0,
+                  child: Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentStep--; // Verhoog de huidige stap
+                        });
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.neutral_50,
+                        foregroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: const BorderSide(
+                                color: AppColors.primary, width: 2)),
+                        elevation: 0,
+                      ),
+                      child: Text('Vorige',
+                          style:
+                              AppStyles.of(context).data.textStyle.buttonText),
+                    ),
+                  ),
+                ),
+                Visibility(
+                  visible: _currentStep > 0,
+                  child: const SizedBox(
+                      width:
+                          16.0), // Space between buttons if 2nd button is visible
+                ),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: switch (widget.selectedType.typeKey) {
+                      InteractionTypeKey.sighting =>
+                        (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                            ? () {
+                                setState(() {
+                                  _currentStep++;
+                                });
+                              }
+                            : ((_currentStep == 1)
+                                ? () {
+                                    _closeReport(false);
+                                  }
+                                : null),
+                      InteractionTypeKey.damage => () {
+                          _closeReport(false);
+                        },
+                      InteractionTypeKey.inappropriateBehaviour => () {
+                          _closeReport(false);
+                        },
+                      InteractionTypeKey.traffic =>
+                        (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                            ? () {
+                                setState(() {
+                                  _currentStep++;
+                                });
+                              }
+                            : ((_currentStep == 1)
+                                ? () {
+                                    _closeReport(false);
+                                  }
+                                : null),
+                      InteractionTypeKey.maintenance => () {
+                          _closeReport(false);
+                        },
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      elevation: 0,
+                    ),
+                    // onPressed: null,
+                    child: Text(
+                        switch (widget.selectedType.typeKey) {
+                          InteractionTypeKey.sighting =>
+                            _currentStep < 1 ? 'Volgende' : 'Opslaan',
+                          InteractionTypeKey.damage => "Opslaan",
+                          InteractionTypeKey.inappropriateBehaviour =>
+                            "Opslaan",
+                          InteractionTypeKey.traffic =>
+                            _currentStep < 1 ? 'Volgende' : 'Opslaan',
+                          InteractionTypeKey.maintenance => "Opslaan",
+                        },
+                        style: AppStyles.of(context).data.textStyle.buttonText),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget pickAnimalStep(animals) {
+    return SizedBox(
+      width: double.maxFinite,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Wat is het dier?',
+            style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
+                  color: AppColors.primary,
+                ),
+          ),
+          Container(
+            padding: const EdgeInsets.only(top: 4),
+            width: double.maxFinite,
+            child: Wrap(
+              spacing: 16,
+              runSpacing: 16,
+              children: (animals.value! as List<Animal>)
+                  .map(
+                    (animal) => GestureDetector(
+                      onTap: () {
+                        if (_chosenAnimal != animal.id) {
+                          setState(() {
+                            _chosenAnimal = animal.id;
+                          });
+                        } else {
+                          setState(() {
+                            _chosenAnimal = '';
+                          });
+                        }
+                      },
+                      child: FractionallySizedBox(
+                        widthFactor: 1 / 3.3,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            AspectRatio(
+                              aspectRatio: 1.0,
+                              child: Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: ShapeDecoration(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    side: BorderSide(
+                                      color: _chosenAnimal == animal.id
+                                          ? AppColors.primary
+                                          : Colors.white,
+                                      width: 2,
+                                    ),
+                                  ),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: Image(
+                                        image: NetworkImage(animal.image ??
+                                            "https://placehold.co/600x400/EEE/31343C"),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              animal.name,
+                              textAlign: TextAlign.center,
+                              style: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .paragraph,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              children: [
+                TextFormField(
+                  onChanged: (value) {
+                    setState(() {
+                      _chosenAnimal = value;
+                    });
+                  },
+                  style: AppStyles.of(context).data.textStyle.paragraph,
+                  decoration: InputDecoration(
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+                    filled: true,
+                    fillColor: Colors.white,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    hintText: 'Anders, namelijk:',
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget evaluationQuestions(AsyncValue<List<Question>> questions) {
+    return Container(
+        padding: const EdgeInsets.only(top: 4),
+        width: double.maxFinite,
+        child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            children: questions.value!
+                .asMap()
+                .entries
+                .map((question) => SizedBox(
+                      width: question.value.questionOrder >= 1
+                          ? MediaQuery.of(context).size.width - 32
+                          : (MediaQuery.of(context).size.width / 2) - 24,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Wat is het dier?',
+                            question.value.question +
+                                (!question.value.isOptional ? '*' : ''),
                             style: AppStyles.of(context)
                                 .data
                                 .textStyle
@@ -340,457 +549,211 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                   color: AppColors.primary,
                                 ),
                           ),
-                          Container(
-                            padding: const EdgeInsets.only(top: 4),
-                            width: double.maxFinite,
-                            child: Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
-                              children: animals.value!
-                                  .map(
-                                    (animal) => GestureDetector(
-                                      onTap: () {
-                                        if (_chosenAnimal != animal.id) {
-                                          setState(() {
-                                            _chosenAnimal = animal.id;
-                                          });
-                                        } else {
-                                          setState(() {
-                                            _chosenAnimal = '';
-                                          });
-                                        }
-                                      },
-                                      child: FractionallySizedBox(
-                                        widthFactor: 1 / 3.3,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            AspectRatio(
-                                              aspectRatio: 1.0,
-                                              child: Container(
-                                                padding:
-                                                    const EdgeInsets.all(8),
-                                                decoration: ShapeDecoration(
-                                                  color: Colors.white,
-                                                  shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8),
-                                                    side: BorderSide(
-                                                      color: _chosenAnimal ==
-                                                              animal.id
-                                                          ? AppColors.primary
-                                                          : Colors.white,
-                                                      width: 2,
-                                                    ),
-                                                  ),
-                                                ),
-                                                child: Row(
-                                                  mainAxisSize:
-                                                      MainAxisSize.min,
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.center,
-                                                  children: [
-                                                    Expanded(
-                                                      child: Image(
-                                                        image: NetworkImage(animal
-                                                                .image ??
-                                                            "https://placehold.co/600x400/EEE/31343C"),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              animal.name,
-                                              textAlign: TextAlign.center,
-                                              style: AppStyles.of(context)
-                                                  .data
-                                                  .textStyle
-                                                  .paragraph,
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                  .toList(),
+                          const SizedBox(height: 4),
+                          if (question.value.type == 'dropdown')
+                            DropdownMenu<String>(
+                              width: question.key > 1
+                                  ? MediaQuery.of(context).size.width - 32
+                                  : (MediaQuery.of(context).size.width / 2) -
+                                      24,
+                              initialSelection: question.key == 0
+                                  ? '1'
+                                  : (question.key == 1 ? '0' : null),
+                              trailingIcon: Transform.translate(
+                                  offset: const Offset(10, 0),
+                                  child: const Icon(AppIcons.arrow_down,
+                                      size: 16)),
+                              selectedTrailingIcon: Transform.translate(
+                                  offset: const Offset(10, 0),
+                                  child: Transform.rotate(
+                                      angle: 180 * pi / 180,
+                                      child: const Icon(AppIcons.arrow_down,
+                                          size: 16))),
+                              hintText: question.value.placeholder,
+                              textStyle: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .paragraph,
+                              menuStyle: const MenuStyle(
+                                backgroundColor:
+                                    MaterialStatePropertyAll(Colors.white),
+                                visualDensity: VisualDensity.compact,
+                              ),
+                              inputDecorationTheme: const InputDecorationTheme(
+                                  constraints: BoxConstraints(maxHeight: 40),
+                                  isDense: true,
+                                  border: OutlineInputBorder(
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(8)),
+                                      borderSide: BorderSide.none),
+                                  fillColor: Colors.white,
+                                  filled: true,
+                                  contentPadding:
+                                      EdgeInsets.symmetric(horizontal: 16)),
+                              onSelected: (String? value) {
+                                setState(() {
+                                  answers[question.key]["answers"][0] = value;
+                                });
+                              },
+                              dropdownMenuEntries: question.value.specifications
+                                  .map<DropdownMenuEntry<String>>((value) {
+                                return DropdownMenuEntry<String>(
+                                  value: value,
+                                  label: value,
+                                );
+                              }).toList(),
                             ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(vertical: 24),
-                            child: Column(
-                              children: [
-                                TextFormField(
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _chosenAnimal = value;
-                                    });
-                                  },
-                                  style: AppStyles.of(context)
-                                      .data
-                                      .textStyle
-                                      .paragraph,
-                                  decoration: InputDecoration(
-                                    contentPadding: const EdgeInsets.symmetric(
-                                        vertical: 8, horizontal: 8),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    hintText: 'Anders, namelijk:',
-                                  ),
-                                ),
-                              ],
+                          if (question.value.type == 'multiselect')
+                            MultiSelectDropDown(
+                              dropdownHeight: 300,
+                              suffixIcon: Icon(AppIcons.arrow_down, size: 16),
+                              hint: question.value.placeholder ?? "",
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 8),
+                              selectedOptionBackgroundColor: AppColors.primary,
+                              selectedOptionTextColor: Colors.white,
+                              borderRadius: 8,
+                              onOptionSelected: (selectedOptions) {
+                                setState(() {
+                                  answers[question.key]["answers"] = [];
+
+                                  if(selectedOptions.isNotEmpty) {
+                                    for (var option in selectedOptions) {
+                                      int index = selectedOptions.indexOf(
+                                          option);
+                                      // Ensure the list has enough elements before accessing the index
+                                      while (answers[question.key]["answers"].length <=
+                                          index) {
+                                        answers[question.key]["answers"].add(null);
+                                      }
+                                      answers[question.key]["answers"][index] =
+                                          option.value.toString();
+                                    }
+                                  }
+                                });
+                              },
+                              options: question.value.specifications
+                                  .map<ValueItem<String>>((value) {
+                                return ValueItem(
+                                  value: value,
+                                  label: value,
+                                );
+                              }).toList(),
+                              selectionType: SelectionType.multi,
+                              chipConfig:
+                                  const ChipConfig(wrapType: WrapType.scroll),
+                              optionTextStyle: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .paragraph,
+                              hintStyle: AppStyles.of(context)
+                                  .data
+                                  .textStyle
+                                  .paragraph,
+                              selectedOptionIcon:
+                                  const Icon(Icons.check_circle),
+                              borderColor: AppColors.neutral_50,
                             ),
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  CustomStep(
-                      state: _currentStep >= 1
-                          ? CustomStepState.editing
-                          : CustomStepState.indexed,
-                      content: Container(
-                          padding: const EdgeInsets.only(top: 4),
-                          width: double.maxFinite,
-                          child: Wrap(
-                              spacing: 16,
-                              runSpacing: 16,
-                              children: questionsApi
-                                  .asMap()
-                                  .entries
-                                  .map((question) => SizedBox(
-                                        width: question.value.questionOrder >= 1
-                                            ? MediaQuery.of(context)
-                                                    .size
-                                                    .width -
-                                                32
-                                            : (MediaQuery.of(context)
-                                                        .size
-                                                        .width /
-                                                    2) -
-                                                24,
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              question.value.question +
-                                                  (!question.value.optional
-                                                      ? '*'
-                                                      : ''),
-                                              style: AppStyles.of(context)
-                                                  .data
-                                                  .textStyle
-                                                  .cardTitle
-                                                  .copyWith(
-                                                    color: AppColors.primary,
-                                                  ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            if (question.value.inputType ==
-                                                    'dropdown' ||
-                                                question.value.inputType ==
-                                                    'multiselect')
-                                              DropdownMenu<String>(
-                                                width: question.key > 1
-                                                    ? MediaQuery.of(context)
-                                                            .size
-                                                            .width -
-                                                        32
-                                                    : (MediaQuery.of(context)
-                                                                .size
-                                                                .width /
-                                                            2) -
-                                                        24,
-                                                initialSelection:
-                                                    question.key == 0
-                                                        ? '1'
-                                                        : (question.key == 1
-                                                            ? '0'
-                                                            : null),
-                                                trailingIcon:
-                                                    Transform.translate(
-                                                        offset:
-                                                            const Offset(10, 0),
-                                                        child: const Icon(
-                                                            AppIcons.arrow_down,
-                                                            size: 16)),
-                                                selectedTrailingIcon:
-                                                    Transform.translate(
-                                                        offset:
-                                                            const Offset(10, 0),
-                                                        child: Transform.rotate(
-                                                            angle:
-                                                                180 * pi / 180,
-                                                            child: const Icon(
-                                                                AppIcons
-                                                                    .arrow_down,
-                                                                size: 16))),
-                                                hintText: question.value.hint,
-                                                textStyle: AppStyles.of(context)
-                                                    .data
-                                                    .textStyle
-                                                    .paragraph,
-                                                menuStyle: const MenuStyle(
-                                                  backgroundColor:
-                                                      MaterialStatePropertyAll(
-                                                          Colors.white),
-                                                  visualDensity:
-                                                      VisualDensity.compact,
-                                                ),
-                                                inputDecorationTheme:
-                                                    const InputDecorationTheme(
-                                                        constraints:
-                                                            BoxConstraints(
-                                                                maxHeight: 40),
-                                                        isDense: true,
-                                                        border: OutlineInputBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .all(Radius
-                                                                        .circular(
-                                                                            8)),
-                                                            borderSide:
-                                                                BorderSide
-                                                                    .none),
-                                                        fillColor: Colors.white,
-                                                        filled: true,
-                                                        contentPadding:
-                                                            EdgeInsets
-                                                                .symmetric(
-                                                                    horizontal:
-                                                                        8)),
-                                                onSelected: (String? value) {
-                                                  setState(() {
-                                                    question.value.answers[0] =
-                                                        value;
-                                                  });
-                                                },
-                                                dropdownMenuEntries:
-                                                    question.value.options.map<
-                                                        DropdownMenuEntry<
-                                                            String>>((value) {
-                                                  return DropdownMenuEntry<
-                                                      String>(
-                                                    value: value,
-                                                    label: value,
-                                                  );
-                                                }).toList(),
-                                              ),
-                                            if (question.value.inputType ==
-                                                'star')
-                                              RatingBar.builder(
-                                                  minRating: 1,
-                                                  direction: Axis.horizontal,
-                                                  allowHalfRating: true,
-                                                  itemCount: 5,
-                                                  itemPadding: const EdgeInsets
-                                                      .symmetric(horizontal: 0),
-                                                  itemBuilder: (context, _) =>
-                                                      const Icon(
-                                                        Icons.star,
-                                                        color:
-                                                            AppColors.primary,
-                                                      ),
-                                                  onRatingUpdate: (rating) {
-                                                    setState(() {
-                                                      question.value
-                                                              .answers[0] =
-                                                          rating.toString();
-                                                    });
-                                                  }),
-                                            if (question.value.inputType ==
-                                                'text')
-                                              TextFormField(
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    question.value.answers[0] =
-                                                        value;
-                                                  });
-                                                },
-                                                minLines: 3,
-                                                maxLines: 5,
-                                                style: AppStyles.of(context)
-                                                    .data
-                                                    .textStyle
-                                                    .paragraph,
-                                                decoration: InputDecoration(
-                                                  contentPadding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                          vertical: 8,
-                                                          horizontal: 8),
-                                                  filled: true,
-                                                  fillColor: Colors.white,
-                                                  border: OutlineInputBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            8.0),
-                                                    borderSide: BorderSide.none,
-                                                  ),
-                                                  hintText: question.value.hint,
-                                                ),
-                                              ),
-                                            if (question.value.inputType ==
-                                                'file')
-                                              Row(
-                                                children: [
-                                                  if (image != null)
-                                                    Row(children: [
-                                                      GestureDetector(
-                                                        onTap: () {
-                                                          setState(() {
-                                                            image = null;
-                                                          });
-                                                        },
-                                                        child: Image(
-                                                          image:
-                                                              FileImage(image!),
-                                                          height: 45,
-                                                          width: 45,
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                      ),
-                                                      const SizedBox(width: 8),
-                                                    ]),
-                                                  ElevatedButton(
-                                                      onPressed: () {
-                                                        _showPickerDialog();
-                                                      },
-                                                      style: ElevatedButton
-                                                          .styleFrom(
-                                                        backgroundColor:
-                                                            AppColors
-                                                                .neutral_50,
-                                                        foregroundColor:
-                                                            AppColors.primary,
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                                horizontal: 16,
-                                                                vertical: 8),
-                                                        shape: RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            side:
-                                                                const BorderSide(
-                                                                    color: AppColors
-                                                                        .primary,
-                                                                    width: 2)),
-                                                        elevation: 0,
-                                                      ),
-                                                      child:
-                                                          const Row(children: [
-                                                        Icon(AppIcons.add,
-                                                            size: 20),
-                                                        SizedBox(width: 4),
-                                                        Text('Voeg foto toe'),
-                                                      ])),
-                                                ],
-                                              )
-                                          ],
-                                        ),
-                                      ))
-                                  .toList()))),
-                ]),
-          ),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    Visibility(
-                      visible: _currentStep > 0,
-                      child: Expanded(
-                        child: ElevatedButton(
-                          onPressed: () {
-                            setState(() {
-                              _currentStep--; // Verhoog de huidige stap
-                            });
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.neutral_50,
-                            foregroundColor: AppColors.primary,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 8),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: const BorderSide(
-                                    color: AppColors.primary, width: 2)),
-                            elevation: 0,
-                          ),
-                          child: Text('Vorige',
+                          if (question.value.type == 'star')
+                            RatingBar.builder(
+                                minRating: 1,
+                                direction: Axis.horizontal,
+                                allowHalfRating: true,
+                                itemCount: 5,
+                                itemPadding:
+                                    const EdgeInsets.symmetric(horizontal: 0),
+                                itemBuilder: (context, _) => const Icon(
+                                      Icons.star,
+                                      color: AppColors.primary,
+                                    ),
+                                onRatingUpdate: (rating) {
+                                  setState(() {
+                                    if (answers[question.key]["answers"].isEmpty) {
+                                      answers[question.key]["answers"].add(null);
+                                    }
+
+                                    answers[question.key]["answers"][0] =
+                                        rating.toString();
+                                  });
+                                }),
+                          if (question.value.type == 'text')
+                            TextFormField(
+                              onChanged: (String? value) {
+                                setState(() {
+                                  if (answers[question.key]["answers"].isEmpty) {
+                                    answers[question.key]["answers"].add(null);
+                                  }
+
+                                  answers[question.key]["answers"][0] = value;
+                                });
+                              },
+                              minLines: 3,
+                              maxLines: 5,
                               style: AppStyles.of(context)
                                   .data
                                   .textStyle
-                                  .buttonText),
-                        ),
+                                  .paragraph,
+                              decoration: InputDecoration(
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 8, horizontal: 8),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                                hintText: question.value.placeholder,
+                              ),
+                            ),
+                          if (question.value.type == 'file')
+                            Row(
+                              children: [
+                                if (image != null)
+                                  Row(children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        setState(() {
+                                          image = null;
+                                        });
+                                      },
+                                      child: Image(
+                                        image: FileImage(image!),
+                                        height: 45,
+                                        width: 45,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ]),
+                                ElevatedButton(
+                                    onPressed: () {
+                                      _showPickerDialog();
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: AppColors.neutral_50,
+                                      foregroundColor: AppColors.primary,
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 8),
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          side: const BorderSide(
+                                              color: AppColors.primary,
+                                              width: 2)),
+                                      elevation: 0,
+                                    ),
+                                    child: const Row(children: [
+                                      Icon(AppIcons.add, size: 20),
+                                      SizedBox(width: 4),
+                                      Text('Voeg foto toe'),
+                                    ])),
+                              ],
+                            ),
+                          Text(answers[question.key]["answers"].toString()),
+                        ],
                       ),
-                    ),
-                    Visibility(
-                      visible: _currentStep > 0,
-                      child: const SizedBox(
-                          width:
-                              16.0), // Space between buttons if 2nd button is visible
-                    ),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed:
-                            (_chosenAnimal.isNotEmpty && _currentStep == 0)
-                                ? () {
-                                    setState(() {
-                                      _currentStep++;
-                                    });
-                                  }
-                                : ((_currentStep == 1)
-                                    ? () {
-                                        _closeReport(false);
-                                      }
-                                    : null),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          elevation: 0,
-                        ),
-                        // onPressed: null,
-                        child: Text(_currentStep < 1 ? 'Volgende' : 'Opslaan',
-                            style: AppStyles.of(context)
-                                .data
-                                .textStyle
-                                .buttonText),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+                    ))
+                .toList()));
   }
 
   Future<void> _showPickerDialog() async {

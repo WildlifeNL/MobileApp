@@ -22,7 +22,7 @@ class _ReportModalState extends ConsumerState<ReportTypeModal> {
   Widget build(BuildContext context) {
     var interactionTypes = ref.watch(interactionTypesProvider);
 
-    if (interactionTypes.isLoading || interactionTypes.hasError) {
+    if (interactionTypes.isLoading || interactionTypes.hasError || !interactionTypes.hasValue) {
       return Container(
         decoration: ShapeDecoration(
           color: AppColors.neutral_50,
@@ -106,7 +106,7 @@ class _ReportModalState extends ConsumerState<ReportTypeModal> {
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        ReportPage(selectedType: _selectedType),
+                                        ReportPage(selectedType: interactionTypes.value!.firstWhere((element) => element.id == _selectedType)),
                                   ),
                                 );
                               }
