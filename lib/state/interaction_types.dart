@@ -8,7 +8,7 @@ part 'interaction_types.g.dart';
 class InteractionTypes extends _$InteractionTypes {
   @override
   Future<List<InteractionType>> build() async {
-    var response = await InteractionService.getInteractionTypes(accessToken: "");
+    var response = await InteractionService.getInteractionTypes(userId: "");
 
     if (response.isOk()) {
       return response();

@@ -13,6 +13,7 @@ import 'package:wildlife_nl_app/state/interaction_types.dart';
 import 'package:wildlife_nl_app/state/interactions.dart';
 import 'package:wildlife_nl_app/state/location.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
+import 'package:wildlife_nl_app/utilities/authentication.dart';
 import 'package:wildlife_nl_app/widgets/add_report/report_other_animal.dart';
 import 'package:wildlife_nl_app/widgets/map/map_marker.dart';
 import 'package:wildlife_nl_app/widgets/map/map_settings_modal.dart';
@@ -129,10 +130,12 @@ class _MapPageState extends ConsumerState<MapPage> {
 
   @override
   Widget build(BuildContext context) {
+    final authentication = Authentication.of(context);
+
     var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
     var settingState = ref.watch(settingsProvider);
-    var interactions = ref.watch(mapInteractionsProvider);
+    var interactions = ref.watch(mapInteractionsProvider(authentication.userId));
     var interactionTypes = ref.watch(interactionTypesProvider);
     var animals = ref.watch(animalTypesProvider);
 
