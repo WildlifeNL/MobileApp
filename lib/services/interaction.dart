@@ -12,7 +12,7 @@ class InteractionService {
       int page, int pageCount,
       {required String userId}) async {
     var response = await http.get(Uri.parse(
-        "${F.apiUrl}api/controllers/interactions.php?user_id=$userId&page=$page&count=$pageCount"));
+        "${F.apiUrl}api/controllers/interactions.php?userId=$userId&page=$page&count=$pageCount"));
 
     //Example validation
     if (response.statusCode != 200) {
@@ -35,7 +35,7 @@ class InteractionService {
       InteractionTypeKey type, int page, int pageCount,
       {required String userId}) async {
     var response = await http.get(Uri.parse(
-        "${F.apiUrl}api/controllers/interactions.php?type=${Casing.snakeCase(type.name)}&page=$page&count=$pageCount&user_id=$userId"));
+        "${F.apiUrl}api/controllers/interactions.php?type=${Casing.snakeCase(type.name)}&page=$page&count=$pageCount&userId=$userId"));
 
     //Example validation
     if (response.statusCode != 200) {
