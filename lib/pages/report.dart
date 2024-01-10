@@ -21,6 +21,7 @@ import 'package:wildlife_nl_app/state/questions.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
+import 'package:wildlife_nl_app/utilities/authentication.dart';
 import 'package:wildlife_nl_app/widgets/custom_stepper.dart';
 
 class ReportPage extends ConsumerStatefulWidget {
@@ -41,9 +42,9 @@ class _ReportPageState extends ConsumerState<ReportPage> {
 
   List<Map<String, dynamic>> answers = [];
 
-  Future _closeReport(forceClose) async {
+  Future _closeReport(bool forceClose, String userId) async {
     if (!forceClose) {
-      pushReportToApi().then((value) {
+      pushReportToApi(userId).then((value) {
         Navigator.of(context).pop();
       });
     } else {
@@ -66,13 +67,13 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     }
   }
 
-  Future<void> pushReportToApi() async {
+  Future<void> pushReportToApi(String userId) async {
     await _getUserLocation();
     //   Push to interactions db
     final String apiUrl = '${F.apiUrl}api/controllers/interactions.php';
 
     Map<String, Object?> report = {
-      'user_id': "0e6df1f1-400f-4e8d-8e69-16b1a55b400a",
+      'user_id': userId,
       'interaction_type': widget.selectedType.id,
       'lat': latitude,
       'lon': longitude,
@@ -143,6 +144,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     final interactionTypes = ref.watch(interactionTypesProvider);
     final questions = ref.watch(questionsProvider(widget.selectedType));
 
+    final authentication = Authentication.of(context);
+
     if (animals.isLoading ||
         animals.hasError ||
         interactionTypes.isLoading ||
@@ -167,7 +170,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                         onPressed: () {
-                          _closeReport(true);
+                          _closeReport(true, authentication.userId);
                         },
                         icon: const Icon(AppIcons.cross)),
                   ),
@@ -225,7 +228,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                     alignment: Alignment.centerRight,
                     child: IconButton(
                         onPressed: () {
-                          _closeReport(true);
+                          _closeReport(true, authentication.userId);
                         },
                         icon: const Icon(AppIcons.cross)),
                   ),
@@ -345,14 +348,14 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                               }
                             : ((_currentStep == 1)
                                 ? () {
-                                    _closeReport(false);
+                                    _closeReport(false, authentication.userId);
                                   }
                                 : null),
                       InteractionTypeKey.damage => () {
-                          _closeReport(false);
+                          _closeReport(false, authentication.userId);
                         },
                       InteractionTypeKey.inappropriateBehaviour => () {
-                          _closeReport(false);
+                          _closeReport(false, authentication.userId);
                         },
                       InteractionTypeKey.traffic =>
                         (_chosenAnimal.isNotEmpty && _currentStep == 0)
@@ -363,11 +366,11 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                               }
                             : ((_currentStep == 1)
                                 ? () {
-                                    _closeReport(false);
+                                    _closeReport(false, authentication.userId);
                                   }
                                 : null),
                       InteractionTypeKey.maintenance => () {
-                          _closeReport(false);
+                          _closeReport(false, authentication.userId);
                         },
                     },
                     style: ElevatedButton.styleFrom(
