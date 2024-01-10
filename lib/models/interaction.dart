@@ -26,9 +26,9 @@ class Interaction with _$Interaction {
     required String? animalId,
     required String? animalCountLower,
     required String? animalCountUpper,
-    @JsonKey(name: "juvenil_count_lower")
+    @JsonKey(name: "juvenil_animal_count_lower")
     required String? juvenileCountLower,
-    @JsonKey(name: "juvenil_count_upper")
+    @JsonKey(name: "juvenil_animal_count_upper")
     required String? juvenileCountUpper,
     required String? trafficEvent,
   }) = _Interaction;
