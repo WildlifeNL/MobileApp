@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -90,7 +91,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
               ? answers[1]["answers"][0]
               : null,
       "questions": answers
-          .skip(2)
+          .skip(widget.selectedType.typeKey == InteractionTypeKey.sighting ? 2 : 0)
           .map((answer) => {
                 "question_id": answer["id"],
                 "answer": jsonEncode(answer["answers"]),
@@ -124,7 +125,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     developer.log(report.toString());
   }
 
-  Future<void> pickImage(ImageSource source) async {
+  Future<void> pickImage(ImageSource source, key) async {
     final imagePicker = ImagePicker();
     try {
       final pickedFile = await imagePicker.pickImage(source: source);
@@ -135,6 +136,49 @@ class _ReportPageState extends ConsumerState<ReportPage> {
       }
     } catch (e) {
       developer.log('Error picking image: $e');
+    }
+
+    imageToUrl(image!, key);
+  }
+
+  Future<String?> imageToUrl(File image, key) async {
+    // Replace this key with your own API key
+    String apiKey = "795da2c1f5780b930d83ae17bf965afe";
+
+    // Create a multipart request
+    var request = http.MultipartRequest(
+      'POST',
+      Uri.parse('https://api.imgbb.com/1/upload'),
+    );
+
+    // Add the API key to the request
+    request.fields['key'] = apiKey;
+
+    // Add the image file to the request
+    var fileStream = http.ByteStream(image.openRead());
+    var length = await image.length();
+    request.files.add(http.MultipartFile(
+      'image',
+      fileStream,
+      length,
+      filename: Random().nextInt(1000).toString() + '.jpg',
+    ));
+
+    // Send the request
+    var response = await request.send();
+
+    // Read and decode the response
+    if (response.statusCode == 200) {
+      // Successful upload
+      var responseData = await response.stream.bytesToString();
+      // Parse the JSON response and get the display URL
+      var parsedData = json.decode(responseData);
+      var displayUrl = parsedData['data']['display_url'];
+      answers[key]["answers"] = displayUrl;
+    } else {
+      // Handle the error (e.g., print an error message)
+      print('Error uploading image: ${response.statusCode}');
+      return null;
     }
   }
 
@@ -188,8 +232,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     var index = 0;
 
     while (answers.length < questions.value!.length) {
-      if (widget.selectedType.typeKey == InteractionTypeKey.sighting ||
-          widget.selectedType.typeKey == InteractionTypeKey.traffic) {
+      if (widget.selectedType.typeKey == InteractionTypeKey.sighting) {
         if (index == 0) {
           answers.add({
             'answers': ["1"],
@@ -415,7 +458,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Wat is het dier?',
+            'Welk dier heb je gezien?',
             style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
                   color: AppColors.primary,
                 ),
@@ -557,7 +600,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                           const SizedBox(height: 4),
                           if (question.value.type == 'dropdown')
                             DropdownMenu<String>(
-                              width: question.key > 1
+                              width: question.value.questionOrder >= 1
                                   ? MediaQuery.of(context).size.width - 32
                                   : (MediaQuery.of(context).size.width / 2) -
                                       24,
@@ -597,7 +640,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                       EdgeInsets.symmetric(horizontal: 16)),
                               onSelected: (String? value) {
                                 setState(() {
-                                  answers[question.key]["answers"][0] = value;
+                                  answers[question.key]["answers"] = value;
                                 });
                               },
                               dropdownMenuEntries: question.value.specifications
@@ -681,7 +724,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                           .add(null);
                                     }
 
-                                    answers[question.key]["answers"][0] =
+                                    answers[question.key]["answers"] =
                                         rating.toString();
                                   });
                                 }),
@@ -694,7 +737,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     answers[question.key]["answers"].add(null);
                                   }
 
-                                  answers[question.key]["answers"][0] = value;
+                                  answers[question.key]["answers"] = value;
                                 });
                               },
                               minLines: 3,
@@ -737,7 +780,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                   ]),
                                 ElevatedButton(
                                     onPressed: () {
-                                      _showPickerDialog();
+                                      _showPickerDialog(question.key);
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: AppColors.neutral_50,
@@ -765,7 +808,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                 .toList()));
   }
 
-  Future<void> _showPickerDialog() async {
+  Future<void> _showPickerDialog(key) async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -789,7 +832,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    pickImage(ImageSource.gallery);
+                    pickImage(ImageSource.gallery, key);
                   },
                 ),
                 const SizedBox(height: 16),
@@ -805,7 +848,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                   ),
                   onTap: () {
                     Navigator.pop(context);
-                    pickImage(ImageSource.camera);
+                    pickImage(ImageSource.camera, key);
                   },
                 ),
               ],
