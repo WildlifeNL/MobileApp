@@ -1,14 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:hexcolor/hexcolor.dart';
-import 'package:wildlife_nl_app/models/interaction_type.dart';
-import 'package:wildlife_nl_app/pages/report.dart';
-import 'package:wildlife_nl_app/state/interaction_types.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
-import 'package:wildlife_nl_app/widgets/custom_infinite_grouped_list.dart';
 
 import '../../state/animal_types.dart';
 
@@ -21,7 +16,9 @@ class ReportOtherModal extends ConsumerStatefulWidget {
 
 class _ReportModalState extends ConsumerState<ReportOtherModal> {
   String textinput = '';
-  String Animal = '';
+  String animal = '';
+
+  String animalId = '';
 
   @override
   Widget build(BuildContext context) {
@@ -35,37 +32,36 @@ class _ReportModalState extends ConsumerState<ReportOtherModal> {
         .where((element) =>
             (textinput != '' &&
                 element.name.toLowerCase().contains(textinput.toLowerCase())) ||
-            element.name.toLowerCase() == Animal.toLowerCase())
+            element.name.toLowerCase() == animal.toLowerCase())
         .map(
-          (animal) => GestureDetector(
+          (currentAnimal) => GestureDetector(
               onTap: () {
                 FocusManager.instance.primaryFocus?.unfocus();
 
                 setState(() {
-                  Animal = animal.name;
+                  animal = currentAnimal.name;
+                  animalId = currentAnimal.id;
                 });
 
                 // Add to AddReport
               },
               child: Container(
+                padding: const EdgeInsets.all(8.0),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(4),
-                    border: Animal == animal.name
+                    borderRadius: BorderRadius.circular(4),
+                    border: animalId == currentAnimal.id
                         ? Border.all(color: AppColors.primary, width: 2)
                         : Border.all(color: Colors.transparent)),
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        child: Image.network(animal.image!),
-                      ),
-                      SizedBox(width: 16),
-                      Text(animal.name)
-                    ],
-                  ),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 50,
+                      height: 50,
+                      child: Image.network(currentAnimal.image!),
+                    ),
+                    const SizedBox(width: 16),
+                    Text(currentAnimal.name)
+                  ],
                 ),
               )),
         )
@@ -79,88 +75,89 @@ class _ReportModalState extends ConsumerState<ReportOtherModal> {
           side: BorderSide.none,
         ),
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Column(
-        children: [
-          Align(
-            alignment: Alignment.centerRight,
-            child: IconButton(
-              onPressed: () {
-                Navigator.pop(context);
-                textinput = '';
-              },
-              icon: const Icon(AppIcons.cross),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.only(bottom: 24),
-            child: Text(
-              'Anders, namelijk:',
-              textAlign: TextAlign.center,
-              style: AppStyles.of(context)
-                  .data
-                  .textStyle
-                  .headerMedium
-                  .copyWith(color: AppColors.primary),
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              TextField(
-                onChanged: (value) {
-                  setState(() {
-                    textinput = value;
-                  });
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8)
+          .copyWith(bottom: 16 + MediaQuery.of(context).viewInsets.bottom),
+      child: Center(
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerRight,
+              child: IconButton(
+                onPressed: () {
+                  Navigator.pop(context, null);
+                  textinput = '';
                 },
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Zoek een dier',
-                ),
+                icon: const Icon(AppIcons.cross),
               ),
-              const SizedBox(height: 32),
-              if (textinput != '' || Animal != '')
-                Container(
-                    width: double.maxFinite,
-                    constraints: BoxConstraints(maxHeight: 250),
-                    child: PrimaryScrollController(
-                      controller: myScrollWorks,
-                      child: CupertinoScrollbar(
-                        child: SingleChildScrollView(
-                          child: Wrap(
-                            spacing: 16,
-                            runSpacing: 16,
-                            children: stuff,
-                          ),
-                        ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 24),
+              child: Text(
+                'Anders, namelijk:',
+                textAlign: TextAlign.center,
+                style: AppStyles.of(context)
+                    .data
+                    .textStyle
+                    .headerMedium
+                    .copyWith(color: AppColors.primary),
+              ),
+            ),
+            TextField(
+              onChanged: (value) {
+                setState(() {
+                  textinput = value;
+                });
+              },
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                labelText: 'Zoek een dier',
+              ),
+            ),
+            const SizedBox(height: 32),
+            if (textinput != '' || animal != '')
+              Container(
+                  width: double.maxFinite,
+                  constraints: BoxConstraints(
+                      maxHeight:
+                          (stuff.length * 75).clamp(75, 200).toDouble()),
+                  child: PrimaryScrollController(
+                    controller: myScrollWorks,
+                    child: CupertinoScrollbar(
+                      child: ListView.builder(
+                        itemBuilder: (context, index) {
+                          return stuff[index];
+                        },
+                        itemCount: stuff.length,
                       ),
-                    )),
-              if (textinput != '' || Animal != '')
-              const SizedBox(height: 32),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
                     ),
-                    elevation: 0,
+                  )),
+            if (textinput != '' || animal != '') const SizedBox(height: 32),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context, animalId);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
                   ),
-                  // onPressed: null,
-                  child: Text('Volgende',
-                      style: AppStyles.of(context).data.textStyle.buttonText),
+                  elevation: 0,
                 ),
-              )
-            ],
-          ),
-        ],
+                // onPressed: null,
+                child: Text('Volgende',
+                    style: AppStyles.of(context).data.textStyle.buttonText),
+              ),
+            ),
+            const SizedBox(
+              height: 25,
+            )
+          ],
+        ),
       ),
     );
   }
