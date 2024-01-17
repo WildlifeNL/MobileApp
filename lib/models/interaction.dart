@@ -27,14 +27,39 @@ class Interaction with _$Interaction {
     required String? animalCountLower,
     required String? animalCountUpper,
     @JsonKey(name: "juvenil_animal_count_lower")
-    required String? juvenileCountLower,
+    required String? juvenileAnimalCountLower,
     @JsonKey(name: "juvenil_animal_count_upper")
-    required String? juvenileCountUpper,
+    required String? juvenileAnimalCountUpper,
     required String? trafficEvent,
+    required List<InteractionQuestion> questions,
   }) = _Interaction;
 
   factory Interaction.fromJson(Map<String, Object?> json) =>
       _$InteractionFromJson(json);
+}
+
+@freezed
+class InteractionQuestion with _$InteractionQuestion {
+  @JsonSerializable(fieldRename: FieldRename.snake)
+  const factory InteractionQuestion({
+    required String id,
+    required String questionId,
+    required String interactionId,
+    required String answer,
+  }) = _InteractionQuestion;
+
+  factory InteractionQuestion.fromJson(Map<String, Object?> json) =>
+      _$InteractionQuestionFromJson(json);
+}
+
+extension InteractionQuestionExtensions on InteractionQuestion {
+  List<T> getAnswers<T>() {
+    return (jsonDecode(answer) as List<dynamic>).cast<T>();
+  }
+
+  T? getAnswer<T>() {
+    return (jsonDecode(answer) as List<dynamic>).cast<T>().firstOrNull;
+  }
 }
 
 @JsonSerializable(fieldRename: FieldRename.snake)
