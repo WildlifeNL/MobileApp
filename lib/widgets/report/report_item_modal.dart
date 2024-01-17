@@ -1,13 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:wildlife_nl_app/models/animal.dart';
 import 'package:wildlife_nl_app/models/interaction.dart';
 import 'package:wildlife_nl_app/models/interaction_type.dart';
+import 'package:wildlife_nl_app/state/questions.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
+import 'dart:developer' as developer;
 
-class ReportItemModal extends StatelessWidget {
+class ReportItemModal extends ConsumerWidget {
   final Interaction interaction;
   final InteractionType type;
   final Animal? animal;
@@ -20,8 +23,10 @@ class ReportItemModal extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     var dateFormatter = intl.DateFormat.yMd().add_jm();
+
+    var questions = ref.watch(questionsProvider(type));
 
     return Container(
       padding: const EdgeInsets.only(bottom: 40.0),
@@ -134,9 +139,9 @@ class ReportItemModal extends StatelessWidget {
                 ],
               ),
             ),
-          if (interaction.juvenileCountUpper != null &&
-              interaction.juvenileCountUpper != "0" &&
-              interaction.juvenileCountUpper != '')
+          if (interaction.juvenileAnimalCountUpper != null &&
+              interaction.juvenileAnimalCountUpper != "0" &&
+              interaction.juvenileAnimalCountUpper != '')
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Row(
@@ -148,7 +153,7 @@ class ReportItemModal extends StatelessWidget {
                         fontWeight: FontWeight.bold),
                   ),
                   const Spacer(),
-                  Text(interaction.juvenileCountUpper!),
+                  Text(interaction.juvenileAnimalCountUpper!),
                 ],
               ),
             ),
@@ -203,7 +208,24 @@ class ReportItemModal extends StatelessWidget {
                       child: Image.network(interaction.image!)),
                 ],
               ),
-            )
+            ),
+          if(!questions.hasError && questions.hasValue)
+            for(var item in interaction.questions)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      questions.value?.where((element) => element.id == item.questionId).firstOrNull?.question??"",
+                      style: TextStyle(
+                          color: HexColor(type.color),
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(interaction.questions.where((x) => x.id == item.id).firstOrNull?.getAnswers<String>().join(", ")??""),
+                  ],
+                ),
+              ),
         ]),
       ),
     );

@@ -14,7 +14,7 @@ import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
-import 'package:wildlife_nl_app/widgets/report_item_modal.dart';
+import 'package:wildlife_nl_app/widgets/report/report_item_modal.dart';
 
 class ActivityItemCard extends ConsumerWidget {
   const ActivityItemCard({
