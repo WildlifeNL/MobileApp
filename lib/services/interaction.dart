@@ -8,34 +8,11 @@ import 'package:wildlife_nl_app/models/interaction.dart';
 import 'package:wildlife_nl_app/models/interaction_type.dart';
 
 class InteractionService {
-  static Future<Result<PaginatedInteractions, String>> getInteractionsByUserId(
-      String userId, int page, int pageCount,
-      {required String accessToken}) async {
-    var response = await http.get(Uri.parse(
-        "${F.apiUrl}api/controllers/interactions.php?userId=$userId&page=$page&count=$pageCount"));
-
-    //Example validation
-    if (response.statusCode != 200) {
-      return Err("HTTP status code was not 200: ${response.body}");
-    }
-
-    return Ok(PaginatedInteractions.fromJson(response.body));
-  }
-
-  // static Future<Result<PaginatedInteractions, String>> getInteractions(
-  //     int page, int pageCount,
-  //     {required String accessToken}) async {
-  //
-  //   return Ok(PaginatedInteractions(results: [
-  //
-  //   ], meta: PaginatedMeta(nextPageUrl: null, lastPageUrl: null)));
-  // }
-
   static Future<Result<PaginatedInteractions, String>> getInteractions(
       int page, int pageCount,
-      {required String accessToken}) async {
+      {required String userId}) async {
     var response = await http.get(Uri.parse(
-        "${F.apiUrl}api/controllers/interactions.php?page=$page&count=$pageCount"));
+        "${F.apiUrl}api/controllers/interactions.php?userId=$userId&page=$page&count=$pageCount"));
 
     //Example validation
     if (response.statusCode != 200) {
@@ -56,9 +33,9 @@ class InteractionService {
 
   static Future<Result<PaginatedInteractions, String>> getInteractionsByType(
       InteractionTypeKey type, int page, int pageCount,
-      {required String accessToken}) async {
+      {required String userId}) async {
     var response = await http.get(Uri.parse(
-        "${F.apiUrl}api/controllers/interactions.php?type=${Casing.snakeCase(type.name)}&page=$page&count=$pageCount"));
+        "${F.apiUrl}api/controllers/interactions.php?type=${Casing.snakeCase(type.name)}&page=$page&count=$pageCount&userId=$userId"));
 
     //Example validation
     if (response.statusCode != 200) {
@@ -68,7 +45,7 @@ class InteractionService {
     return Ok(PaginatedInteractions.fromJson(response.body));
   }
 
-  static Future<Result<List<InteractionType>, String>> getInteractionTypes({required String accessToken}) async {
+  static Future<Result<List<InteractionType>, String>> getInteractionTypes({required String userId}) async {
     var response = await http.get(Uri.parse(
         "${F.apiUrl}api/controllers/interactions.php/types"));
 

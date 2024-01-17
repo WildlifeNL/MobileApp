@@ -8,6 +8,7 @@ import 'package:wildlife_nl_app/state/animal_types.dart';
 import 'package:wildlife_nl_app/state/interaction_types.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
+import 'package:wildlife_nl_app/utilities/authentication.dart';
 import 'package:wildlife_nl_app/utilities/hex_color.dart';
 import 'package:wildlife_nl_app/widgets/custom_infinite_grouped_list.dart';
 import 'package:wildlife_nl_app/widgets/report/report_filter_chips.dart';
@@ -43,13 +44,13 @@ class _ReportListState extends ConsumerState<ReportList> {
     super.initState();
   }
 
-  Future<List<Interaction>> onLoadMore(int page) async {
+  Future<List<Interaction>> onLoadMore(int page, {required String userId}) async {
     if (widget.type != null) {
       var response = await InteractionService.getInteractionsByType(
         widget.type!,
         page,
         15,
-        accessToken: "",
+        userId: userId,
       );
 
       if (response.isOk()) {
@@ -59,7 +60,7 @@ class _ReportListState extends ConsumerState<ReportList> {
       }
     } else {
       var response =
-          await InteractionService.getInteractions(page, 15, accessToken: "");
+          await InteractionService.getInteractions(page, 15, userId: userId);
 
       if (response.isOk()) {
         return response().results;
@@ -73,6 +74,7 @@ class _ReportListState extends ConsumerState<ReportList> {
   Widget build(BuildContext context) {
     var interactionTypes = ref.watch(interactionTypesProvider);
     var animals = ref.watch(animalTypesProvider);
+    final authentication = Authentication.of(context);
 
     if (interactionTypes.isLoading || animals.isLoading) {
       return const Center(child: CircularProgressIndicator());
@@ -125,7 +127,7 @@ class _ReportListState extends ConsumerState<ReportList> {
             animal: animal,
           );
         },
-        onLoadMore: (info) async => await onLoadMore(info.page),
+        onLoadMore: (info) async => await onLoadMore(info.page, userId: authentication.userId),
         loadMoreItemsErrorWidget: (lol) => const Padding(
           padding: EdgeInsets.zero,
         ),

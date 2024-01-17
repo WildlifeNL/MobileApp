@@ -25,12 +25,12 @@ class InteractionState with _$InteractionState {
 @riverpod
 class Interactions extends _$Interactions {
   @override
-  Future<InteractionState> build(InteractionType? activityType) async {
+  Future<InteractionState> build(InteractionType? activityType, String userId) async {
     Result<PaginatedInteractions, String> response;
     if(activityType != null){
-      response = await InteractionService.getInteractionsByType(activityType.typeKey,1, 10, accessToken: "");
+      response = await InteractionService.getInteractionsByType(activityType.typeKey,1, 10, userId: userId);
     } else {
-      response = await InteractionService.getInteractions(1, 10, accessToken: "");
+      response = await InteractionService.getInteractions(1, 10, userId: userId);
     }
 
     if (response.isOk()) {
@@ -51,11 +51,14 @@ class Interactions extends _$Interactions {
         state.requireValue.isLoadingNewPage ||
         !state.requireValue.hasNextPage) return;
     state = AsyncData(state.value!.copyWith(isLoadingNewPage: true));
-    var response = await InteractionService.getInteractions(
-      state.requireValue.currentPage + 1,
-      10,
-      accessToken: "",
-    );
+
+    Result<PaginatedInteractions, String> response;
+
+    if(activityType != null){
+      response = await InteractionService.getInteractionsByType(activityType!.typeKey,1, 10, userId: userId);
+    } else {
+      response = await InteractionService.getInteractions(1, 10, userId: userId);
+    }
 
     if (response.isOk()) {
       var paginatedInteractions = response.unwrap();
@@ -79,9 +82,9 @@ class Interactions extends _$Interactions {
 @riverpod
 class MapInteractions extends _$MapInteractions {
   @override
-  Future<InteractionState> build() async {
+  Future<InteractionState> build(String userId) async {
     Result<PaginatedInteractions, String> response;
-    response = await InteractionService.getInteractions(1, 9999, accessToken: "");
+    response = await InteractionService.getInteractions(1, 9999, userId: userId);
 
     if (response.isOk()) {
       var paginatedInteractions = response.unwrap();
