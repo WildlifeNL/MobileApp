@@ -21,8 +21,8 @@ import 'package:wildlife_nl_app/state/questions.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
-import 'package:wildlife_nl_app/widgets/add_report/report_other_animal.dart';
 import 'package:wildlife_nl_app/utilities/authentication.dart';
+import 'package:wildlife_nl_app/widgets/add_report/report_other_animal.dart';
 import 'package:wildlife_nl_app/widgets/custom_stepper.dart';
 
 class ReportPage extends ConsumerStatefulWidget {
@@ -176,7 +176,10 @@ class _ReportPageState extends ConsumerState<ReportPage> {
       // Parse the JSON response and get the display URL
       var parsedData = json.decode(responseData);
       var displayUrl = parsedData['data']['display_url'];
-      answers[key]["answers"] = displayUrl;
+      if (answers[key]["answers"].isEmpty) {
+        answers[key]["answers"].add(null);
+      }
+      answers[key]["answers"][0] = displayUrl;
     } else {
       // Handle the error (e.g., print an error message)
       print('Error uploading image: ${response.statusCode}');
@@ -306,7 +309,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
+                        content:
+                            pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -318,24 +322,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: evaluationQuestions(questions)),
               InteractionTypeKey.inappropriateBehaviour => CustomStepper(
-                  elevation: 0,
-                  currentStep: _currentStep,
-                  controlsBuilder: (context, details) => const Text(""),
-                  steps: [
-                    CustomStep(
-                      state: _currentStep < 0
-                          ? CustomStepState.indexed
-                          : (_currentStep > 0
-                          ? CustomStepState.complete
-                          : CustomStepState.editing),
-                      content: pickAnimalStep(animals, 'Bij welk dier is er iets gebeurd?'),
-                    ),
-                    CustomStep(
-                        state: _currentStep >= 1
-                            ? CustomStepState.editing
-                            : CustomStepState.indexed,
-                        content: evaluationQuestions(questions)),
-                  ]),
+                    elevation: 0,
+                    currentStep: _currentStep,
+                    controlsBuilder: (context, details) => const Text(""),
+                    steps: [
+                      CustomStep(
+                        state: _currentStep < 0
+                            ? CustomStepState.indexed
+                            : (_currentStep > 0
+                                ? CustomStepState.complete
+                                : CustomStepState.editing),
+                        content: pickAnimalStep(
+                            animals, 'Bij welk dier is er iets gebeurd?'),
+                      ),
+                      CustomStep(
+                          state: _currentStep >= 1
+                              ? CustomStepState.editing
+                              : CustomStepState.indexed,
+                          content: evaluationQuestions(questions)),
+                    ]),
               InteractionTypeKey.traffic => CustomStepper(
                     elevation: 0,
                     currentStep: _currentStep,
@@ -347,7 +352,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
+                        content:
+                            pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -416,17 +422,17 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                           _closeReport(false, authentication.userId);
                         },
                       InteractionTypeKey.inappropriateBehaviour =>
-                      (_chosenAnimal.isNotEmpty && _currentStep == 0)
-                          ? () {
-                        setState(() {
-                          _currentStep++;
-                        });
-                      }
-                          : ((_currentStep == 1)
-                          ? () {
-                        _closeReport(false, authentication.userId);
-                      }
-                          : null),
+                        (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                            ? () {
+                                setState(() {
+                                  _currentStep++;
+                                });
+                              }
+                            : ((_currentStep == 1)
+                                ? () {
+                                    _closeReport(false, authentication.userId);
+                                  }
+                                : null),
                       InteractionTypeKey.traffic =>
                         (_chosenAnimal.isNotEmpty && _currentStep == 0)
                             ? () {
@@ -588,7 +594,8 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                               context: context,
                               isScrollControlled: true,
                               builder: (BuildContext context) {
-                                return const Wrap(children: [ReportOtherModal()]);
+                                return const Wrap(
+                                    children: [ReportOtherModal()]);
                               });
 
                           if (animal != null) {
@@ -685,7 +692,11 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                       EdgeInsets.symmetric(horizontal: 16)),
                               onSelected: (String? value) {
                                 setState(() {
-                                  answers[question.key]["answers"] = value;
+                                  if (answers[question.key]["answers"]
+                                      .isEmpty) {
+                                    answers[question.key]["answers"].add(null);
+                                  }
+                                  answers[question.key]["answers"][0] = value;
                                 });
                               },
                               dropdownMenuEntries: question.value.specifications
@@ -769,7 +780,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                           .add(null);
                                     }
 
-                                    answers[question.key]["answers"] =
+                                    answers[question.key]["answers"][0] =
                                         rating.toString();
                                   });
                                 }),
@@ -782,7 +793,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                                     answers[question.key]["answers"].add(null);
                                   }
 
-                                  answers[question.key]["answers"] = value;
+                                  answers[question.key]["answers"][0] = value;
                                 });
                               },
                               minLines: 3,
