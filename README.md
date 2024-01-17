@@ -46,14 +46,7 @@ lib/           # Source code
 test/          # Tests
 ```
 
-If anything is found that doesn't fit in these bounds, just create the code and it it processed during Review.
-
 For State management Riverpod is used, we use the Riverpod annotations to automatically generate our Riverpod providers for us.
-
-For localization we use l10n, for this you need an Android Studio (possibly also available for VSCode) plugin called Flutter Intl.
-
-Also recommended are the following plugins for Android Studio: Flutter snippets and Flutter Riverpod snippets, for these plugins there probably exist an equivalent VSCode version.
-
 
 ## How to run this project locally
 
