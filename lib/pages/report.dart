@@ -303,7 +303,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals),
+                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -314,9 +314,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
               InteractionTypeKey.damage => Container(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: evaluationQuestions(questions)),
-              InteractionTypeKey.inappropriateBehaviour => Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: evaluationQuestions(questions)),
+              InteractionTypeKey.inappropriateBehaviour => CustomStepper(
+                  elevation: 0,
+                  currentStep: _currentStep,
+                  controlsBuilder: (context, details) => const Text(""),
+                  steps: [
+                    CustomStep(
+                      state: _currentStep < 0
+                          ? CustomStepState.indexed
+                          : (_currentStep > 0
+                          ? CustomStepState.complete
+                          : CustomStepState.editing),
+                      content: pickAnimalStep(animals, 'Bij welk dier is er iets gebeurd?'),
+                    ),
+                    CustomStep(
+                        state: _currentStep >= 1
+                            ? CustomStepState.editing
+                            : CustomStepState.indexed,
+                        content: evaluationQuestions(questions)),
+                  ]),
               InteractionTypeKey.traffic => CustomStepper(
                     elevation: 0,
                     currentStep: _currentStep,
@@ -328,7 +344,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals),
+                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -396,9 +412,18 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                       InteractionTypeKey.damage => () {
                           _closeReport(false);
                         },
-                      InteractionTypeKey.inappropriateBehaviour => () {
-                          _closeReport(false);
-                        },
+                      InteractionTypeKey.inappropriateBehaviour =>
+                      (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                          ? () {
+                        setState(() {
+                          _currentStep++;
+                        });
+                      }
+                          : ((_currentStep == 1)
+                          ? () {
+                        _closeReport(false);
+                      }
+                          : null),
                       InteractionTypeKey.traffic =>
                         (_chosenAnimal.isNotEmpty && _currentStep == 0)
                             ? () {
@@ -432,7 +457,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.damage => "Opslaan",
                           InteractionTypeKey.inappropriateBehaviour =>
-                            "Opslaan",
+                            _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.traffic =>
                             _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.maintenance => "Opslaan",
@@ -448,7 +473,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     );
   }
 
-  Widget pickAnimalStep(animals) {
+  Widget pickAnimalStep(animals, animalQuestion) {
     return SizedBox(
       width: double.maxFinite,
       child: Column(
@@ -457,7 +482,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welk dier heb je gezien?',
+            animalQuestion,
             style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
                   color: AppColors.primary,
                 ),
