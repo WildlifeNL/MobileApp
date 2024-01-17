@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -22,6 +21,7 @@ import 'package:wildlife_nl_app/state/questions.dart';
 import 'package:wildlife_nl_app/utilities/app_colors.dart';
 import 'package:wildlife_nl_app/utilities/app_icons.dart';
 import 'package:wildlife_nl_app/utilities/app_styles.dart';
+import 'package:wildlife_nl_app/widgets/add_report/report_other_animal.dart';
 import 'package:wildlife_nl_app/utilities/authentication.dart';
 import 'package:wildlife_nl_app/widgets/custom_stepper.dart';
 
@@ -91,7 +91,9 @@ class _ReportPageState extends ConsumerState<ReportPage> {
               ? answers[1]["answers"][0]
               : null,
       "questions": answers
-          .skip(widget.selectedType.typeKey == InteractionTypeKey.sighting ? 2 : 0)
+          .skip(widget.selectedType.typeKey == InteractionTypeKey.sighting
+              ? 2
+              : 0)
           .map((answer) => {
                 "question_id": answer["id"],
                 "answer": jsonEncode(answer["answers"]),
@@ -304,7 +306,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals),
+                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -315,9 +317,25 @@ class _ReportPageState extends ConsumerState<ReportPage> {
               InteractionTypeKey.damage => Container(
                   padding: EdgeInsets.symmetric(horizontal: 16),
                   child: evaluationQuestions(questions)),
-              InteractionTypeKey.inappropriateBehaviour => Container(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: evaluationQuestions(questions)),
+              InteractionTypeKey.inappropriateBehaviour => CustomStepper(
+                  elevation: 0,
+                  currentStep: _currentStep,
+                  controlsBuilder: (context, details) => const Text(""),
+                  steps: [
+                    CustomStep(
+                      state: _currentStep < 0
+                          ? CustomStepState.indexed
+                          : (_currentStep > 0
+                          ? CustomStepState.complete
+                          : CustomStepState.editing),
+                      content: pickAnimalStep(animals, 'Bij welk dier is er iets gebeurd?'),
+                    ),
+                    CustomStep(
+                        state: _currentStep >= 1
+                            ? CustomStepState.editing
+                            : CustomStepState.indexed,
+                        content: evaluationQuestions(questions)),
+                  ]),
               InteractionTypeKey.traffic => CustomStepper(
                     elevation: 0,
                     currentStep: _currentStep,
@@ -329,7 +347,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             : (_currentStep > 0
                                 ? CustomStepState.complete
                                 : CustomStepState.editing),
-                        content: pickAnimalStep(animals),
+                        content: pickAnimalStep(animals, 'Welk dier heb je gezien?'),
                       ),
                       CustomStep(
                           state: _currentStep >= 1
@@ -397,9 +415,18 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                       InteractionTypeKey.damage => () {
                           _closeReport(false, authentication.userId);
                         },
-                      InteractionTypeKey.inappropriateBehaviour => () {
-                          _closeReport(false, authentication.userId);
-                        },
+                      InteractionTypeKey.inappropriateBehaviour =>
+                      (_chosenAnimal.isNotEmpty && _currentStep == 0)
+                          ? () {
+                        setState(() {
+                          _currentStep++;
+                        });
+                      }
+                          : ((_currentStep == 1)
+                          ? () {
+                        _closeReport(false, authentication.userId);
+                      }
+                          : null),
                       InteractionTypeKey.traffic =>
                         (_chosenAnimal.isNotEmpty && _currentStep == 0)
                             ? () {
@@ -433,7 +460,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                             _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.damage => "Opslaan",
                           InteractionTypeKey.inappropriateBehaviour =>
-                            "Opslaan",
+                            _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.traffic =>
                             _currentStep < 1 ? 'Volgende' : 'Opslaan',
                           InteractionTypeKey.maintenance => "Opslaan",
@@ -449,7 +476,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
     );
   }
 
-  Widget pickAnimalStep(animals) {
+  Widget pickAnimalStep(animals, animalQuestion) {
     return SizedBox(
       width: double.maxFinite,
       child: Column(
@@ -458,7 +485,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Welk dier heb je gezien?',
+            animalQuestion,
             style: AppStyles.of(context).data.textStyle.cardTitle.copyWith(
                   color: AppColors.primary,
                 ),
@@ -542,24 +569,42 @@ class _ReportPageState extends ConsumerState<ReportPage> {
             padding: const EdgeInsets.symmetric(vertical: 24),
             child: Column(
               children: [
-                TextFormField(
-                  onChanged: (value) {
-                    setState(() {
-                      _chosenAnimal = value;
-                    });
-                  },
-                  style: AppStyles.of(context).data.textStyle.paragraph,
-                  decoration: InputDecoration(
-                    contentPadding:
-                        const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
-                    filled: true,
-                    fillColor: Colors.white,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          elevation: 0,
+                        ),
+                        onPressed: () async {
+                          String? animal = await showModalBottomSheet(
+                              context: context,
+                              isScrollControlled: true,
+                              builder: (BuildContext context) {
+                                return const Wrap(children: [ReportOtherModal()]);
+                              });
+
+                          if (animal != null) {
+                            setState(() {
+                              _chosenAnimal = animal;
+                            });
+                          }
+                        },
+                        child: Text(
+                          "Anders, namelijk",
+                          style:
+                              AppStyles.of(context).data.textStyle.buttonText,
+                        ),
+                      ),
                     ),
-                    hintText: 'Anders, namelijk:',
-                  ),
+                  ],
                 ),
               ],
             ),
