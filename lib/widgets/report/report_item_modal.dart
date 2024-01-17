@@ -210,7 +210,7 @@ class ReportItemModal extends ConsumerWidget {
               ),
             ),
           if(!questions.hasError && questions.hasValue)
-            for(var item in interaction.questions)
+            for(var item in interaction.questions.where((x) => !questions.value!.any((y) => y.type == "file" && y.id == x.questionId)))
               Padding(
                 padding: const EdgeInsets.only(bottom: 16),
                 child: Column(
@@ -222,7 +222,7 @@ class ReportItemModal extends ConsumerWidget {
                           color: HexColor(type.color),
                           fontWeight: FontWeight.bold),
                     ),
-                    Text(interaction.questions.where((x) => x.id == item.id).firstOrNull?.getAnswers<String>().join(", ")??""),
+                    Text(interaction.questions.where((x) => x.id == item.id).firstOrNull?.getAnswers<String>().join(", ")??"Geen antwoord gegeven"),
                   ],
                 ),
               ),
