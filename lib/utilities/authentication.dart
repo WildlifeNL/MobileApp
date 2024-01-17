@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:localstorage/localstorage.dart';
 import 'package:uuid/uuid.dart';
+import 'package:wildlife_nl_app/flavors.dart';
 
 class Authentication extends InheritedWidget {
   const Authentication({
@@ -31,10 +35,37 @@ class AuthenticationData {
   AuthenticationData({required this.userId});
 }
 
-class AuthenticationProvider extends StatelessWidget {
+class AuthenticationProvider extends StatefulWidget {
   final Widget child;
 
   const AuthenticationProvider({super.key, required this.child});
+
+  @override
+  State<AuthenticationProvider> createState() => _AuthenticationProviderState();
+}
+
+class _AuthenticationProviderState extends State<AuthenticationProvider> {
+  bool hasAddedUser = false;
+
+  void addNewUser(String userId) async {
+    final String apiUrl = '${F.apiUrl}api/controllers/users.php';
+
+    Map<String, Object?> report = {
+      'Id': userId,
+      'Role': "43510ba1-89f2-11ee-919a-1e0034001676",
+    };
+
+    String jsonData = jsonEncode(report);
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        body: jsonData,
+      );
+    } catch (error) {
+      //
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -52,9 +83,13 @@ class AuthenticationProvider extends StatelessWidget {
             storage.setItem("user_id", userId);
           }
 
+          if (!hasAddedUser) {
+            addNewUser(userId);
+          }
+
           return Authentication(
             data: AuthenticationData(userId: userId),
-            child: child,
+            child: widget.child,
           );
         } else {
           return const Center(child: CircularProgressIndicator());
