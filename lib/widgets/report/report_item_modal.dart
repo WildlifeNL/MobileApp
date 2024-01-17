@@ -222,7 +222,7 @@ class ReportItemModal extends ConsumerWidget {
                           color: HexColor(type.color),
                           fontWeight: FontWeight.bold),
                     ),
-                    Text(interaction.questions.where((x) => x.id == item.id).firstOrNull?.getAnswers<String>().join(", ")??"Geen antwoord gegeven"),
+                    Text(interaction.questions.where((x) => x.id == item.id).firstOrNull?.getAnswers(isModal: true).join(", ")??"Geen antwoord gegeven"),
                   ],
                 ),
               ),

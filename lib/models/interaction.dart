@@ -53,12 +53,19 @@ class InteractionQuestion with _$InteractionQuestion {
 }
 
 extension InteractionQuestionExtensions on InteractionQuestion {
-  List<T> getAnswers<T>() {
-    return (jsonDecode(answer) as List<dynamic>).cast<T>();
+  List<String> getAnswers({bool isModal=false}) {
+    var answers = (jsonDecode(answer) as List<dynamic>).cast<String>();
+
+    if(answers.isEmpty && isModal){
+      answers.add("Geen antwoord gegeven");
+    }
+
+    return answers;
   }
 
-  T? getAnswer<T>() {
-    return (jsonDecode(answer) as List<dynamic>).cast<T>().firstOrNull;
+  String? getAnswer({bool isModal=false}) {
+    var newAnswer = (jsonDecode(answer) as List<dynamic>).cast<String>().firstOrNull;
+    return isModal ? newAnswer ?? "Geen antwoord gegeven" : newAnswer;
   }
 }
 
