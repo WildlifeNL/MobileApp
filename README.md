@@ -48,10 +48,37 @@ test/          # Tests
 
 For State management Riverpod is used, we use the Riverpod annotations to automatically generate our Riverpod providers for us.
 
+## Revert back to vector tilemap
+
+Set the variable "mapURL" in ``MobileApp\lib\pages\map.dart``  to a MapBox style URL or an alternative URL of a vector tile map.
+
+Also uncomment all code that is related to this in the map.dart. Also comment the TileLayer with OSM inside.
+
+## Flutter Beta track
+
+It might be that you still get errors when trying to build the project even after following the steps below.
+
+Then you need to switch to the flutter beta track with ``flutter channel beta``
+
+Then you need to do a flutter upgrade to update flutter and then it should all work.
+
 ## How to run this project locally
 
-1. Set the variable "mapURL" in ``MobileApp\lib\pages\map.dart``  to a MapBox style URL or an alternative URL of a vector tile map.
-2. Install Dependencies:
+1. Install Dependencies:
 Navigate to the project directory and ``run flutter pub get`` to install the required dependencies.
-3. Build the project with ``dart run build_runner build``
-4. Run the app with the run-button in Android-studio
+2. Generate the auto generated code with ``dart run build_runner build``
+3. Run the app with the run-button (main_prod, main_dev)  in Android-studio or with ``flutter run --flavor dev`` or ``flutter run --flavor prod``
+
+## Build the project apk
+
+1. Install Dependencies:
+   Navigate to the project directory and ``run flutter pub get`` to install the required dependencies.
+2. Generate the auto generated code with ``dart run build_runner build``
+3. Build the apk with ``flutter build apk --flavor prod``
+
+## Build the project iOS app
+
+1. Install Dependencies:
+   Navigate to the project directory and ``run flutter pub get`` to install the required dependencies.
+2. Generate the auto generated code with ``dart run build_runner build``
+3. Run the app with the run-button (main_prod) in Android-studio or with ``flutter run --flavor prod``
