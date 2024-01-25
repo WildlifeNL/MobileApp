@@ -24,18 +24,18 @@ part 'map.freezed.dart';
 
 part 'map.g.dart';
 
-String mapURL =
-    'https://api.mapbox.com/styles/v1/daankleinen/clq51lfjn004901pq4k3p320o?access_token=pk.eyJ1IjoiZGFhbmtsZWluZW4iLCJhIjoiY2t4MzFwMTJxMGo2bTJ1bzFncjV6YmJ6ayJ9.FY0BF_wgag5wFw-2dWSLGQ';
+// String mapURL =
+//     'https://api.mapbox.com/styles/v1/daankleinen/clq51lfjn004901pq4k3p320o?access_token=pk.eyJ1IjoiZGFhbmtsZWluZW4iLCJhIjoiY2t4MzFwMTJxMGo2bTJ1bzFncjV6YmJ6ayJ9.FY0BF_wgag5wFw-2dWSLGQ';
 
-@Riverpod(keepAlive: true)
-class MapStyle extends _$MapStyle {
-  @override
-  Future<Style> build() async {
-    return await StyleReader(
-      uri: mapURL,
-    ).read();
-  }
-}
+// @Riverpod(keepAlive: true)
+// class MapStyle extends _$MapStyle {
+//   @override
+//   Future<Style> build() async {
+//     return await StyleReader(
+//       uri: mapURL,
+//     ).read();
+//   }
+// }
 
 @riverpod
 class Settings extends _$Settings {
@@ -119,7 +119,7 @@ enum MapType {
 }
 
 class MapPage extends ConsumerStatefulWidget {
-  MapPage({super.key});
+  const MapPage({super.key});
 
   @override
   ConsumerState<MapPage> createState() => _MapPageState();
@@ -132,19 +132,19 @@ class _MapPageState extends ConsumerState<MapPage> {
   Widget build(BuildContext context) {
     final authentication = Authentication.of(context);
 
-    var style = ref.watch(mapStyleProvider);
+    // var style = ref.watch(mapStyleProvider);
     var location = ref.watch(currentLocationProvider);
     var settingState = ref.watch(settingsProvider);
     var interactions = ref.watch(mapInteractionsProvider(authentication.userId));
     var interactionTypes = ref.watch(interactionTypesProvider);
     var animals = ref.watch(animalTypesProvider);
 
-    if (style.isLoading ||
-        location.isLoading ||
+    if (location.isLoading ||
+        // style.isLoading ||
         interactionTypes.isLoading ||
         animals.isLoading ||
         interactions.isLoading ||
-        style.hasError ||
+        // style.hasError ||
         location.hasError ||
         interactionTypes.hasError ||
         animals.hasError ||
@@ -201,13 +201,16 @@ class _MapPageState extends ConsumerState<MapPage> {
                   InteractiveFlag.pinchZoom |
                   InteractiveFlag.doubleTapZoom),
           children: [
-            // normally you would see TileLayer which provides raster tiles
-            // instead this vector tile layer replaces the standard tile layer
-            VectorTileLayer(
-                theme: style.value!.theme,
-                sprites: style.value!.sprites,
-                tileOffset: TileOffset.mapbox,
-                tileProviders: style.value!.providers),
+            TileLayer(
+              urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+              userAgentPackageName: 'nl.wildlifenl',
+            ),
+            // Old mapbox tileset
+            // VectorTileLayer(
+            //     theme: style.value!.theme,
+            //     sprites: style.value!.sprites,
+            //     tileOffset: TileOffset.mapbox,
+            //     tileProviders: style.value!.providers),
             CurrentLocationLayer(
               turnOnHeadingUpdate: TurnOnHeadingUpdate.never,
               style: const LocationMarkerStyle(
