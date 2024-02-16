@@ -622,7 +622,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
   }
 
   Widget evaluationQuestions(AsyncValue<List<Question>> questions) {
-    return Container(
+    return SingleChildScrollView(child: Container(
         padding: const EdgeInsets.only(top: 4),
         width: double.maxFinite,
         child: Wrap(
@@ -861,7 +861,7 @@ class _ReportPageState extends ConsumerState<ReportPage> {
                         ],
                       ),
                     ))
-                .toList()));
+                .toList())));
   }
 
   Future<void> _showPickerDialog(key) async {
